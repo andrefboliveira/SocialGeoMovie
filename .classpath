@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="SocialGeoMovie/src"/>
+	<classpathentry kind="src" path="OpenSubs"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
+		<attributes>
+			<attribute name="owner.project.facets" value="java"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
+	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="lib" path="C:/Users/r.vallejo/Desktop/jars/ant-1.9.7.jar"/>
+	<classpathentry kind="lib" path="C:/Users/r.vallejo/Desktop/jars/ant-launcher-1.9.7.jar"/>
+	<classpathentry kind="lib" path="C:/Users/r.vallejo/Desktop/jars/bsh-2.0b4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/r.vallejo/Desktop/jars/jcommander-1.48.jar"/>
+	<classpathentry kind="lib" path="C:/Users/r.vallejo/Desktop/jars/junit-3.8.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/r.vallejo/Desktop/jars/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="lib" path="C:/Users/r.vallejo/Desktop/jars/slf4j-simple-1.7.25.jar"/>
+	<classpathentry kind="lib" path="C:/Users/r.vallejo/Desktop/jars/testng-6.9.13.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/r.vallejo/Desktop/jars/ws-commons-util-1.0.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/r.vallejo/Desktop/jars/xmlrpc-client-3.1.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/r.vallejo/Desktop/jars/xmlrpc-common-3.1.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/r.vallejo/Desktop/rv/apache-tomee-plume-7.0.3/lib/javaee-api-7.0-1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
