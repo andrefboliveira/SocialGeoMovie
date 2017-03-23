@@ -2,7 +2,6 @@
     <wb-module deploy-name="aw2017">
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/SocialGeoMovie/src"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/OpenSubs"/>
         <property name="context-root" value="aw2017"/>
         <property name="java-output-path" value="/aw2017/bin"/>
     </wb-module>
