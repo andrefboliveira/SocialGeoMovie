@@ -9,16 +9,29 @@ import com.github.wtekiela.opensub4j.impl.OpenSubtitlesImpl;
 
 public class OpenSubsClient {
 	
-	private static String URL = "http://api.opensubtitles.org:80/xml-rpc"; 
-	private static String UA = "OSTestUserAgentTemp";
-	private static String LANG = "en";
+	private String URL = "http://api.opensubtitles.org:80/xml-rpc"; 
+	private String UA = "OSTestUserAgentTemp";
+	private String LANG = "en";
+	private String FORMAT = "UTF-8";
+	private OpenSubtitlesImpl os;
 	
-	public static void main(String [] args) throws MalformedURLException, XmlRpcException{
-		
-		OpenSubtitlesImpl os = new OpenSubtitlesImpl(new URL(URL));
-		os.login(LANG, UA);
-		System.out.println(os.searchSubtitles(LANG, "76759").get(0));
-		System.out.println(os.downloadSubtitles(os.searchSubtitles("en", "76759").get(0).getId()).get(0).getContentAsString("UTF-8"));
-		
+	public OpenSubsClient(){
+		try {
+			os = new OpenSubtitlesImpl(new URL(URL));
+			os.login(LANG, UA);
+		} catch (XmlRpcException | MalformedURLException e) {
+			e.printStackTrace();
+		}
 	}
+	
+	public String getSubtitle(String imdb){
+		
+		try {
+			return os.downloadSubtitles(os.searchSubtitles(LANG, imdb).get(0).getId()).get(0).getContentAsString(FORMAT);
+		} catch (XmlRpcException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+	
 }
