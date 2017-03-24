@@ -37,7 +37,7 @@ public class OpenSubsClient {
 					subId = subInfo.getSubtitleFileId();
 					for (SubtitleFile file : os.downloadSubtitles(subId)) {
 						if(file != null)
-							return "a" + file.getContentAsString(FORMAT);
+							return file.getContentAsString(FORMAT);
 					}
 				}
 			}
