@@ -9,6 +9,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.socialgeomovie.clients.OpenSubsClient;
 import com.socialgeomovie.clients.TraktClient;
 import com.uwetrottmann.trakt5.entities.CastMember;
@@ -18,6 +21,9 @@ import com.uwetrottmann.trakt5.entities.Movie;
 @Path("movies")
 public class MoviesServlet 
 {
+	private static final Logger logger = LoggerFactory
+			.getLogger(MoviesServlet.class);
+	
 	@GET
 	@Produces("application/json")
 	public Response testGet()
@@ -43,6 +49,8 @@ public class MoviesServlet
 			{
 				Movie movie = movies.get(i);
 				
+				logger.info(movie.title);
+				 
 				// TODO store movie data
 				
 				//System.out.println(movie.ids.imdb);
@@ -51,6 +59,7 @@ public class MoviesServlet
 				for(int j=0; j<castCount; j++)
 				{
 					CastMember castMember = cast.get(j);
+					logger.info(castMember.person.name);
 					// TODO store cast information
 				}
 
@@ -59,6 +68,7 @@ public class MoviesServlet
 				if(!subtitle.isEmpty())
 				{
 				
+//					logger.info(subtitle.toString());
 					// TODO process subtitles
 					// TODO store subtitle information
 				}
