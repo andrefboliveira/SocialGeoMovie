@@ -15,11 +15,12 @@ import retrofit2.Response;
 public class TraktClient 
 {
 	private TraktV2 trakt;
+	private Movies traktMovies;
 	
 	public TraktClient()
 	{
 		trakt = new TraktV2("f3e23412c0e637f237f1929f1d7c4424b2f3a091d726bb285a5b3ae067e6c934");
-		
+		traktMovies = trakt.movies();
 	}
 	
 	/**
@@ -31,8 +32,7 @@ public class TraktClient
 	 */
 	public List<Movie> getPopularMovies(int page, int limit) throws IOException
 	{
-		Movies traktMovies = trakt.movies();
-		Response<List<Movie>> responseMovies = traktMovies.popular(1, 10, Extended.FULL).execute();
+		Response<List<Movie>> responseMovies = traktMovies.popular(page, limit, Extended.FULL).execute();
 		List<Movie> movies = null;
 	    if (responseMovies.isSuccessful())
 	    {
@@ -50,7 +50,6 @@ public class TraktClient
 	 */
 	public Movie getMovie(String traktMovieId) throws IOException
 	{
-		Movies traktMovies = trakt.movies();
 		Response<Movie> responseMovie = traktMovies.summary(traktMovieId, Extended.FULL).execute();
 		Movie movie = null;
 		if (responseMovie.isSuccessful())
@@ -70,8 +69,7 @@ public class TraktClient
 	 */
 	public List<CastMember> getCast(String traktMovieId) throws IOException
 	{
-		Movies traktMovies = trakt.movies();
-		Response<Credits> responsePeople = traktMovies.people("120").execute();
+		Response<Credits> responsePeople = traktMovies.people(traktMovieId).execute();
 		
 		List<CastMember> cast = null;
 		if (responsePeople.isSuccessful())
