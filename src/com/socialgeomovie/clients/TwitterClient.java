@@ -38,7 +38,7 @@ public class TwitterClient {
 
 		// Build a hosebird client
 		ClientBuilder builder = new ClientBuilder()
-				.hosts(hosebirdHosts)						// add Constants.STREAM_HOST
+				.hosts(hosebirdHosts)
 				.authentication(hosebirdAuth)
 				.endpoint(hosebirdEndpoint)
 				.processor(new StringDelimitedProcessor(msgQueue))
