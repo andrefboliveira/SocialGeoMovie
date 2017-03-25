@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.socialgeomovie.clients.OpenSubsClient;
 import com.socialgeomovie.clients.TraktClient;
+import com.socialgeomovie.clients.TwitterClient;
 import com.socialgeomovie.pojos.Subtitle;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
@@ -40,6 +41,8 @@ public class MoviesServlet
 	{
 		TraktClient trakt = new TraktClient();
 		OpenSubsClient openSubs = new OpenSubsClient();
+		TwitterClient twitterClient = new TwitterClient();
+		
 		List<Movie> movies;
 		try 
 		{
@@ -73,9 +76,11 @@ public class MoviesServlet
 					// TODO process subtitles
 					// TODO store subtitle information
 				}
+				
+				twitterClient.getTweet(10);
 			}
 		}
-		catch (IOException e)
+		catch (IOException | InterruptedException e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
