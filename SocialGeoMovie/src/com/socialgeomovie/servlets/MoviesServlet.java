@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.socialgeomovie.clients.OpenSubsClient;
 import com.socialgeomovie.clients.TraktClient;
+import com.socialgeomovie.pojos.Subtitle;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
 
@@ -64,8 +65,8 @@ public class MoviesServlet
 				}
 
 				// TODO get subtitles
-				String subtitle = openSubs.getSubtitle(movie.ids.imdb);
-				if(!subtitle.isEmpty())
+				Subtitle subtitle = openSubs.getSubtitle(movie.ids.imdb);
+				if(subtitle != null)
 				{
 				
 //					logger.info(subtitle.toString());

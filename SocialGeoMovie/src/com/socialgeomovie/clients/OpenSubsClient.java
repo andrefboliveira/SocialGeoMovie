@@ -8,6 +8,7 @@ import org.apache.xmlrpc.XmlRpcException;
 import com.github.wtekiela.opensub4j.impl.OpenSubtitlesImpl;
 import com.github.wtekiela.opensub4j.response.SubtitleFile;
 import com.github.wtekiela.opensub4j.response.SubtitleInfo;
+import com.socialgeomovie.pojos.Subtitle;
 
 public class OpenSubsClient {
 
@@ -26,18 +27,21 @@ public class OpenSubsClient {
 		}
 	}
 
-	public String getSubtitle(String imdb) {
+	public Subtitle getSubtitle(String imdb) {
 
 		try {
-			if(imdb.startsWith("tt"))
+			if (imdb.startsWith("tt"))
 				imdb = imdb.substring(2, imdb.length());
 			int subId = -1;
 			for (SubtitleInfo subInfo : os.searchSubtitles(LANG, imdb)) {
 				if (subInfo != null && subInfo.getSubtitleFileId() > -1 && subInfo.getLanguage().equals("English")) {
 					subId = subInfo.getSubtitleFileId();
 					for (SubtitleFile file : os.downloadSubtitles(subId)) {
-						if(file != null)
-							return file.getContentAsString(FORMAT);
+						if (file != null) {
+							return new Subtitle(subInfo.getSubtitleFileId(), subInfo.getLanguage(),
+									subInfo.getFileName(), subInfo.getFormat(), subInfo.getDownloadLink(),
+									file.getContentAsString(FORMAT), imdb);
+						}
 					}
 				}
 			}
@@ -45,7 +49,6 @@ public class OpenSubsClient {
 		} catch (XmlRpcException e) {
 			e.printStackTrace();
 		}
-		return "";
+		return null;
 	}
-
 }
