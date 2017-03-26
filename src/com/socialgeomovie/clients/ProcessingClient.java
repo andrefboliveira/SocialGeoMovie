@@ -10,8 +10,8 @@ public class ProcessingClient {
 	
 	public static void main(String[] args) throws IOException {
 		// Indica que não pode haver mais do que um filme com o mesmo titulo ou o mesmo id do IMDb
-		Neo4JClient.setConstraint("Movie", "title");
-		Neo4JClient.setConstraint("Movie", "imdb");
+		Neo4JClient.setUniquenessConstraint("Movie", "title");
+		Neo4JClient.setUniquenessConstraint("Movie", "imdb");
 		
 		TraktClient trakt = new TraktClient();
 		List<Movie> popular = trakt.getPopularMovies(1, 10);

@@ -26,7 +26,7 @@ import com.sun.jersey.json.impl.provider.entity.JSONObjectProvider;
 import com.socialgeomovie.pojos.neo4j.*;
 import com.socialgeomovie.pojos.neo4j.cypher.*;
 
-public class Neo4JClient {
+public abstract class Neo4JClient {
 	private static final String SERVER_ROOT_URI = "http://localhost:7474/db/data/";
 	private static final String username = "neo4j";
 	private static final String password = "aw";
@@ -41,13 +41,7 @@ public class Neo4JClient {
 		return resource;
 	}
 
-	private static WebResource createWebResource(URI Uri) {
-		Client client = Client.create();
-		client.addFilter(new HTTPBasicAuthFilter(username, password));
-		WebResource resource = client.resource(Uri);
 
-		return resource;
-	}
 
 	private static void checkDatabaseIsRunning() {
 		WebResource resource = createWebResource(SERVER_ROOT_URI);
@@ -60,7 +54,7 @@ public class Neo4JClient {
 		response.close();
 	}
 
-	public static GetNodeByID getNodeByID(String ID) {
+	private static GetNodeByID getNodeByID(String ID) {
 		final String nodeUri = SERVER_ROOT_URI + "node/" + ID;
 
 		WebResource resource = createWebResource(nodeUri);
@@ -360,7 +354,7 @@ public class Neo4JClient {
 		response.close();
 	}
 	
-	public static void deleteNodeProperty(URI nodeUri, String propertyName) {
+	private static void deleteNodeProperty(URI nodeUri, String propertyName) {
 		String propertiesUri = nodeUri.toString() + "/properties/" + propertyName;
 
 		WebResource resource = createWebResource(propertiesUri);
@@ -374,7 +368,7 @@ public class Neo4JClient {
 		response.close();
 	}
 	
-	public static void deleteNodeProperties(URI nodeUri) {
+	private static void deleteNodeProperties(URI nodeUri) {
 		String propertiesUri = nodeUri.toString() + "/properties";
 
 		WebResource resource = createWebResource(propertiesUri);
@@ -430,7 +424,7 @@ public class Neo4JClient {
 		return relationships;
 	}
 	
-	public static GetRelationshipByID getRelationshipByID(String ID) {
+	private static GetRelationshipByID getRelationshipByID(String ID) {
 		final String relationUri = SERVER_ROOT_URI + "relationship/" + ID;
 
 		WebResource resource = createWebResource(relationUri);
@@ -456,7 +450,7 @@ public class Neo4JClient {
 
 	private static URI createRelationshipWithProperties(URI startNode, URI endNode, String relationshipType,
 			Map<String, String> relationAtributes) throws URISyntaxException {
-		URI fromUri = new URI(startNode.toString() + "/relationships");
+		String fromUri = startNode.toString() + "/relationships";
 
 		Map<String, Object> relationship = new HashMap<String, Object>();
 		relationship.put("to", endNode.toString());
@@ -539,7 +533,7 @@ public class Neo4JClient {
 	
 	private static void addRelationshipProperty(URI relationshipUri, String propertyName, String propertyValue)
 			throws URISyntaxException {
-		URI propertyUri = new URI(relationshipUri.toString() + "/properties/" + propertyName);
+		String propertyUri = relationshipUri.toString() + "/properties/" + propertyName;
 
 		WebResource resource = createWebResource(propertyUri);
 
@@ -556,7 +550,7 @@ public class Neo4JClient {
 
 	private static void addRelationshipProperties(URI relationshipUri, Map<String, String> relationshipProperties)
 			throws URISyntaxException {
-		URI propertiesUri = new URI(relationshipUri.toString() + "/properties");
+		String propertiesUri = relationshipUri.toString() + "/properties";
 		
 		String relationshipPropertiesJSON = gson.toJson(relationshipProperties);
 
@@ -574,7 +568,7 @@ public class Neo4JClient {
 	
 	private static void addRelationshipProperty(URI relationshipUri, String propertyName)
 			throws URISyntaxException {
-		URI propertyUri = new URI(relationshipUri.toString() + "/properties/" + propertyName);
+		String propertyUri = relationshipUri.toString() + "/properties/" + propertyName;
 
 		WebResource resource = createWebResource(propertyUri);
 
@@ -592,7 +586,7 @@ public class Neo4JClient {
 	
 	private static void deleteRelationshipProperties(URI relationshipUri)
 			throws URISyntaxException {
-		URI propertiesUri = new URI(relationshipUri.toString() + "/properties");
+		String propertiesUri = relationshipUri.toString() + "/properties";
 		
 
 		WebResource resource = createWebResource(propertiesUri);
@@ -691,7 +685,7 @@ public class Neo4JClient {
 	}
 	
 	
-	public static void setConstraint(String label, String atributo) {
+	public static void setUniquenessConstraint(String label, String atributo) {
 		final String labelConstraintUri = SERVER_ROOT_URI + "schema/constraint/" + label + "/uniqueness/";
 		
 		Map<String, String> property_keys = new HashMap<String, String>();
