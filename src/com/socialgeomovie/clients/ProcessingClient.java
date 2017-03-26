@@ -7,12 +7,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import com.socialgeomovie.clients.*;
+import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
 
 public class ProcessingClient {
 	
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, URISyntaxException {
 		// Indica que não pode haver mais do que um filme com o mesmo titulo ou o mesmo id do IMDb
 //		Neo4JClient.setUniquenessConstraint("Movie", "title");
 //		Neo4JClient.setUniquenessConstraint("Movie", "imdb");
@@ -22,8 +23,10 @@ public class ProcessingClient {
 		
 		TraktClient trakt_movie = new TraktClient();
 		List<Movie> popular = trakt_movie.getPopularMovies(1, 10);
-		
+		URI movieNode;
+
 		for (Movie movie : popular) {
+			movieNode = null;
 			HashMap<String, Object> movieProperties = new HashMap<String, Object>();
 			Integer id = movie.ids.trakt;
 			
@@ -34,30 +37,47 @@ public class ProcessingClient {
 			movieProperties.put("rating", movie.rating);
 			movieProperties.put("trailer", movie.trailer);
 			movieProperties.put("year", movie.year);
-
 			
-			URI movieNode = Neo4JClient.createNodeWithProperties("Movie", movieProperties);
-			System.out.println(movie.title);
+			try {
+				movieNode = Neo4JClient.createNodeWithProperties("Movie", movieProperties);
+				System.out.println("Movie" + movie.title);
+			} catch (Exception e) {
+				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "trakt", id);
+				for (GetNodesByLabel getNodesByLabel : movieNodes) {
+					System.out.println(getNodesByLabel.getLabels());
+				}
+				movieNode = new URI(movieNodes[0].getSelf());
+			}
+			
 			
 			
 			TraktClient trakt_cast = new TraktClient();
 			List<CastMember> cast = trakt_cast.getCast(String.valueOf(id));
+			System.out.println(cast.size());
 			
 			for (CastMember castMember : cast) {
-				System.out.println(castMember.person.name);
 				HashMap<String, Object> castProperties = new HashMap<String, Object>();
 				List<String> castLabels = new ArrayList<String>();
 				castProperties.put("name", castMember.person.name);
 				castProperties.put("character", castMember.character);
 				
 				castLabels.add("Cast");
-				URI castNode = Neo4JClient.createNodeWithProperties(castLabels, castProperties);
+				URI castNode;
+				try {
+		
+
+					castNode = Neo4JClient.createNodeWithProperties(castLabels, castProperties);
+					System.out.println(castMember.person.name);
+					
+				} catch (Exception e) {
+					GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "name", castMember.person.name);
+					castNode = new URI(castNodes[0].getSelf());
+				}
 				
 				try {
 					Neo4JClient.createRelationship(castNode, movieNode, "acts in");
-				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				} catch (Exception e) {
+					// TODO: handle exception
 				}
 
 			}

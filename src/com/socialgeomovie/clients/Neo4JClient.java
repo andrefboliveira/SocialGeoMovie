@@ -96,7 +96,7 @@ public abstract class Neo4JClient {
 			throws UnsupportedEncodingException {
 		String safe_param_value = URLEncoder.encode("\"" + param_value + "\"", "UTF-8");
 		final String labelParamUri = SERVER_ROOT_URI + "label/" + label + "/nodes?" + parameter + "=" + safe_param_value;
-
+		
 		WebResource resource = createWebResource(labelParamUri);
 		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
 				.get(ClientResponse.class);
@@ -107,7 +107,27 @@ public abstract class Neo4JClient {
 
 		String output = response.getEntity(String.class);
 		GetNodesByLabel[] nodeList = gson.fromJson(output, GetNodesByLabel[].class);
+		
+		response.close();
 
+		return nodeList;
+	}
+	
+	public static GetNodesByLabel[] getNodesByLabelAndProperty(String label, String parameter, Number param_value)
+			throws UnsupportedEncodingException {
+		final String labelParamUri = SERVER_ROOT_URI + "label/" + label + "/nodes?" + parameter + "=" + param_value;
+		
+		WebResource resource = createWebResource(labelParamUri);
+		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+
+		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
+			throw new RuntimeException("Failed! " + response.toString());
+		}
+
+		String output = response.getEntity(String.class);
+		GetNodesByLabel[] nodeList = gson.fromJson(output, GetNodesByLabel[].class);
+		
 		response.close();
 
 		return nodeList;
@@ -675,7 +695,6 @@ public abstract class Neo4JClient {
 
 		String payload = gson.toJson(payloadRaw);
 		
-		System.out.println(payload);
 
 		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
 				.entity(payload).post(ClientResponse.class);
@@ -718,5 +737,6 @@ public abstract class Neo4JClient {
 		}
 	}
 	
+
 
 }
