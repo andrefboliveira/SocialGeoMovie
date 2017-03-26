@@ -252,12 +252,28 @@ public abstract class Neo4JClient {
 	
 		return addNodeLabel(nodeUri, label);
 	}
+	
+	public static URI createNodeWithProperty(List <String> labels, String propertyName, String propertyValue) {
+		
+		URI nodeUri = createSimpleNodeWithProperty(propertyName, propertyValue);
+	
+		return addNodeLabels(nodeUri, labels);
+	}
 
 	public static URI createNodeWithProperties(String label, Map<String, Object> properties) {
 		URI nodeUri = createSimpleNodeWithProperties(properties);
 
 		return addNodeLabel(nodeUri, label);
 	}
+
+	public static URI createNodeWithProperties(List <String> labels, Map<String, Object> properties) {
+		URI nodeUri = createSimpleNodeWithProperties(properties);
+
+		return addNodeLabels(nodeUri, labels);
+	}
+	
+	
+	
 
 	private static void deleteNodeByID(String ID) {
 		// IMPORTANT: Usar "DETACH DELETE" em
@@ -443,12 +459,12 @@ public abstract class Neo4JClient {
 		return relationship;
 	}
 
-	private static URI createRelationship(URI startNode, URI endNode, String relationshipType)
+	public static URI createRelationship(URI startNode, URI endNode, String relationshipType)
 			throws URISyntaxException {
 		return createRelationshipWithProperties(startNode, endNode, relationshipType, null);
 	}
 
-	private static URI createRelationshipWithProperties(URI startNode, URI endNode, String relationshipType,
+	public static URI createRelationshipWithProperties(URI startNode, URI endNode, String relationshipType,
 			Map<String, String> relationAtributes) throws URISyntaxException {
 		String fromUri = startNode.toString() + "/relationships";
 
