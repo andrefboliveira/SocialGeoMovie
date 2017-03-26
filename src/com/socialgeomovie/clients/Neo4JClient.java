@@ -691,7 +691,7 @@ public class Neo4JClient {
 	}
 	
 	
-	private static void setConstraint(String label, String atributo) {
+	public static void setConstraint(String label, String atributo) {
 		final String labelConstraintUri = SERVER_ROOT_URI + "schema/constraint/" + label + "/uniqueness/";
 		
 		Map<String, String> property_keys = new HashMap<String, String>();
