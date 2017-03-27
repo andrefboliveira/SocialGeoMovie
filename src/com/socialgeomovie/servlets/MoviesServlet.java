@@ -3,6 +3,7 @@ package com.socialgeomovie.servlets;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +89,10 @@ public class MoviesServlet
 					Map<String, Object> castData = Converter.cast2Map(castMember);
 					String character = (String) castData.get("character");
 					castData.remove("character");
-					URI castNode = Neo4JClient.createNodeWithProperties("Cast", castData);
+					List<String> castLabels = new ArrayList<String>();
+					castLabels.add("Cast");
+
+					URI castNode = Neo4JClient.createNodeWithProperties(castLabels, castData);
 					Map<String, String> characterMap = new HashMap<String, String>();
 					characterMap.put("character", character);
 					URI relationship = Neo4JClient.createRelationshipWithProperties(castNode, movieNode, "acts in", characterMap);
