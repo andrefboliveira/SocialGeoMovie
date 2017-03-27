@@ -351,7 +351,6 @@ public abstract class Neo4JClient {
 		}
 
 		String output = response.getEntity(String.class);
-		System.out.println(output);
 		Type type = new TypeToken<Map<String, Object>>(){}.getType();
 		Map<String, Object> properties = gson.fromJson(output, type);
 

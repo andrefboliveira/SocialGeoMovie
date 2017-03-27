@@ -41,25 +41,21 @@ public class MovieServelt {
 			@QueryParam("page") final int page) {
 		List<Map<String, Object>> nodeList = new ArrayList<>();
 		Gson gson = new Gson();
-		
+
 		GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabel("Movie");
 		for (GetNodesByLabel getNodesByLabel : movieNodes) {
 			Map<String, Object> nodeInfo = new HashMap<String, Object>();
-
 			try {
-
-				//URI propertiesURI = new URI(getNodesByLabel.getProperties());
 				URI propertiesURI = new URI(getNodesByLabel.getSelf());
-				LinkedTreeMap <String, Object> propertiesResponse =  (LinkedTreeMap<String, Object>) Neo4JClient.getNodeProperties(propertiesURI);
+				LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
+						.getNodeProperties(propertiesURI);
 				nodeInfo.put("title", propertiesResponse.get("title"));
 				Number idNumb = (Number) propertiesResponse.get("id_trakt");
 				nodeInfo.put("id", idNumb.intValue());
-				if (details) 
-				{
+				if (details) {
 					nodeInfo.putAll(propertiesResponse);
-
 				}
-				
+
 				nodeList.add(nodeInfo);
 
 			} catch (URISyntaxException e) {
@@ -69,28 +65,27 @@ public class MovieServelt {
 		}
 		return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 	}
-	
+
 	/**
 	 * Add a movie
 	 */
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createMovie(){
+	public Response createMovie() {
 		return null;
 	}
-	
+
 	/**
 	 * Add info about a movie
 	 */
 	@GET
 	@Path("/{movie_id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMovie(@PathParam("movie_id") int movie_id)
-	{
+	public Response getMovie(@PathParam("movie_id") int movie_id) {
 		return null;
 	}
-	
+
 	/**
 	 * Update info about a movie
 	 */
@@ -98,17 +93,17 @@ public class MovieServelt {
 	@Path("/{movie_id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateMovie(@PathParam("movie_id") int movie_id){
+	public Response updateMovie(@PathParam("movie_id") int movie_id) {
 		return null;
 	}
-	
+
 	/**
 	 * Delete a movie
 	 */
 	@DELETE
 	@Path("/{movie_id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteMovie(@PathParam("movie_id") int movie_id){
+	public Response deleteMovie(@PathParam("movie_id") int movie_id) {
 		return null;
 	}
 }
