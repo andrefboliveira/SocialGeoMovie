@@ -25,6 +25,7 @@ import com.sun.jersey.json.impl.provider.entity.JSONObjectProvider;
 
 import com.socialgeomovie.pojos.neo4j.*;
 import com.socialgeomovie.pojos.neo4j.cypher.*;
+import com.socialgeomovie.utils.Neo4JRequestException;
 
 public abstract class Neo4JClient {
 	private static final String SERVER_ROOT_URI = "http://localhost:7474/db/data/";
@@ -48,7 +49,7 @@ public abstract class Neo4JClient {
 		ClientResponse response = resource.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		response.close();
@@ -62,7 +63,7 @@ public abstract class Neo4JClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -81,7 +82,7 @@ public abstract class Neo4JClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -102,7 +103,7 @@ public abstract class Neo4JClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -122,7 +123,7 @@ public abstract class Neo4JClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -144,7 +145,7 @@ public abstract class Neo4JClient {
 				.entity("{}").post(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.CREATED.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		final URI location = response.getLocation();
@@ -165,7 +166,7 @@ public abstract class Neo4JClient {
 				.entity(gson.toJson(properties)).post(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.CREATED.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		final URI location = response.getLocation();
@@ -190,7 +191,7 @@ public abstract class Neo4JClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -212,7 +213,7 @@ public abstract class Neo4JClient {
 				.entity(gson.toJson(label)).post(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		response.close();
@@ -231,7 +232,7 @@ public abstract class Neo4JClient {
 				.entity(gson.toJson(labels)).post(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		response.close();
@@ -252,7 +253,7 @@ public abstract class Neo4JClient {
 				.entity(gson.toJson(labels)).put(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		response.close();
@@ -309,13 +310,13 @@ public abstract class Neo4JClient {
 				.delete(ClientResponse.class);
 	
 		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 	
 		response.close();
 	}
 	
-	public static GetNodeProperties getNodeProperty(URI nodeUri, String propertyName) {
+	public static Object getNodeProperty(URI nodeUri, String propertyName) {
 		String propertiesUri = nodeUri.toString() + "/properties/" + propertyName;
 
 		WebResource resource = createWebResource(propertiesUri);
@@ -323,18 +324,20 @@ public abstract class Neo4JClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
-		GetNodeProperties property = gson.fromJson(output, GetNodeProperties.class);
+		
+		Object property = gson.fromJson(output, Object.class);
+		
 
 		response.close();
 
 		return property;
 	}
 	
-	public static GetNodeProperties[] getNodeProperties(URI nodeUri) {
+	public static Object[] getNodeProperties(URI nodeUri) {
 		String propertiesUri = nodeUri.toString() + "/properties";
 
 		WebResource resource = createWebResource(propertiesUri);
@@ -342,11 +345,11 @@ public abstract class Neo4JClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
-		GetNodeProperties[] properties = gson.fromJson(output, GetNodeProperties[].class);
+		Object[] properties = gson.fromJson(output, Object[].class);
 
 		response.close();
 
@@ -363,7 +366,7 @@ public abstract class Neo4JClient {
 				.entity(gson.toJson(propertyValue)).put(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		response.close();
@@ -384,7 +387,7 @@ public abstract class Neo4JClient {
 				.entity(gson.toJson(properties)).put(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		response.close();
@@ -398,7 +401,7 @@ public abstract class Neo4JClient {
 				.delete(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 		
 		response.close();
@@ -412,7 +415,7 @@ public abstract class Neo4JClient {
 				.delete(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		response.close();
@@ -429,7 +432,7 @@ public abstract class Neo4JClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -449,7 +452,7 @@ public abstract class Neo4JClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -468,7 +471,7 @@ public abstract class Neo4JClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -485,16 +488,17 @@ public abstract class Neo4JClient {
 	}
 
 	public static URI createRelationshipWithProperties(URI startNode, URI endNode, String relationshipType,
-			Map<String, String> relationAtributes) throws URISyntaxException {
+			Map<String, Object> relationAtributes) throws URISyntaxException {
 		String fromUri = startNode.toString() + "/relationships";
 
 		Map<String, Object> relationship = new HashMap<String, Object>();
 		relationship.put("to", endNode.toString());
 		relationship.put("type", relationshipType);
-
-		if (relationAtributes != null && relationAtributes.isEmpty()) {
+		
+		if (!(relationAtributes == null && relationAtributes.isEmpty())) {
 			relationship.put("data", relationAtributes);
 		}
+		
 
 		String relationshipJson = gson.toJson(relationship);
 
@@ -505,7 +509,7 @@ public abstract class Neo4JClient {
 				.entity(relationshipJson).post(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.CREATED.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		final URI location = response.getLocation();
@@ -523,7 +527,7 @@ public abstract class Neo4JClient {
 				.delete(ClientResponse.class);
 	
 		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 	
 		response.close();
@@ -537,7 +541,7 @@ public abstract class Neo4JClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -556,7 +560,7 @@ public abstract class Neo4JClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -577,7 +581,7 @@ public abstract class Neo4JClient {
 				.entity(gson.toJson(propertyValue)).put(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		response.close();
@@ -596,7 +600,7 @@ public abstract class Neo4JClient {
 				.entity(relationshipPropertiesJSON).put(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		response.close();
@@ -612,7 +616,7 @@ public abstract class Neo4JClient {
 				.delete(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		response.close();
@@ -631,14 +635,14 @@ public abstract class Neo4JClient {
 				.delete(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		response.close();
 	}
 	
 
-	private static CypherResultNormal sendTransactionalCypherQuery(String query) {
+	public static CypherResultNormal sendTransactionalCypherQuery(String query) {
 		final String txUri = SERVER_ROOT_URI + "transaction/commit";
 
 		WebResource resource = createWebResource(txUri);
@@ -657,7 +661,7 @@ public abstract class Neo4JClient {
 				.entity(payload).post(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -700,7 +704,7 @@ public abstract class Neo4JClient {
 				.entity(payload).post(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -719,9 +723,8 @@ public abstract class Neo4JClient {
 		return queryResult;
 	}
 	
-	
-	public static void setUniquenessConstraint(String label, String atributo) {
-		final String labelConstraintUri = SERVER_ROOT_URI + "schema/constraint/" + label + "/uniqueness/";
+	public static void createConstraint(String label, String type, String atributo) {
+		final String labelConstraintUri = SERVER_ROOT_URI + "schema/constraint/" + label + "/" + type + "/";
 		
 		Map<String, String> property_keys = new HashMap<String, String>();
 		property_keys.put("property_keys", atributo);
@@ -733,10 +736,36 @@ public abstract class Neo4JClient {
 				.entity(gson.toJson(property_keys)).post(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("Failed! " + response.toString());
+			throw new Neo4JRequestException("Failed! " + response.toString());
 		}
 	}
 	
+	public static void createUniquenessConstraint(String label, String atributo) {
+		createConstraint(label, "uniqueness", atributo);		
+	}
+	
+	
+	
+	public static void deleteConstraint(String label, String type, String atributo) {
+		final String labelConstraintUri = SERVER_ROOT_URI + "schema/constraint/" + label + "/" + type + "/" + atributo;
+		
+		
+		WebResource resource = createWebResource(labelConstraintUri);
 
+		// POST {} to the node entry point URI
+		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
+				.delete(ClientResponse.class);
+
+		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
+			throw new Neo4JRequestException("Failed! " + response.toString());
+		}
+	}
+	
+	public static void deleteUniquenessConstraint(String label, String atributo) {
+		deleteConstraint(label, "uniqueness", atributo);		
+
+	}
+	
+	
 
 }
