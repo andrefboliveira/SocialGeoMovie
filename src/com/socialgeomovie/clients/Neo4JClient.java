@@ -2,6 +2,7 @@ package com.socialgeomovie.clients;
 
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -15,6 +16,7 @@ import java.util.Map.Entry;
 import javax.ws.rs.core.MediaType;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -337,7 +339,7 @@ public abstract class Neo4JClient {
 		return property;
 	}
 	
-	public static Object[] getNodeProperties(URI nodeUri) {
+	public static Map<String, Object> getNodeProperties(URI nodeUri) {
 		String propertiesUri = nodeUri.toString() + "/properties";
 
 		WebResource resource = createWebResource(propertiesUri);
@@ -349,7 +351,9 @@ public abstract class Neo4JClient {
 		}
 
 		String output = response.getEntity(String.class);
-		Object[] properties = gson.fromJson(output, Object[].class);
+		System.out.println(output);
+		Type type = new TypeToken<Map<String, Object>>(){}.getType();
+		Map<String, Object> properties = gson.fromJson(output, type);
 
 		response.close();
 
