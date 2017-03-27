@@ -50,9 +50,9 @@ public class SaveDataClient {
 
 				moviesURI.put(movie.ids.trakt, movieNode);
 			} catch (Neo4JRequestException e) {
-				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "id_trakt",
-						movie.ids.trakt);
-				movieNode = new URI(movieNodes[0].getSelf());
+//				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "id_trakt",
+//						movie.ids.trakt);
+//				movieNode = new URI(movieNodes[0].getSelf());
 			}
 
 		}
@@ -88,9 +88,9 @@ public class SaveDataClient {
 				castProps.add(character);
 				castURIProps.put(castMember.person.ids.trakt, castProps);
 			} catch (Neo4JRequestException e) {
-				GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "id_trakt",
-						castMember.person.ids.trakt);
-				castNode = new URI(castNodes[0].getSelf());
+//				GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "id_trakt",
+//						castMember.person.ids.trakt);
+//				castNode = new URI(castNodes[0].getSelf());
 			}
 
 		}

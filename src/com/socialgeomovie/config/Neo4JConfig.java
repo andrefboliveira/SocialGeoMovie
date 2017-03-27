@@ -56,5 +56,9 @@ public abstract class Neo4JConfig {
 	public static void cleanDB() {
 		Neo4JClient.sendTransactionalCypherQuery("MATCH (n) WHERE size(labels(n)) = 0 DELETE n");
 	}
+	
+	public static void deleteAll() {
+		Neo4JClient.sendTransactionalCypherQuery("MATCH (n) DETACH DELETE n");
+	}
 
 }
