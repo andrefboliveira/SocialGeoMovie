@@ -30,9 +30,9 @@ import com.socialgeomovie.utils.Neo4JRequestException;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
 
-// http://localhost:8080/aw2017/rest/movies
+// http://localhost:8080/aw2017/rest
 
-@Path("movie")
+@Path("movies")
 public class MoviesServlet 
 {
 	private static final Logger logger = LoggerFactory
@@ -65,7 +65,7 @@ public class MoviesServlet
 		List<Movie> movies;
 		try 
 		{
-			movies = trakt.getPopularMovies(1, 1);
+			movies = trakt.getPopularMovies(1, 10);
 			int count = movies.size();
 			report.put("movies", count);
 			
@@ -127,11 +127,12 @@ public class MoviesServlet
 					// TODO store subtitle information
 				}
 				
-				int tweetCount = 10;
+				int tweetCount = 3;
 				List<String> tweets = twitterClient.getTweet(movie.title, tweetCount);
-				report.put("tweets", tweetCount + report.get("tweets"));
+				report.put("tweets", tweets.size() + report.get("tweets"));
 				
 				logger.info("Import process done");
+				Neo4JConfig.cleanDB();
 			}
 		}
 		catch (Exception e)
