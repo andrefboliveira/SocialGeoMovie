@@ -44,16 +44,18 @@ public class MovieServelt {
 		Gson gson = new Gson();
 		
 		GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabel("Movie");
-		for (GetNodesByLabel getNodesByLabel : movieNodes) {
-			
-			try {
+		for (GetNodesByLabel getNodesByLabel : movieNodes) 
+		{
+			try 
+			{
 				//URI propertiesURI = new URI(getNodesByLabel.getProperties());
 				URI propertiesURI = new URI(getNodesByLabel.getSelf());
 				LinkedTreeMap <String, Object> propertiesResponse =  (LinkedTreeMap<String, Object>) Neo4JClient.getNodeProperties(propertiesURI);
 				
 				nodeInfo.put("id", propertiesResponse.get("id_trakt"));
-				if (details) {
-					nodeInfo.put("...", propertiesResponse.get("..."));
+				if (details) 
+				{
+					nodeInfo.putAll(propertiesResponse);
 
 				}
 				
@@ -83,7 +85,8 @@ public class MovieServelt {
 	@GET
 	@Path("/{movie_id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMovie(@PathParam("movie_id") int movie_id){
+	public Response getMovie(@PathParam("movie_id") int movie_id)
+	{
 		return null;
 	}
 	
