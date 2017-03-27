@@ -22,14 +22,17 @@ import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.clients.OpenSubsClient;
 import com.socialgeomovie.clients.TraktClient;
 import com.socialgeomovie.clients.TwitterClient;
+import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.Subtitle;
+import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.utils.Converter;
+import com.socialgeomovie.utils.Neo4JRequestException;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
 
 // http://localhost:8080/aw2017/rest/movies
 
-@Path("movies")
+@Path("movie")
 public class MoviesServlet 
 {
 	private static final Logger logger = LoggerFactory
@@ -51,32 +54,37 @@ public class MoviesServlet
 		TraktClient trakt = new TraktClient();
 		OpenSubsClient openSubs = new OpenSubsClient();
 		TwitterClient twitterClient = new TwitterClient();
-		//Neo4JClient.setUniquenessConstraint("Movie", "imdb");
+		Neo4JConfig.setUniqueConstraints();
 		
 		Map<String, Integer> report = new HashMap<String, Integer>();
+		report.put("movies", 0);
+		report.put("cast members", 0);
+		report.put("subtitles", 0);
+		report.put("tweets", 0);
 		
 		List<Movie> movies;
 		try 
 		{
-			movies = trakt.getPopularMovies(1, 10);
-			
+			movies = trakt.getPopularMovies(1, 1);
 			int count = movies.size();
 			report.put("movies", count);
-			report.put("cast members", 0);
-			report.put("subtitles", 0);
-			report.put("tweets", 0);
+			
 			for(int i=0; i<count; i++)
 			{
 				Movie movie = movies.get(i);
 				
 				logger.info("Processing movie: " + movie.title);
-				// TODO store movie data
-				//Neo4JClient.createNodeWithProperties("Movie", m);
-				URI movieNode = Neo4JClient.createNodeWithProperties("Movie", Converter.movie2Map(movie));
-				
-				
-				
-				//System.out.println(movie.ids.imdb);
+				URI movieNode;			
+				try 
+				{
+					movieNode = Neo4JClient.createNodeWithProperties("Movie", Converter.movie2Map(movie));
+				} 
+				catch (Neo4JRequestException e) 
+				{
+					GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "id_trakt", movie.ids.trakt);
+					movieNode = new URI(movieNodes[0].getSelf());
+				}
+
 				List<CastMember> cast = trakt.getCast(movie.ids.trakt+"");
 				int castCount = cast.size();
 				report.put("cast members", castCount + report.get("cast members"));
@@ -92,8 +100,18 @@ public class MoviesServlet
 					List<String> castLabels = new ArrayList<String>();
 					castLabels.add("Cast");
 
-					URI castNode = Neo4JClient.createNodeWithProperties(castLabels, castData);
-					Map<String, String> characterMap = new HashMap<String, String>();
+					URI castNode;
+					try 
+					{
+						castNode = Neo4JClient.createNodeWithProperties(castLabels, castData);
+					} 
+					catch (Neo4JRequestException e) 
+					{
+						GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "id_trakt", castMember.person.ids.trakt);
+						castNode = new URI(castNodes[0].getSelf());
+					}
+
+					Map<String, Object> characterMap = new HashMap<String, Object>();
 					characterMap.put("character", character);
 					URI relationship = Neo4JClient.createRelationshipWithProperties(castNode, movieNode, "acts in", characterMap);
 				}
@@ -110,13 +128,13 @@ public class MoviesServlet
 				}
 				
 				int tweetCount = 10;
-				twitterClient.getTweet(tweetCount);
+				List<String> tweets = twitterClient.getTweet(movie.title, tweetCount);
 				report.put("tweets", tweetCount + report.get("tweets"));
 				
 				logger.info("Import process done");
 			}
 		}
-		catch (IOException | InterruptedException | URISyntaxException e)
+		catch (Exception e)
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -1,6 +1,7 @@
 package com.socialgeomovie.clients;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.uwetrottmann.trakt5.TraktV2;
@@ -35,9 +36,9 @@ public class TraktClient
 		Response<List<Movie>> responseMovies = traktMovies.popular(page, limit, Extended.FULL).execute();
 		List<Movie> movies = null;
 	    if (responseMovies.isSuccessful())
-	    {
 	    	 movies = responseMovies.body();
-	    }
+	    else
+	    	movies = new ArrayList<Movie>();
 	    
 	    return movies;
 	}
