@@ -38,21 +38,22 @@ public class MovieServelt {
 	public Response getMovies(
 			@QueryParam("include_details") final boolean details,
 			@QueryParam("limit") final int limit,
-			@QueryParam("page") final int page){
+			@QueryParam("page") final int page) {
 		List<Map<String, Object>> nodeList = new ArrayList<>();
-		Map<String, Object> nodeInfo = new HashMap<String, Object>();
 		Gson gson = new Gson();
 		
 		GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabel("Movie");
-		for (GetNodesByLabel getNodesByLabel : movieNodes) 
-		{
-			try 
-			{
+		for (GetNodesByLabel getNodesByLabel : movieNodes) {
+			Map<String, Object> nodeInfo = new HashMap<String, Object>();
+
+			try {
+
 				//URI propertiesURI = new URI(getNodesByLabel.getProperties());
 				URI propertiesURI = new URI(getNodesByLabel.getSelf());
 				LinkedTreeMap <String, Object> propertiesResponse =  (LinkedTreeMap<String, Object>) Neo4JClient.getNodeProperties(propertiesURI);
-				
-				nodeInfo.put("id", propertiesResponse.get("id_trakt"));
+				nodeInfo.put("title", propertiesResponse.get("title"));
+				Number idNumb = (Number) propertiesResponse.get("id_trakt");
+				nodeInfo.put("id", idNumb.intValue());
 				if (details) 
 				{
 					nodeInfo.putAll(propertiesResponse);
