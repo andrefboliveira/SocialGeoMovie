@@ -23,7 +23,7 @@ public class TwitterClient {
 	private static final String ACCESS_TOKEN = "841224583051149313-vvUu5cxygGm9t1uZg0QPSgdgs9BTkww";
 	private static final String ACCESS_TOKEN_SECRET = "fHj97HjevuabndTH62GIKBfIaCCafENyKsPOXUSxTiJVg";
 	
-	public ArrayList<String> getTweet(int nrTweets) throws InterruptedException{
+	public ArrayList<String> getTweet(String tweetSearchTerms, int nrTweets) throws InterruptedException{
 		
 		// Create an appropriately sized blocking queue
 		BlockingQueue<String> msgQueue = new LinkedBlockingQueue<String>(nrTweets);
@@ -43,27 +43,27 @@ public class TwitterClient {
 				.endpoint(hosebirdEndpoint)
 				.processor(new StringDelimitedProcessor(msgQueue))
 				.eventMessageQueue(eventQueue);                          // optional: use this if you want to process client events
+				
+		// Client properties
+		// Followings - uncomment if filter is wanted
+//		List<Long> followings = new ArrayList<Long>();
+//		followings.add(1234L);
+//		followings.add(566788L);
+//		hosebirdEndpoint.followings(followings);
+		// Search ("track") Terms
+		List<String> terms = new ArrayList<String>();
+		terms.add(tweetSearchTerms);
+		hosebirdEndpoint.trackTerms(terms);
+		// Languages
+		List<String> languages = new ArrayList<String>();
+		languages.add("en");
+		languages.add("pt");
+		hosebirdEndpoint.languages(languages);	
 		
 		// Creates a client
 		Client hosebirdClient = builder.build();
 		
 		// Attempts to establish a connection
-		hosebirdClient.connect();
-				
-		// Followings and track terms
-		List<Long> followings = new ArrayList<Long>();
-		followings.add(1234L);
-		followings.add(566788L);
-		List<String> terms = new ArrayList<String>();
-		terms.add("twitter");
-		terms.add("api");
-		List<String> languages = new ArrayList<String>();
-		languages.add("en");
-		languages.add("pt");
-		hosebirdEndpoint.followings(followings);
-		hosebirdEndpoint.trackTerms(terms);
-		hosebirdEndpoint.languages(languages);
-		
 		hosebirdClient.connect();
 		
 		// Creates a list to save the iterated tweets
