@@ -56,6 +56,24 @@ public abstract class Neo4JClient {
 
 		response.close();
 	}
+	
+	public static GetNodeByID getNode(String nodeUri) {
+
+		WebResource resource = createWebResource(nodeUri);
+		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+
+		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
+			throw new Neo4JRequestException("Failed! " + response.toString());
+		}
+
+		String output = response.getEntity(String.class);
+		GetNodeByID node = gson.fromJson(output, GetNodeByID.class);
+
+		response.close();
+
+		return node;
+	}
 
 	private static GetNodeByID getNodeByID(String ID) {
 		final String nodeUri = SERVER_ROOT_URI + "node/" + ID;
@@ -339,6 +357,24 @@ public abstract class Neo4JClient {
 		return property;
 	}
 	
+	public static Map<String, Object> getNodeProperties(String nodePropertiesUri) {
+		WebResource resource = createWebResource(nodePropertiesUri);
+		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+
+		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
+			throw new Neo4JRequestException("Failed! " + response.toString());
+		}
+
+		String output = response.getEntity(String.class);
+		Type type = new TypeToken<Map<String, Object>>(){}.getType();
+		Map<String, Object> properties = gson.fromJson(output, type);
+
+		response.close();
+
+		return properties;
+	}
+	
 	public static Map<String, Object> getNodeProperties(URI nodeUri) {
 		String propertiesUri = nodeUri.toString() + "/properties";
 
@@ -429,6 +465,24 @@ public abstract class Neo4JClient {
 	
 	public static GetNodeRelationship[] getNodeRelationships(URI nodeUri) {
 		String relationsUri = nodeUri.toString() + "/relationships/all";
+
+		WebResource resource = createWebResource(relationsUri);
+		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+
+		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
+			throw new Neo4JRequestException("Failed! " + response.toString());
+		}
+
+		String output = response.getEntity(String.class);
+		GetNodeRelationship[] relationships = gson.fromJson(output, GetNodeRelationship[].class);
+
+		response.close();
+
+		return relationships;
+	}
+	
+	public static GetNodeRelationship[] getNodeRelationships(String relationsUri) {
 
 		WebResource resource = createWebResource(relationsUri);
 		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)

@@ -70,6 +70,7 @@ public class ProcessingClient {
 				relationProp.put("character", castMember.character);
 				
 				castLabels.add("Cast");
+				castLabels.add("Person");
 				URI castNode;
 				try {
 		

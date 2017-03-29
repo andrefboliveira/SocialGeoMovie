@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.Subtitle;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
-import com.socialgeomovie.servlets.MoviesServlet;
+import com.socialgeomovie.servlets.DeprecatedMoviesServlet;
 import com.socialgeomovie.utils.Converter;
 import com.socialgeomovie.utils.Neo4JRequestException;
 import com.uwetrottmann.trakt5.entities.CastMember;
@@ -29,7 +29,7 @@ import com.uwetrottmann.trakt5.entities.Movie;
 
 public class SaveDataClient {
 
-	private static final Logger logger = LoggerFactory.getLogger(MoviesServlet.class);
+	private static final Logger logger = LoggerFactory.getLogger(DeprecatedMoviesServlet.class);
 
 	private static Map<Integer, URI> saveMovies(List<Movie> movies)
 			throws UnsupportedEncodingException, URISyntaxException {
@@ -78,6 +78,7 @@ public class SaveDataClient {
 
 			List<String> castLabels = new ArrayList<String>();
 			castLabels.add("Cast");
+			castLabels.add("Person");
 
 			URI castNode;
 			try {
@@ -255,6 +256,7 @@ public class SaveDataClient {
 					castData.remove("character");
 					List<String> castLabels = new ArrayList<String>();
 					castLabels.add("Cast");
+					castLabels.add("Person");
 					
 					
 					URI castNode;

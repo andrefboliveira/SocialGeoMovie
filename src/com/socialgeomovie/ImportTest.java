@@ -72,6 +72,8 @@ public class ImportTest {
 				castData.remove("character");
 				List<String> castLabels = new ArrayList<String>();
 				castLabels.add("Cast");
+				castLabels.add("Person");
+
 
 
 				URI castNode;

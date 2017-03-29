@@ -31,12 +31,12 @@ import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
 
 // http://localhost:8080/aw2017/rest
-
+/* Replace with DB Import Servlet */
 @Path("movies")
-public class MoviesServlet 
+public class DeprecatedMoviesServlet 
 {
 	private static final Logger logger = LoggerFactory
-			.getLogger(MoviesServlet.class);
+			.getLogger(DeprecatedMoviesServlet.class);
 	
 	@GET
 	@Produces("application/json")
@@ -99,6 +99,8 @@ public class MoviesServlet
 					castData.remove("character");
 					List<String> castLabels = new ArrayList<String>();
 					castLabels.add("Cast");
+					castLabels.add("Person");
+
 
 					URI castNode;
 					try 
