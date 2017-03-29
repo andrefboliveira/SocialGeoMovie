@@ -15,6 +15,9 @@ import java.util.Map.Entry;
 
 import javax.ws.rs.core.MediaType;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.sun.jersey.api.client.Client;
@@ -27,6 +30,7 @@ import com.sun.jersey.json.impl.provider.entity.JSONObjectProvider;
 
 import com.socialgeomovie.pojos.neo4j.*;
 import com.socialgeomovie.pojos.neo4j.cypher.*;
+import com.socialgeomovie.servlets.DeprecatedMoviesServlet;
 import com.socialgeomovie.utils.Neo4JRequestException;
 
 public abstract class Neo4JClient {
@@ -314,7 +318,23 @@ public abstract class Neo4JClient {
 	}
 	
 	
+	public static void deleteNode(String nodeUri) {
+		// IMPORTANT: Usar "DETACH DELETE" em
+		// sendTransactionalCypherQuery(query) para apagar nós com relações
+		/*
+		 * MATCH (n) DETACH DELETE n
+		 */
+		
+		WebResource resource = createWebResource(nodeUri);
+		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
+				.delete(ClientResponse.class);
 	
+		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
+			throw new Neo4JRequestException("Failed! " + response.toString());
+		}
+	
+		response.close();
+	}
 
 	private static void deleteNodeByID(String ID) {
 		// IMPORTANT: Usar "DETACH DELETE" em
@@ -778,6 +798,12 @@ public abstract class Neo4JClient {
 		response.close();
 		
 		return queryResult;
+	}
+	
+	public static void safeDeleteNode(int nodeID) {
+		String query = "MATCH (n {id_trakt:" + nodeID + "}) DETACH DELETE n";
+		System.out.println(query);
+		sendTransactionalCypherQuery(query);
 	}
 	
 	public static void createConstraint(String label, String type, String atributo) {

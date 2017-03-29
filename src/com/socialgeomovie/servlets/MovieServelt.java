@@ -126,7 +126,12 @@ public class MovieServelt {
 	@Path("/{movie_id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteMovie(@PathParam("movie_id") int movie_id) {
-		return null;
+		// TODO Return type
+		// Using trakt id
+		Neo4JClient.safeDeleteNode(movie_id);
+		
+//		return null;
+		return Response.status(Status.OK).entity("{\"status\":\"OK\"}").build();
 	}
 	
 	@Path("/{movie_id}/people")
@@ -147,10 +152,6 @@ public class MovieServelt {
 				@DefaultValue("false") @QueryParam("include_details") final boolean details,
 				@DefaultValue("-1") @QueryParam("limit") final int limit,
 				@DefaultValue("1") @QueryParam("page") final int page) {
-			
-//			 final Logger logger = LoggerFactory
-//					.getLogger(DeprecatedMoviesServlet.class);
-//			 logger.info("aqui");
 
 			List<Map<String, Object>> nodeList = new ArrayList<>();
 			Gson gson = new Gson();
