@@ -50,9 +50,9 @@ public class SaveDataClient {
 
 				moviesURI.put(movie.ids.trakt, movieNode);
 			} catch (Neo4JRequestException e) {
-//				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "id_trakt",
-//						movie.ids.trakt);
-//				movieNode = new URI(movieNodes[0].getSelf());
+				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "id_trakt",
+						movie.ids.trakt);
+				movieNode = new URI(movieNodes[0].getSelf());
 			}
 
 		}
@@ -89,6 +89,7 @@ public class SaveDataClient {
 				URI castNode;
 				try {
 					castNode = Neo4JClient.createNodeWithProperties(castLabels, castData);
+					castURI.put(castMember.person.ids.trakt, castNode);
 					logger.info("adding cast :" +castMember.person.name);
 
 					
@@ -100,9 +101,6 @@ public class SaveDataClient {
 				Map<String, Object> characterMap = new HashMap<String, Object>();
 				characterMap.put("character", character);
 				URI relationship = Neo4JClient.createRelationshipWithProperties(castNode, movieURI, "acts in", characterMap);
-
-
-				castURI.put(castMember.person.ids.trakt, castNode);
 				relationshipURI.add(relationship);
 
 			}
