@@ -60,63 +60,84 @@ public class SaveDataClient {
 
 	}
 
-	private static Map<Integer, List<Object>> saveCast(List<CastMember> cast)
-			throws UnsupportedEncodingException, URISyntaxException {
-		Map<Integer, List<Object>> castURIProps = new HashMap<Integer, List<Object>>();
-		List<Object> castProps = new ArrayList<Object>();
-
-		int castCount = cast.size();
-		for (int j = 0; j < castCount; j++) {
-			CastMember castMember = cast.get(j);
-			logger.info("Processing cast :" + castMember.person.name);
-
-			// TODO store cast information
-
-			Map<String, Object> castData = Converter.cast2Map(castMember);
-			String character = (String) castData.get("character");
-			castData.remove("character");
-
-			List<String> castLabels = new ArrayList<String>();
-			castLabels.add("Cast");
-			castLabels.add("Person");
-
-			URI castNode;
-			try {
-				castNode = Neo4JClient.createNodeWithProperties(castLabels, castData);
-				logger.info("added cast :" + castMember.person.name);
-
-				castProps.add(castNode);
-				castProps.add(character);
-				castURIProps.put(castMember.person.ids.trakt, castProps);
-			} catch (Neo4JRequestException e) {
-//				GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "id_trakt",
-//						castMember.person.ids.trakt);
-//				castNode = new URI(castNodes[0].getSelf());
-			}
-
-		}
-		return castURIProps;
-	}
+//	private static Map<Integer, List<Object>> saveCast(List<CastMember> cast)
+//			throws UnsupportedEncodingException, URISyntaxException {
+//		Map<Integer, List<Object>> castURIProps = new HashMap<Integer, List<Object>>();
+//		List<Object> castProps = new ArrayList<Object>();
+//
+//		int castCount = cast.size();
+//		for (int j = 0; j < castCount; j++) {
+//			CastMember castMember = cast.get(j);
+//			logger.info("Processing cast :" + castMember.person.name);
+//
+//			// TODO store cast information
+//
+//			Map<String, Object> castData = Converter.cast2Map(castMember);
+//			String character = (String) castData.get("character");
+//			castData.remove("character");
+//
+//			List<String> castLabels = new ArrayList<String>();
+//			castLabels.add("Cast");
+//			castLabels.add("Person");
+//
+//			URI castNode;
+//			try {
+//				castNode = Neo4JClient.createNodeWithProperties(castLabels, castData);
+//				logger.info("added cast :" + castMember.person.name);
+//
+//				castProps.add(castNode);
+//				castProps.add(character);
+//				castURIProps.put(castMember.person.ids.trakt, castProps);
+//			} catch (Neo4JRequestException e) {
+////				GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "id_trakt",
+////						castMember.person.ids.trakt);
+////				castNode = new URI(castNodes[0].getSelf());
+//			}
+//
+//		}
+//		return castURIProps;
+//	}
 
 	private static Map<Integer, URI> saveMovieCast(Integer traktID, URI movieURI) {
 		Map<Integer, URI> castURI = new HashMap<Integer, URI>();
 		List<URI> relationshipURI = new ArrayList<URI>();
 
 		TraktClient trakt = new TraktClient();
-		List<CastMember> cast;
 		try {
-			cast = trakt.getCast(String.valueOf(traktID));
-			Map<Integer, List<Object>> castOfMovie = saveCast(cast);
-			for (Entry<Integer, List<Object>> castInfo : castOfMovie.entrySet()) {
+			List<CastMember> cast = trakt.getCast(String.valueOf(traktID));
+			int castCount = cast.size();
+			
+			for(int j=0; j<castCount; j++)
+			{
+				CastMember castMember = cast.get(j);
+				logger.info("processing cast :" + castMember.person.name);
+				// TODO store cast information
+				
+				Map<String, Object> castData = Converter.cast2Map(castMember);
+				String character = (String) castData.get("character");
+				castData.remove("character");
+				List<String> castLabels = new ArrayList<String>();
+				castLabels.add("Cast");
+				castLabels.add("Person");
+				
+				
+				URI castNode;
+				try {
+					castNode = Neo4JClient.createNodeWithProperties(castLabels, castData);
+					logger.info("adding cast :" +castMember.person.name);
+
+					
+				} catch (Neo4JRequestException e) {
+					GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "id_trakt", castMember.person.ids.trakt);
+					castNode = new URI(castNodes[0].getSelf());
+				}
+
 				Map<String, Object> characterMap = new HashMap<String, Object>();
-				characterMap.put("character", (String) castInfo.getValue().get(1));
+				characterMap.put("character", character);
+				URI relationship = Neo4JClient.createRelationshipWithProperties(castNode, movieURI, "acts in", characterMap);
 
-				URI castMemberURI = (URI) castInfo.getValue().get(0);
 
-				URI relationship = Neo4JClient.createRelationshipWithProperties(castMemberURI, movieURI, "acts in",
-						characterMap);
-
-				castURI.put(castInfo.getKey(), castMemberURI);
+				castURI.put(castMember.person.ids.trakt, castNode);
 				relationshipURI.add(relationship);
 
 			}
@@ -126,6 +147,8 @@ public class SaveDataClient {
 			e.printStackTrace();
 		}
 
+		
+		
 		return castURI;
 
 	}
