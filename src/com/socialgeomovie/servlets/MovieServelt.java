@@ -131,7 +131,7 @@ public class MovieServelt {
 		Neo4JClient.safeDeleteNode(movie_id);
 		
 //		return null;
-		return Response.status(Status.OK).entity("{\"status\":\"OK\"}").build();
+		return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
 	}
 	
 	@Path("/{movie_id}/people")

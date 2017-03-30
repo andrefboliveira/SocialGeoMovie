@@ -124,5 +124,6 @@ public class PersonServlet {
 	public Response deletePerson(@PathParam("person_id") int person_id) {
 		Neo4JClient.safeDeleteNode(person_id);
 //		return null;
-		return Response.status(Status.OK).entity("{\"status\":\"OK\"}").build();	}
+		return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
+		}
 }

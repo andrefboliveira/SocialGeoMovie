@@ -12,7 +12,7 @@ $(document).ready(function() {
     }).then(function(data) 
     {
     	var tableMovies = "<table class=\"w3-table w3-striped w3-border\">";
-    	tableMovies += "<caption>Tabelas com todos os filmes</caption>";
+    	tableMovies += "<caption>Tabela com todos os filmes</caption>";
     	tableMovies += "<tr><th>Title</th><th>ID</th></tr>";
     	for(var i=0; i<data.length; i++)
     	{
@@ -22,27 +22,13 @@ $(document).ready(function() {
        $("div#movies").html(tableMovies);
     });
     
-    $.ajax({
-        url: "/aw2017/rest/movie/120/people"
-    }).then(function(data) 
-    {
-    	var tableMoviePeople = "<table class=\"w3-table w3-striped w3-border\">";
-    	tableMoviePeople += "<caption>Tabelas com cast do filme id: 120</caption>";
-    	tableMoviePeople += "<tr><th>Name</th><th>ID</th></tr>";
-    	for(var i=0; i<data.length; i++)
-    	{
-    		tableMoviePeople += "<tr><td>"+data[i].name+"</td><td>"+data[i].id+"</td></tr>"
-    	}
-    	tableMoviePeople+="</table>"
-       $("div#moviePeople").html(tableMoviePeople);
-    });
     
     $.ajax({
         url: "/aw2017/rest/person?limit=20"
     }).then(function(data) 
     {
     	var tablePeople = "<table class=\"w3-table w3-striped w3-border\">";
-    	tablePeople += "<caption>Tabelas com 20 pessoas</caption>";
+    	tablePeople += "<caption>Tabela com 20 pessoas</caption>";
     	tablePeople += "<tr><th>Name</th><th>ID</th></tr>";
     	for(var i=0; i<data.length; i++)
     	{
@@ -52,6 +38,21 @@ $(document).ready(function() {
        $("div#people").html(tablePeople);
     });
     
+    $.ajax({
+        url: "/aw2017/rest/movie/120/people"
+    }).then(function(data) 
+    {
+    	var tableMoviePeople = "<table class=\"w3-table w3-striped w3-border\">";
+    	tableMoviePeople += "<caption>Tabela com cast do filme id: 120</caption>";
+    	tableMoviePeople += "<tr><th>Name</th><th>ID</th></tr>";
+    	for(var i=0; i<data.length; i++)
+    	{
+    		tableMoviePeople += "<tr><td>"+data[i].name+"</td><td>"+data[i].id+"</td></tr>"
+    	}
+    	tableMoviePeople+="</table>"
+       $("div#moviePeople").html(tableMoviePeople);
+    });
+    
 });
 </script>
 </head>
@@ -59,8 +60,8 @@ $(document).ready(function() {
     	<div class="w3-container">
     		<div class="w3-row">
 		       <div class="w3-col s4" id = "movies"></div>
-		       <div class="w3-col s4" id = "moviePeople"></div>
 		       <div class="w3-col s4" id = "people"></div>
+		       <div class="w3-col s4" id = "moviePeople"></div>
 			</div>
 		</div>
     </body>

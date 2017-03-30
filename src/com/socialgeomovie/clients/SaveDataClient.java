@@ -29,7 +29,7 @@ import com.uwetrottmann.trakt5.entities.Movie;
 
 public class SaveDataClient {
 
-	private static final Logger logger = LoggerFactory.getLogger(DeprecatedMoviesServlet.class);
+	private static final Logger logger = LoggerFactory.getLogger(SaveDataClient.class);
 
 	private static Map<Integer, URI> saveMovies(List<Movie> movies)
 			throws UnsupportedEncodingException, URISyntaxException {
