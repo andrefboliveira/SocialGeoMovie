@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.Subtitle;
+import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.servlets.DeprecatedMoviesServlet;
 import com.socialgeomovie.utils.Converter;
@@ -30,6 +31,8 @@ import com.uwetrottmann.trakt5.entities.Movie;
 public class SaveDataClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(SaveDataClient.class);
+	
+	
 
 	private static Map<Integer, URI> saveMovies(List<Movie> movies)
 			throws UnsupportedEncodingException, URISyntaxException {
@@ -62,6 +65,19 @@ public class SaveDataClient {
 		return moviesURI;
 
 	}
+	
+	private static boolean checkRelationExists(URI movieURI, URI castNodeURI) throws UnsupportedEncodingException{
+		List<String> types = new ArrayList<String>();
+		types.add("acts in");
+		GetNodeRelationship[] existingRelations = Neo4JClient.getNodeRelationshipsByType(castNodeURI, types);
+		
+		for (GetNodeRelationship getNodeRelationship : existingRelations) {
+			if (movieURI.toString().equals(getNodeRelationship.getEnd())){
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private static Map<Integer, URI> saveMovieCast(Integer traktID, URI movieURI) {
 		Map<Integer, URI> castURI = new HashMap<Integer, URI>();
@@ -90,18 +106,32 @@ public class SaveDataClient {
 				try {
 					castNode = Neo4JClient.createNodeWithProperties(castLabels, castData);
 					castURI.put(castMember.person.ids.trakt, castNode);
+					
+					Map<String, Object> characterMap = new HashMap<String, Object>();
+					characterMap.put("character", character);
+					URI relationship = Neo4JClient.createRelationshipWithProperties(castNode, movieURI, "acts in", characterMap);
+					relationshipURI.add(relationship);
 					logger.info("adding cast :" +castMember.person.name);
 
 					
 				} catch (Neo4JRequestException e) {
 					GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "id_trakt", castMember.person.ids.trakt);
 					castNode = new URI(castNodes[0].getSelf());
+					
+					boolean existingRelation = checkRelationExists(movieURI, castNode);
+					
+					if (!existingRelation) {
+						Map<String, Object> characterMap = new HashMap<String, Object>();
+						characterMap.put("character", character);
+						URI relationship = Neo4JClient.createRelationshipWithProperties(castNode, movieURI, "acts in", characterMap);
+						relationshipURI.add(relationship);
+						logger.info("adding existing cast :" +castMember.person.name);
+
+					}
+					
 				}
 
-				Map<String, Object> characterMap = new HashMap<String, Object>();
-				characterMap.put("character", character);
-				URI relationship = Neo4JClient.createRelationshipWithProperties(castNode, movieURI, "acts in", characterMap);
-				relationshipURI.add(relationship);
+				
 
 			}
 

@@ -521,8 +521,9 @@ public abstract class Neo4JClient {
 	}
 	
 	public static GetNodeRelationship[] getNodeRelationshipsByType(URI nodeUri, List<String> types) throws UnsupportedEncodingException {
-		String safe_types = URLEncoder.encode(String.join("&", types), "UTF-8");
+		String safe_types = URLEncoder.encode(String.join("&", types), "UTF-8").replace("+", "%20");
 		String relationsUri = nodeUri.toString() + "/relationships/all/" + safe_types;
+		
 
 		WebResource resource = createWebResource(relationsUri);
 		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
@@ -534,6 +535,7 @@ public abstract class Neo4JClient {
 
 		String output = response.getEntity(String.class);
 		GetNodeRelationship[] relationships = gson.fromJson(output, GetNodeRelationship[].class);
+		
 
 		response.close();
 
