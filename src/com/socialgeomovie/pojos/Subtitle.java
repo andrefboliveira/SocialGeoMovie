@@ -1,7 +1,5 @@
 package com.socialgeomovie.pojos;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-
 public class Subtitle {
 
 	private Integer subtitleId;

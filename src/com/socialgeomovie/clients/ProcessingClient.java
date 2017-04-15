@@ -46,11 +46,11 @@ public class ProcessingClient {
 			
 			try {
 				movieNode = Neo4JClient.createNodeWithProperties("Movie", movieProperties);
-				System.out.println("Movie" + movie.title);
+//				System.out.println("Movie" + movie.title);
 			} catch (Neo4JRequestException e) {
 				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "trakt", id);
 				for (GetNodesByLabel getNodesByLabel : movieNodes) {
-					System.out.println(getNodesByLabel.getLabels());
+//					System.out.println(getNodesByLabel.getLabels());
 				}
 				movieNode = new URI(movieNodes[0].getSelf());
 			}
@@ -59,7 +59,7 @@ public class ProcessingClient {
 			
 			TraktClient trakt_cast = new TraktClient();
 			List<CastMember> cast = trakt_cast.getCast(String.valueOf(id));
-			System.out.println(cast.size());
+//			System.out.println(cast.size());
 			
 			for (CastMember castMember : cast) {
 				HashMap<String, Object> castProperties = new HashMap<String, Object>();
@@ -76,7 +76,7 @@ public class ProcessingClient {
 		
 
 					castNode = Neo4JClient.createNodeWithProperties(castLabels, castProperties);
-					System.out.println(castMember.person.name);
+//					System.out.println(castMember.person.name);
 					
 				} catch (Neo4JRequestException e) {
 					GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "name", castMember.person.name);

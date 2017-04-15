@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    $.ajax({
+        url: "file:///C:/Users/r.vallejo/Desktop/a.json"
+    }).then(function(data) {
+    	$('#body').append(data)
+       $('.movieId').append(data.one);
+       $('.movieTitle').append(data.key);
+    });
+});
+</script>
+</head>
+    <body id="body">
+        <div>
+            <p class="movieId">The Movie ID is </p>
+            <p class="movieTitle">The Movie title is </p>
+        </div>
+    </body>
+</html>
