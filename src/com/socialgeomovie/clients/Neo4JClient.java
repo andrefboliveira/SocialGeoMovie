@@ -36,7 +36,7 @@ import com.socialgeomovie.utils.Neo4JRequestException;
 public abstract class Neo4JClient {
 	private static final String SERVER_ROOT_URI = "http://localhost:7474/db/data/";
 	private static final String username = "neo4j";
-	private static final String password = "neo";
+	private static final String password = "aw";
 
 	private static Gson gson = new Gson();
 
