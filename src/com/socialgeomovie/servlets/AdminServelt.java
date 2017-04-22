@@ -5,10 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -27,9 +29,9 @@ public class AdminServelt {
 	@Path("/movies")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response importMovies() 
+	public Response importMovies(@DefaultValue("10") @QueryParam("quantity") final int quantity) 
 	{
-		Map<Integer, URI> moviesReport = SaveDataClient.saveAllMovies();
+		Map<Integer, URI> moviesReport = SaveDataClient.saveAllMovies(quantity);
 		Map<String, String> report = new HashMap<String,String>();
 		report.put("status", "OK");
 		report.put("movies", ""+moviesReport.size());

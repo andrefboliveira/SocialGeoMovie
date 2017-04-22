@@ -1,9 +1,12 @@
 package com.socialgeomovie.clients;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,8 +50,30 @@ public class SaveDataClient {
 
 			URI movieNode;
 
-			try {
-				movieNode = Neo4JClient.createNodeWithProperties("Movie", Converter.movie2Map(movie));
+			try
+			{
+				Map<String, Object> movieMap = Converter.movie2Map(movie);
+						
+						
+						
+						
+				URL url;
+				try
+				{
+					url = new URL("http://www.omdbapi.com/?i="+movie.ids.imdb);
+					InputStreamReader reader = new InputStreamReader(url.openStream());
+			        HashMap extraInfoMap = new Gson().fromJson(reader, new HashMap<String,Object>().getClass());
+			        movieMap.put("poster",extraInfoMap.get("Poster"));
+				} 
+				catch (IOException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		        
+		        
+		        
+				movieNode = Neo4JClient.createNodeWithProperties("Movie", movieMap);
 				logger.info("Added movie: " + movie.title);
 
 				moviesURI.put(movie.ids.trakt, movieNode);
@@ -146,15 +171,19 @@ public class SaveDataClient {
 
 	}
 
-	public static Map<Integer, URI> saveAllMovies() {
+	public static Map<Integer, URI> saveAllMovies(int quantity) 
+	{
 		Map<Integer, URI> moviesURI = null;
 
-		try {
+		try
+		{
 			TraktClient trakt = new TraktClient();
-			List<Movie> movies = trakt.getPopularMovies(1, 10);
+			List<Movie> movies = trakt.getPopularMovies(1, quantity);
 
 			moviesURI = saveMovies(movies);
-		} catch (IOException | URISyntaxException e) {
+		} 
+		catch (IOException | URISyntaxException e) 
+		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
