@@ -79,7 +79,7 @@ public abstract class Neo4JClient {
 		return node;
 	}
 
-	private static GetNodeByID getNodeByID(String ID) {
+	public static GetNodeByID getNodeByID(String ID) {
 		final String nodeUri = SERVER_ROOT_URI + "node/" + ID;
 
 		WebResource resource = createWebResource(nodeUri);

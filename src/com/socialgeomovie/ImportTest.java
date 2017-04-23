@@ -98,7 +98,7 @@ public class ImportTest {
 	}
 
 		public static void main(String[] args) throws URISyntaxException, IOException {
-//			imp();
+			imp();
 //			Neo4JConfig.cleanDB();
 	
 		}

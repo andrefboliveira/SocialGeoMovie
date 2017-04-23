@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response.Status;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.socialgeomovie.clients.Neo4JClient;
+import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 
 @Path("/person")
@@ -95,13 +96,18 @@ public class PersonServlet {
 	}
 
 	/**
-	 * Get info about a person
+	 * Get info about a given Neo4J person 
+	 * Example(Ryan Reynolds): http://localhost:8080/aw2017/rest/person/534
 	 */
 	@GET
 	@Path("/{person_id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPerson(@PathParam("person_id") int person_id) {
-		return null;
+	public Response getPerson(@PathParam("person_id") String person_id) {
+		Gson gson = new Gson();
+		GetNodeByID personNode = Neo4JClient.getNodeByID(person_id);
+		LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
+				.getNodeProperties(personNode.getProperties());
+		return Response.status(Status.OK).entity(gson.toJson(propertiesResponse)).build();
 	}
 
 	/**

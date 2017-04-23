@@ -33,11 +33,14 @@ import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
+import com.uwetrottmann.trakt5.entities.Movie;
 
 @Path("/movie")
 public class MovieServelt {
 	// http://localhost:8080/aw2017/rest/movie
 
+	private static final Logger logger = LoggerFactory.getLogger(MovieServelt.class);
+	
 	/**
 	 * Get all movies. // Include filtering number of results option
 	 */
@@ -97,15 +100,20 @@ public class MovieServelt {
 	public Response createMovie() {
 		return null;
 	}
-
+	
 	/**
-	 * Add info about a movie
+	 * Get movie info by given Neo4J Id
+	 * Example(deadpool): http://localhost:8080/aw2017/rest/movie/524
 	 */
 	@GET
 	@Path("/{movie_id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMovie(@PathParam("movie_id") int movie_id) {
-		return null;
+	public Response getMovie(@PathParam("movie_id") String movie_id) {
+		Gson gson = new Gson();
+		GetNodeByID movieNode = Neo4JClient.getNodeByID(movie_id);
+		LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
+				.getNodeProperties(movieNode.getProperties());
+		return Response.status(Status.OK).entity(gson.toJson(propertiesResponse)).build();
 	}
 
 	/**
