@@ -1,0 +1,31 @@
+<h2 id="show-user"><strong>Show User</strong></h2>
+<p>Returns json data about a single user.</p>
+<ul>
+<li><strong>URL</strong></li>
+</ul>
+<p>/users/:id</p>
+<ul>
+<li><strong>Method:</strong></li>
+</ul>
+<p><code>GET</code></p>
+<ul>
+<li><strong>URL Params</strong></li>
+</ul>
+<p><strong>Required:</strong></p>
+<p><code>id=[integer]</code></p>
+<ul>
+<li><strong>Data Params</strong></li>
+</ul>
+<p>None</p>
+<ul>
+<li><p><strong>Success Response:</strong></p></li>
+<li><p><strong>Code:</strong> 200 <br /> <strong>Content:</strong> <code>{ id : 12, name : &quot;Michael Bloom&quot; }</code></p></li>
+<li><p><strong>Error Response:</strong></p></li>
+<li><p><strong>Code:</strong> 404 NOT FOUND <br /> <strong>Content:</strong> <code>{ error : &quot;User doesn't exist&quot; }</code></p></li>
+</ul>
+<p>OR</p>
+<ul>
+<li><p><strong>Code:</strong> 401 UNAUTHORIZED <br /> <strong>Content:</strong> <code>{ error : &quot;You are unauthorized to make this request.&quot; }</code></p></li>
+<li><p><strong>Sample Call:</strong></p></li>
+</ul>
+<p><code>javascript     $.ajax({       url: &quot;/users/1&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>

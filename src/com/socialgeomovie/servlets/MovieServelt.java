@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -21,6 +20,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -33,7 +33,10 @@ import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
-import com.uwetrottmann.trakt5.entities.Movie;
+import com.socialgeomovie.pojos.neo4j.cypher.CypherResultNormal;
+import com.socialgeomovie.pojos.neo4j.cypher.CypherResults;
+import com.socialgeomovie.pojos.neo4j.cypher.Datum;
+import com.socialgeomovie.pojos.neo4j.cypher.Result;
 
 @Path("/movie")
 public class MovieServelt {
@@ -102,18 +105,18 @@ public class MovieServelt {
 	}
 	
 	/**
-	 * Get movie info by given Neo4J Id
-	 * Example(deadpool): http://localhost:8080/aw2017/rest/movie/524
+	 * Get movie info by given movie name
+	 * Example(deadpool): http://localhost:8080/aw2017/rest/movie/deadpool
 	 */
 	@GET
-	@Path("/{movie_id}")
+	@Path("/{movie_name}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMovie(@PathParam("movie_id") String movie_id) {
-		Gson gson = new Gson();
-		GetNodeByID movieNode = Neo4JClient.getNodeByID(movie_id);
-		LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
-				.getNodeProperties(movieNode.getProperties());
-		return Response.status(Status.OK).entity(gson.toJson(propertiesResponse)).build();
+	public Response getMovie(@PathParam("movie_name") String movie_name) {
+		String query = "MATCH (s) where toLower(s.title) = toLower('" + movie_name + "') return s";
+		System.out.println(query);
+		Map<String, Object> ret = Neo4JClient.sendTransactionalCypherQuery2(query);
+		Object movie = ((List<Object>)((Map<String, Object>)((List<Object>)((Map<String, Object>)((List<Object>) ret.get("results")).get(0)).get("data")).get(0)).get("row")).get(0);
+		return Response.status(Status.OK).entity(new Gson().toJson(movie)).build();
 	}
 
 	/**

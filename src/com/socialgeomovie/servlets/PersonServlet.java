@@ -103,11 +103,11 @@ public class PersonServlet {
 	@Path("/{person_id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getPerson(@PathParam("person_id") String person_id) {
-		Gson gson = new Gson();
-		GetNodeByID personNode = Neo4JClient.getNodeByID(person_id);
-		LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
-				.getNodeProperties(personNode.getProperties());
-		return Response.status(Status.OK).entity(gson.toJson(propertiesResponse)).build();
+		String query = "MATCH (s) where toLower(s.name) = toLower('" + person_id + "') return s";
+		System.out.println(query);
+		Map<String, Object> ret = Neo4JClient.sendTransactionalCypherQuery2(query);
+		Object movie = ((List<Object>)((Map<String, Object>)((List<Object>)((Map<String, Object>)((List<Object>) ret.get("results")).get(0)).get("data")).get(0)).get("row")).get(0);
+		return Response.status(Status.OK).entity(new Gson().toJson(movie)).build();
 	}
 
 	/**
