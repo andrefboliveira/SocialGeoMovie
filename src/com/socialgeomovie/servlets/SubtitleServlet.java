@@ -52,6 +52,6 @@ public class SubtitleServlet {
 //		logger.info(googleEntities);
 		Gson gson = new Gson();
 		logger.info("Showing subitle of movie " + movie_id);
-		return Response.status(Status.OK).entity(gson.toJson(subtitle)).build();
+		return Response.status(Status.OK).entity(gson.toJson(retMap)).build();
 	}
 }
