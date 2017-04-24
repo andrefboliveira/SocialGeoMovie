@@ -37,6 +37,7 @@ import com.socialgeomovie.pojos.neo4j.cypher.CypherResultNormal;
 import com.socialgeomovie.pojos.neo4j.cypher.CypherResults;
 import com.socialgeomovie.pojos.neo4j.cypher.Datum;
 import com.socialgeomovie.pojos.neo4j.cypher.Result;
+import com.uwetrottmann.trakt5.entities.Movie;
 
 @Path("/movie")
 public class MovieServelt {
@@ -67,16 +68,17 @@ public class MovieServelt {
 			firstResult = 0;
 			lastResult = length;
 		}
-
-		for (GetNodesByLabel getNodesByLabel : Arrays.copyOfRange(movieNodes, firstResult, lastResult)) {
+		
+		for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
+			GetNodesByLabel getNodesByLabel = movieNodes[nodeNumber];
+			
 			Map<String, Object> nodeInfo = new HashMap<String, Object>();
 			try {
 				URI propertiesURI = new URI(getNodesByLabel.getSelf());
 				LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
 						.getNodeProperties(propertiesURI);
 
-				Number idNumb = (Number) propertiesResponse.get("id_trakt");
-				nodeInfo.put("id", idNumb.intValue());
+				nodeInfo.put("uri", propertiesResponse.get("uri"));
 
 				if (details) {
 					nodeInfo.putAll(propertiesResponse);
@@ -109,14 +111,33 @@ public class MovieServelt {
 	 * Example(deadpool): http://localhost:8080/aw2017/rest/movie/deadpool
 	 */
 	@GET
-	@Path("/{movie_name}")
+	@Path("/{movie_id}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMovie(@PathParam("movie_name") String movie_name) {
-		String query = "MATCH (s) where toLower(s.title) = toLower('" + movie_name + "') return s";
-		System.out.println(query);
-		Map<String, Object> ret = Neo4JClient.sendTransactionalCypherQuery2(query);
-		Object movie = ((List<Object>)((Map<String, Object>)((List<Object>)((Map<String, Object>)((List<Object>) ret.get("results")).get(0)).get("data")).get(0)).get("row")).get(0);
-		return Response.status(Status.OK).entity(new Gson().toJson(movie)).build();
+	public Response getMovie(@PathParam("movie_id") String movie_id) {
+		Gson gson = new Gson();
+
+		Map<String, Object> nodeInfo = new HashMap<String, Object>();
+
+		try {
+			GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_id);
+
+			for (GetNodesByLabel getNodesByLabel : movieNodes) {
+
+				URI propertiesURI = new URI(getNodesByLabel.getSelf());
+				LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
+						.getNodeProperties(propertiesURI);
+
+				nodeInfo.putAll(propertiesResponse);
+
+			}
+
+		} catch (UnsupportedEncodingException | URISyntaxException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		return Response.status(Status.OK).entity(gson.toJson(nodeInfo)).build();
+
 	}
 
 	/**

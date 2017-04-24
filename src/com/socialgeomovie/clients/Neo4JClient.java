@@ -13,16 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.json.JsonArray;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -83,7 +79,7 @@ public abstract class Neo4JClient {
 		return node;
 	}
 
-	public static GetNodeByID getNodeByID(String ID) {
+	private static GetNodeByID getNodeByID(String ID) {
 		final String nodeUri = SERVER_ROOT_URI + "node/" + ID;
 
 		WebResource resource = createWebResource(nodeUri);
@@ -755,35 +751,35 @@ public abstract class Neo4JClient {
 		return queryResult;
 	}
 	
-	public static Map<String, Object> sendTransactionalCypherQuery2(String query) {
-		final String txUri = SERVER_ROOT_URI + "transaction/commit";
-
-		WebResource resource = createWebResource(txUri);
-
-		Map<String, Object> payloadRaw = new HashMap<String, Object>();
-		ArrayList<Map<String, String>> list_statements = new ArrayList<Map<String, String>>();
-		Map<String, String> statement = new HashMap<String, String>();
-
-		statement.put("statement", query);
-		list_statements.add(statement);
-		payloadRaw.put("statements", list_statements);
-
-		String payload = gson.toJson(payloadRaw);
-
-		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
-				.entity(payload).post(ClientResponse.class);
-
-		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new Neo4JRequestException("Failed! " + response.toString());
-		}
-
-		String output = response.getEntity(String.class);
-		Map<String,Object> queryResult = gson.fromJson(output, Map.class);
-		
-		response.close();
-		
-		return queryResult;
-	}
+//	public static Map<String, Object> sendTransactionalCypherQuery2(String query) {
+//		final String txUri = SERVER_ROOT_URI + "transaction/commit";
+//
+//		WebResource resource = createWebResource(txUri);
+//
+//		Map<String, Object> payloadRaw = new HashMap<String, Object>();
+//		ArrayList<Map<String, String>> list_statements = new ArrayList<Map<String, String>>();
+//		Map<String, String> statement = new HashMap<String, String>();
+//
+//		statement.put("statement", query);
+//		list_statements.add(statement);
+//		payloadRaw.put("statements", list_statements);
+//
+//		String payload = gson.toJson(payloadRaw);
+//
+//		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
+//				.entity(payload).post(ClientResponse.class);
+//
+//		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
+//			throw new Neo4JRequestException("Failed! " + response.toString());
+//		}
+//
+//		String output = response.getEntity(String.class);
+//		Map<String,Object> queryResult = gson.fromJson(output, Map.class);
+//		
+//		response.close();
+//		
+//		return queryResult;
+//	}
 	
 	private static CypherResults sendTransactionalCypherQueries(List<Object> statements, Boolean graphResult) {
 		final String txUri = SERVER_ROOT_URI + "transaction/commit";

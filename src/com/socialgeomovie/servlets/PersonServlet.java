@@ -1,5 +1,6 @@
 package com.socialgeomovie.servlets;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -37,8 +38,7 @@ public class PersonServlet {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPeople(
-			@DefaultValue("false") @QueryParam("include_details") final boolean details,
+	public Response getPeople(@DefaultValue("false") @QueryParam("include_details") final boolean details,
 			@DefaultValue("-1") @QueryParam("limit") final int limit,
 			@DefaultValue("1") @QueryParam("page") final int page) {
 		List<Map<String, Object>> nodeList = new ArrayList<>();
@@ -46,33 +46,32 @@ public class PersonServlet {
 
 		GetNodesByLabel[] personNodes = Neo4JClient.getNodesByLabel("Person");
 		int length = personNodes.length;
-		
+
 		int firstResult, lastResult;
 		if (limit > -1) {
 			firstResult = Integer.min(length, ((page - 1) * limit));
-			lastResult =  Integer.min(length, (firstResult + limit));
+			lastResult = Integer.min(length, (firstResult + limit));
 		} else {
 			firstResult = 0;
 			lastResult = length;
 		}
-		
-		for (GetNodesByLabel getNodesByLabel : Arrays.copyOfRange(personNodes, firstResult, lastResult)) {
+
+		for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
+			GetNodesByLabel getNodesByLabel = personNodes[nodeNumber];
+
 			Map<String, Object> nodeInfo = new HashMap<String, Object>();
 			try {
 				URI propertiesURI = new URI(getNodesByLabel.getSelf());
 				LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
 						.getNodeProperties(propertiesURI);
-				
-				Number idNumb = (Number) propertiesResponse.get("id_trakt");
-				nodeInfo.put("id", idNumb.intValue());
-				
-				
+
+				nodeInfo.put("uri", propertiesResponse.get("uri"));
+
 				if (details) {
 					nodeInfo.putAll(propertiesResponse);
 				} else {
 					nodeInfo.put("name", propertiesResponse.get("name"));
 				}
-				
 
 				nodeList.add(nodeInfo);
 
@@ -83,7 +82,6 @@ public class PersonServlet {
 		}
 		return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 	}
-		
 
 	/**
 	 * Create a new person
@@ -96,28 +94,47 @@ public class PersonServlet {
 	}
 
 	/**
-	 * Get info about a given Neo4J person 
-	 * Example(Ryan Reynolds): http://localhost:8080/aw2017/rest/person/534
+	 * Get info about a given Neo4J person Example(Ryan Reynolds):
+	 * http://localhost:8080/aw2017/rest/person/534
 	 */
 	@GET
-	@Path("/{person_id}")
+	@Path("/{person_uri}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPerson(@PathParam("person_id") String person_id) {
-		String query = "MATCH (s) where toLower(s.name) = toLower('" + person_id + "') return s";
-		System.out.println(query);
-		Map<String, Object> ret = Neo4JClient.sendTransactionalCypherQuery2(query);
-		Object movie = ((List<Object>)((Map<String, Object>)((List<Object>)((Map<String, Object>)((List<Object>) ret.get("results")).get(0)).get("data")).get(0)).get("row")).get(0);
-		return Response.status(Status.OK).entity(new Gson().toJson(movie)).build();
+	public Response getPerson(@PathParam("person_uri") String person_uri) {
+		Gson gson = new Gson();
+
+		Map<String, Object> nodeInfo = new HashMap<String, Object>();
+
+		try {
+			GetNodesByLabel[] personNodes = Neo4JClient.getNodesByLabelAndProperty("Person", "uri", person_uri);
+
+			for (GetNodesByLabel getNodesByLabel : personNodes) {
+
+				URI propertiesURI = new URI(getNodesByLabel.getSelf());
+				LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
+						.getNodeProperties(propertiesURI);
+
+				nodeInfo.putAll(propertiesResponse);
+
+			}
+
+		} catch (UnsupportedEncodingException | URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return Response.status(Status.OK).entity(gson.toJson(nodeInfo)).build();
+
 	}
 
 	/**
 	 * update person info
 	 */
 	@PUT
-	@Path("/{person_id}")
+	@Path("/{person_uri}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updatePerson(@PathParam("person_id") int person_id) {
+	public Response updatePerson(@PathParam("person_uri") int person_uri) {
 		return null;
 	}
 
@@ -125,11 +142,11 @@ public class PersonServlet {
 	 * delete person
 	 */
 	@DELETE
-	@Path("/{person_id}")
+	@Path("/{person_uri}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deletePerson(@PathParam("person_id") int person_id) {
-		Neo4JClient.safeDeleteNode(person_id);
-//		return null;
+	public Response deletePerson(@PathParam("person_uri") int person_uri) {
+		Neo4JClient.safeDeleteNode(person_uri);
+		// return null;
 		return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
-		}
+	}
 }

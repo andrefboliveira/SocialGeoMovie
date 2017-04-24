@@ -7,6 +7,11 @@ public abstract class Neo4JConfig {
 	
 	public static void setUniqueConstraints() {
 		try {
+			Neo4JClient.createUniquenessConstraint("Movie", "uri");
+		} catch (Neo4JRequestException e) {
+		} 	
+		
+		try {
 			Neo4JClient.createUniquenessConstraint("Movie", "title");
 		} catch (Neo4JRequestException e) {
 		} 		
@@ -25,6 +30,11 @@ public abstract class Neo4JConfig {
 			Neo4JClient.createUniquenessConstraint("Movie", "id_tmdb");
 		}  catch (Neo4JRequestException e) {
 		}
+		
+		try {
+			Neo4JClient.createUniquenessConstraint("Cast", "uri");
+		} catch (Neo4JRequestException e) {
+		} 	
 		
 		try {
 			Neo4JClient.createUniquenessConstraint("Cast", "name");
@@ -47,9 +57,21 @@ public abstract class Neo4JConfig {
 		}
 		
 		try {
+			Neo4JClient.createUniquenessConstraint("Person", "uri");
+		} catch (Neo4JRequestException e) {
+		} 	
+		
+		try {
 			Neo4JClient.createUniquenessConstraint("Person", "name");
 		}  catch (Neo4JRequestException e) {
 		}
+		
+		try {
+			Neo4JClient.createUniquenessConstraint("Location", "uri");
+		}  catch (Neo4JRequestException e) {
+		}
+		
+		
 	}
 
 	

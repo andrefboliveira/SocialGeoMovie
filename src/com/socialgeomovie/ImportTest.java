@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ import com.socialgeomovie.clients.TwitterClient;
 import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.utils.Converter;
+import com.socialgeomovie.utils.IDParser;
 import com.socialgeomovie.utils.Neo4JRequestException;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
@@ -98,9 +100,11 @@ public class ImportTest {
 	}
 
 		public static void main(String[] args) throws URISyntaxException, IOException {
-			imp();
+//			imp();
 //			Neo4JConfig.cleanDB();
-	
+//			Neo4JConfig.deleteAll();
+			Neo4JConfig.setUniqueConstraints();
+//			System.out.println(IDParser.createURI(" ola tTESte asd153 olá é um dia cão"));
 		}
 
 	}

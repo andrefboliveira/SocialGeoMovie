@@ -11,6 +11,7 @@ public class Converter
 	public static Map<String, Object> movie2Map(Movie movie)
 	{
 		Map<String, Object> movieData = new HashMap<String, Object>();
+		movieData.put("uri", IDParser.createURI(movie.title));
 		movieData.put("id_imdb", movie.ids.imdb);
 		movieData.put("id_trakt", movie.ids.trakt);
 		movieData.put("id_tmdb", movie.ids.tmdb);
@@ -31,6 +32,7 @@ public class Converter
 	public static Map<String, Object> cast2Map(CastMember cast)
 	{
 		Map<String, Object> castData = new HashMap<String, Object>();
+		castData.put("uri", IDParser.createURI(cast.person.name));
 		castData.put("character", cast.character);
 		castData.put("name",cast.person.name);
 		castData.put("id_trakt",cast.person.ids.trakt);
