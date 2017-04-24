@@ -13,8 +13,8 @@ public class Converter
 		Map<String, Object> movieData = new HashMap<String, Object>();
 		movieData.put("uri", IDParser.createURI(movie.title));
 		movieData.put("id_imdb", movie.ids.imdb);
-		movieData.put("id_trakt", movie.ids.trakt);
-		movieData.put("id_tmdb", movie.ids.tmdb);
+		movieData.put("id_trakt", String.valueOf(movie.ids.trakt));
+		movieData.put("id_tmdb", String.valueOf(movie.ids.tmdb));
 		movieData.put("rating", movie.rating);
 		movieData.put("title", movie.title);
 		movieData.put("tagline", movie.tagline);
@@ -35,9 +35,9 @@ public class Converter
 		castData.put("uri", IDParser.createURI(cast.person.name));
 		castData.put("character", cast.character);
 		castData.put("name",cast.person.name);
-		castData.put("id_trakt",cast.person.ids.trakt);
 		castData.put("id_imdb",cast.person.ids.imdb);
-		castData.put("id_tmdb",cast.person.ids.tmdb);
+		castData.put("id_trakt",String.valueOf(cast.person.ids.trakt));
+		castData.put("id_tmdb",String.valueOf(cast.person.ids.tmdb));
 		
 		return castData;
 	}

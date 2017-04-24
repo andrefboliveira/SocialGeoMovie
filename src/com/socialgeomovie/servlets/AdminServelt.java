@@ -31,7 +31,7 @@ public class AdminServelt {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response importMovies(@DefaultValue("10") @QueryParam("quantity") final int quantity) 
 	{
-		Map<Integer, URI> moviesReport = SaveDataClient.saveAllMovies(quantity);
+		Map<String, URI> moviesReport = SaveDataClient.saveAllMovies(quantity);
 		Map<String, String> report = new HashMap<String,String>();
 		report.put("status", "OK");
 		report.put("movies", ""+moviesReport.size());
@@ -48,7 +48,7 @@ public class AdminServelt {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response importCast() 
 	{
-		Map<Integer, URI> castReport = SaveDataClient.saveAllMovieCast();
+		Map<String, URI> castReport = SaveDataClient.saveAllMovieCast();
 		Map<String, String> report = new HashMap<String,String>();
 		report.put("status", "OK");
 		report.put("cast", ""+castReport.size());
