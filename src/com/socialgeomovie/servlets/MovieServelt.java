@@ -84,6 +84,7 @@ public class MovieServelt {
 					nodeInfo.putAll(propertiesResponse);
 				} else {
 					nodeInfo.put("title", propertiesResponse.get("title"));
+					nodeInfo.put("poster", propertiesResponse.get("poster"));
 				}
 
 				nodeList.add(nodeInfo);
