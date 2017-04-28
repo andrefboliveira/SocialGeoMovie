@@ -130,8 +130,8 @@ public class DeprecatedMoviesServlet
 				}
 				
 				int tweetCount = 3;
-				List<String> tweets = twitterClient.getTweet(movie.title, tweetCount);
-				report.put("tweets", tweets.size() + report.get("tweets"));
+//				List<String> tweets = twitterClient.getTweet(movie.title, tweetCount);
+//				report.put("tweets", tweets.size() + report.get("tweets"));
 				
 				logger.info("Import process done");
 				Neo4JConfig.cleanDB();
