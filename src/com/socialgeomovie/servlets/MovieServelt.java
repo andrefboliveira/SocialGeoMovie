@@ -181,7 +181,7 @@ public class MovieServelt {
 		@GET
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response getMovie(
-				@PathParam("movie_id") int movie_id,
+				@PathParam("movie_id") String movie_id,
 				@DefaultValue("false") @QueryParam("include_details") final boolean details,
 				@DefaultValue("-1") @QueryParam("limit") final int limit,
 				@DefaultValue("1") @QueryParam("page") final int page) {
@@ -190,7 +190,7 @@ public class MovieServelt {
 			Gson gson = new Gson();
 			
 			try {
-				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "id_trakt", movie_id);
+				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_id);
 				String movieRelationURI = movieNodes[0].getAllRelationships();
 				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationships(movieRelationURI);
 				
@@ -205,7 +205,13 @@ public class MovieServelt {
 					lastResult = length;
 				}
 				
-				for (GetNodeRelationship getNodeRelationship : Arrays.copyOfRange(nodeRelationship, firstResult, lastResult)) {
+				for (int i = 0; i < nodeRelationship.length; i++) {
+					
+				}
+				
+				for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
+					GetNodeRelationship getNodeRelationship = nodeRelationship[nodeNumber];
+					
 					Map<String, Object> nodeInfo = new HashMap<String, Object>();
 					
 					String nodeID = getNodeRelationship.getStart();
@@ -214,8 +220,8 @@ public class MovieServelt {
 					LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
 							.getNodeProperties(nodePropertiesURI);
 
-					Number idNumb = (Number) propertiesResponse.get("id_trakt");
-					nodeInfo.put("id", idNumb.intValue());
+					String uri = (String) propertiesResponse.get("uri");
+					nodeInfo.put("uri", uri);
 
 					if (details) {
 						nodeInfo.putAll(propertiesResponse);
