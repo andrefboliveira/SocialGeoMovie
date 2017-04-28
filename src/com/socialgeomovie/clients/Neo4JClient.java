@@ -432,12 +432,12 @@ public abstract class Neo4JClient {
 	}
 	
 	private static void updateNodeProperties(URI nodeUri, String propertyName, String propertyValue) {
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put(propertyName, propertyValue);
 		updateNodeProperties(nodeUri, properties);
 	}
 	
-	private static void updateNodeProperties(URI nodeUri, Map<String, String> properties) {
+	public static void updateNodeProperties(URI nodeUri, Map<String, Object> properties) {
 		String propertyUri = nodeUri.toString() + "/properties";
 
 		WebResource resource = createWebResource(propertyUri);

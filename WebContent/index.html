@@ -16,7 +16,7 @@ $(document).ready(function() {
     	tableMovies += "<tr><th>Title</th><th>ID</th></tr>";
     	for(var i=0; i<data.length; i++)
     	{
-    		tableMovies += "<tr><td>"+data[i].title+"</td><td>"+data[i].id+"</td></tr>"
+    		tableMovies += "<tr><td>"+data[i].title+"</td><td>"+data[i].uri+"</td></tr>"
     	}
     	tableMovies+="</table>"
        $("div#movies").html(tableMovies);
@@ -32,7 +32,7 @@ $(document).ready(function() {
     	tablePeople += "<tr><th>Name</th><th>ID</th></tr>";
     	for(var i=0; i<data.length; i++)
     	{
-    		tablePeople += "<tr><td>"+data[i].name+"</td><td>"+data[i].id+"</td></tr>"
+    		tablePeople += "<tr><td>"+data[i].name+"</td><td>"+data[i].uri+"</td></tr>"
     	}
     	tablePeople+="</table>"
        $("div#people").html(tablePeople);
@@ -47,7 +47,7 @@ $(document).ready(function() {
     	tableMoviePeople += "<tr><th>Name</th><th>ID</th></tr>";
     	for(var i=0; i<data.length; i++)
     	{
-    		tableMoviePeople += "<tr><td>"+data[i].name+"</td><td>"+data[i].id+"</td></tr>"
+    		tableMoviePeople += "<tr><td>"+data[i].name+"</td><td>"+data[i].uri+"</td></tr>"
     	}
     	tableMoviePeople+="</table>"
        $("div#moviePeople").html(tableMoviePeople);

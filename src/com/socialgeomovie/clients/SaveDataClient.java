@@ -35,7 +35,20 @@ public class SaveDataClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(SaveDataClient.class);
 
-	private static Map<String, URI> saveMovies(List<Movie> movies)
+	private static boolean checkRelationExists(URI movieURI, URI castNodeURI) throws UnsupportedEncodingException {
+		List<String> types = new ArrayList<String>();
+		types.add("acts in");
+		GetNodeRelationship[] existingRelations = Neo4JClient.getNodeRelationshipsByType(castNodeURI, types);
+	
+		for (GetNodeRelationship getNodeRelationship : existingRelations) {
+			if (movieURI.toString().equals(getNodeRelationship.getEnd())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static Map<String, URI> saveTraktMovies(List<Movie> movies, boolean updateData)
 			throws UnsupportedEncodingException, URISyntaxException {
 		Map<String, URI> moviesURI = new HashMap<String, URI>();
 
@@ -44,31 +57,29 @@ public class SaveDataClient {
 			Movie movie = movies.get(i);
 			logger.info("Processing movie: " + movie.title);
 
-			// TODO store movie data
+			
+			Map<String, Object> movieMap = Converter.traktMovie2Map(movie);
 
 			URI movieNode;
 
-			try {
-				Map<String, Object> movieMap = Converter.movie2Map(movie);
-
-				URL url;
-				try {
-					url = new URL("http://www.omdbapi.com/?i=" + movie.ids.imdb);
-					InputStreamReader reader = new InputStreamReader(url.openStream());
-					HashMap extraInfoMap = new Gson().fromJson(reader, new HashMap<String, Object>().getClass());
-					movieMap.put("poster", extraInfoMap.get("Poster"));
-				} catch (IOException e) {
-
-				}
-
+			try {				
 				movieNode = Neo4JClient.createNodeWithProperties("Movie", movieMap);
 				logger.info("Added movie: " + movie.title);
 
 				moviesURI.put(String.valueOf(movie.ids.trakt), movieNode);
 			} catch (Neo4JRequestException e) {
-				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "id_trakt",
-						String.valueOf(movie.ids.trakt));
-				movieNode = new URI(movieNodes[0].getSelf());
+				if (updateData) {
+					GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "id_trakt",
+							String.valueOf(movie.ids.trakt));
+					movieNode = new URI(movieNodes[0].getSelf());
+					
+					Neo4JClient.updateNodeProperties(movieNode, movieMap);
+					
+					logger.info("Updated movie: " + movie.title);
+					moviesURI.put(String.valueOf(movie.ids.trakt), movieNode);
+
+				}
+				
 			}
 
 		}
@@ -79,20 +90,7 @@ public class SaveDataClient {
 
 	}
 
-	private static boolean checkRelationExists(URI movieURI, URI castNodeURI) throws UnsupportedEncodingException {
-		List<String> types = new ArrayList<String>();
-		types.add("acts in");
-		GetNodeRelationship[] existingRelations = Neo4JClient.getNodeRelationshipsByType(castNodeURI, types);
-
-		for (GetNodeRelationship getNodeRelationship : existingRelations) {
-			if (movieURI.toString().equals(getNodeRelationship.getEnd())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static Map<String, URI> saveMovieCast(String traktID, URI movieURI) {
+	private static Map<String, URI> saveTraktMovieCast(String traktID, URI movieURI, boolean updateData) {
 		Map<String, URI> castURI = new HashMap<String, URI>();
 		List<URI> relationshipURI = new ArrayList<URI>();
 
@@ -106,9 +104,9 @@ public class SaveDataClient {
 				logger.info("processing cast :" + castMember.person.name);
 				// TODO store cast information
 
-				Map<String, Object> castData = Converter.cast2Map(castMember);
-				String character = (String) castData.get("character");
-				castData.remove("character");
+				Map<String, Object> castData = Converter.traktCast2Map(castMember);
+				String castCharacter = castMember.character;
+
 				List<String> castLabels = new ArrayList<String>();
 				castLabels.add("Cast");
 				castLabels.add("Person");
@@ -119,7 +117,7 @@ public class SaveDataClient {
 					castURI.put(String.valueOf(castMember.person.ids.trakt), castNode);
 
 					Map<String, Object> characterMap = new HashMap<String, Object>();
-					characterMap.put("character", character);
+					characterMap.put("character", castCharacter);
 					URI relationship = Neo4JClient.createRelationshipWithProperties(castNode, movieURI, "acts in",
 							characterMap);
 					relationshipURI.add(relationship);
@@ -129,16 +127,24 @@ public class SaveDataClient {
 					GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "id_trakt",
 							String.valueOf(castMember.person.ids.trakt));
 					castNode = new URI(castNodes[0].getSelf());
+					
+					if (updateData) {
+						Neo4JClient.updateNodeProperties(castNode, castData);
+						
+						logger.info("Updated cast: " + castMember.person.name);
+						castURI.put(String.valueOf(castMember.person.ids.trakt), castNode);
+					}
+
 
 					boolean existingRelation = checkRelationExists(movieURI, castNode);
 
 					if (!existingRelation) {
 						Map<String, Object> characterMap = new HashMap<String, Object>();
-						characterMap.put("character", character);
+						characterMap.put("character", castCharacter);
 						URI relationship = Neo4JClient.createRelationshipWithProperties(castNode, movieURI, "acts in",
 								characterMap);
 						relationshipURI.add(relationship);
-						logger.info("adding existing cast :" + castMember.person.name);
+						logger.info("adding existing cast: " + castMember.person.name + "to movie: " + traktID);
 
 					}
 
@@ -157,7 +163,7 @@ public class SaveDataClient {
 
 	}
 
-	public static Map<String, URI> saveAllMovies(int quantity) {
+	public static Map<String, URI> saveAllTraktMovies(int quantity) {
 		Neo4JConfig.setUniqueConstraints();
 
 		Map<String, URI> moviesURI = null;
@@ -166,7 +172,7 @@ public class SaveDataClient {
 			TraktClient trakt = new TraktClient();
 			List<Movie> movies = trakt.getPopularMovies(1, quantity);
 
-			moviesURI = saveMovies(movies);
+			moviesURI = saveTraktMovies(movies, true);
 		} catch (IOException | URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -175,7 +181,7 @@ public class SaveDataClient {
 		return moviesURI;
 	}
 
-	public static Map<String, URI> saveAllMovieCast() {
+	public static Map<String, URI> saveAllTraktMovieCast() {
 		Neo4JConfig.setUniqueConstraints();
 
 		Map<String, URI> movieCastURI = null;
@@ -184,7 +190,7 @@ public class SaveDataClient {
 			try {
 				URI movieURI = new URI(getNodesByLabel.getSelf());
 				String id_trakt = (String) Neo4JClient.getNodeProperty(movieURI, "id_trakt");
-				movieCastURI = saveMovieCast(id_trakt, movieURI);
+				movieCastURI = saveTraktMovieCast(id_trakt, movieURI, true);
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -224,10 +230,10 @@ public class SaveDataClient {
 
 		try {
 			List<Movie> movies = trakt.getPopularMovies(1, 10);
-			Map<String, URI> moviesURI = saveMovies(movies);
+			Map<String, URI> moviesURI = saveTraktMovies(movies, true);
 			Map<String, URI> movieCastURI = new HashMap<String, URI>();
 			for (Entry<String, URI> movie : moviesURI.entrySet()) {
-				movieCastURI.putAll(saveMovieCast(movie.getKey(), movie.getValue()));
+				movieCastURI.putAll(saveTraktMovieCast(movie.getKey(), movie.getValue(), true));
 
 			}
 		} catch (IOException | URISyntaxException e) {
@@ -236,6 +242,11 @@ public class SaveDataClient {
 		}
 		return null;
 
+	}
+	
+	private static Map<String, URI> addingOMDbData(){
+		return null;
+		
 	}
 
 }

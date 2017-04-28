@@ -77,7 +77,7 @@ public class DeprecatedMoviesServlet
 				URI movieNode;			
 				try 
 				{
-					movieNode = Neo4JClient.createNodeWithProperties("Movie", Converter.movie2Map(movie));
+					movieNode = Neo4JClient.createNodeWithProperties("Movie", Converter.traktMovie2Map(movie));
 				} 
 				catch (Neo4JRequestException e) 
 				{
@@ -94,7 +94,7 @@ public class DeprecatedMoviesServlet
 					logger.info("adding cast :" +castMember.person.name);
 					// TODO store cast information
 					
-					Map<String, Object> castData = Converter.cast2Map(castMember);
+					Map<String, Object> castData = Converter.traktCast2Map(castMember);
 					String character = (String) castData.get("character");
 					castData.remove("character");
 					List<String> castLabels = new ArrayList<String>();

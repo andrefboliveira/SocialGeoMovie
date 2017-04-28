@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ import com.socialgeomovie.utils.IDParser;
 import com.socialgeomovie.utils.Neo4JRequestException;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
+import java.net.URL;
 
 public class ImportTest {
 
@@ -54,7 +56,7 @@ public class ImportTest {
 			URI movieNode;			
 
 			try {
-				movieNode = Neo4JClient.createNodeWithProperties("Movie", Converter.movie2Map(movie));
+				movieNode = Neo4JClient.createNodeWithProperties("Movie", Converter.traktMovie2Map(movie));
 			} catch (Neo4JRequestException e) {
 				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "id_trakt", movie.ids.trakt);
 				movieNode = new URI(movieNodes[0].getSelf());
@@ -71,7 +73,7 @@ public class ImportTest {
 				System.out.println("adding cast :" +castMember.person.name);
 				// TODO store cast information
 
-				Map<String, Object> castData = Converter.cast2Map(castMember);
+				Map<String, Object> castData = Converter.traktCast2Map(castMember);
 				String character = (String) castData.get("character");
 				castData.remove("character");
 				List<String> castLabels = new ArrayList<String>();
@@ -103,8 +105,12 @@ public class ImportTest {
 //			imp();
 //			Neo4JConfig.cleanDB();
 //			Neo4JConfig.deleteAll();
-			Neo4JConfig.setUniqueConstraints();
+//			Neo4JConfig.setUniqueConstraints();
 //			System.out.println(IDParser.createURI(" ola tTESte asd153 olá é um dia cão"));
+			int id = 293660;
+			
+		
+			
 		}
 
 	}
