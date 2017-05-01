@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -30,14 +28,8 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.socialgeomovie.clients.Neo4JClient;
-import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
-import com.socialgeomovie.pojos.neo4j.cypher.CypherResultNormal;
-import com.socialgeomovie.pojos.neo4j.cypher.CypherResults;
-import com.socialgeomovie.pojos.neo4j.cypher.Datum;
-import com.socialgeomovie.pojos.neo4j.cypher.Result;
-import com.uwetrottmann.trakt5.entities.Movie;
 
 @Path("/movie")
 public class MovieServelt {
@@ -145,7 +137,7 @@ public class MovieServelt {
 	 * Update info about a movie
 	 */
 	@PUT
-	@Path("/{movie_id}")
+	@Path("put/{movie_id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateMovie(@PathParam("movie_id") int movie_id) {
@@ -156,7 +148,7 @@ public class MovieServelt {
 	 * Delete a movie
 	 */
 	@DELETE
-	@Path("/{movie_id}")
+	@Path("delete/{movie_id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteMovie(@PathParam("movie_id") int movie_id) {
 		// TODO Return type

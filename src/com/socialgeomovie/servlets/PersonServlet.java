@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +25,6 @@ import javax.ws.rs.core.Response.Status;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.socialgeomovie.clients.Neo4JClient;
-import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 
 @Path("/person")
@@ -131,7 +129,7 @@ public class PersonServlet {
 	 * update person info
 	 */
 	@PUT
-	@Path("/{person_uri}")
+	@Path("put/{person_uri}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updatePerson(@PathParam("person_uri") int person_uri) {
@@ -142,7 +140,7 @@ public class PersonServlet {
 	 * delete person
 	 */
 	@DELETE
-	@Path("/{person_uri}")
+	@Path("delete/{person_uri}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deletePerson(@PathParam("person_uri") int person_uri) {
 		Neo4JClient.safeDeleteNode(person_uri);

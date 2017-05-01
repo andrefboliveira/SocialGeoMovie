@@ -1,0 +1,45 @@
+<h1 id="show-user"><strong>SocialGeoMovie ADMIN Endpoint's</strong></h1>
+
+<p>ADMIN: Populate Movies in Neo4J database (import Movie's Data)</p>
+<ul>
+<li><strong>URL: http://localhost:8080/aw2017/rest/db/movies</strong></li>
+</ul>
+<p><code>GET</code></p>
+<ul>
+<li><strong>URL Params: No Params</strong></li>
+</ul>
+<ul>
+<li><p><strong>Success Response:</strong></p></li>
+<li><p><strong>Code:</strong> 200 <br /> <strong>Content:</strong> <code>{&quot;movies&quot;:&quot;#n&quot;,&quot;status&quot;:&quot;OK&quot;}</code></p></li>
+#n: number of movies retrieved
+<li><p><strong>Error Response:</strong></p></li>
+<li><p><strong>Code:</strong> 404 NOT FOUND <br /> <strong>Content:</strong> <code>{ error 404 }</code></p></li>
+</ul>
+<p>OR</p>
+<ul>
+<li><p><strong>Code:</strong> 401 UNAUTHORIZED <br /> <strong>Content:</strong> <code>{ error : &quot;You are unauthorized to make this request.&quot; }</code></p></li>
+<li><p><strong>Sample Call:</strong></p></li>
+</ul>
+<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/db/movies&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>
+
+<p>ADMIN: Populate Cast in Neo4J database (import Cast Data)</p>
+<ul>
+<li><strong>URL: http://localhost:8080/aw2017/rest/db/cast</strong></li>
+</ul>
+<p><code>GET</code></p>
+<ul>
+<li><strong>URL Params: No Params</strong></li>
+</ul>
+<ul>
+<li><p><strong>Success Response:</strong></p></li>
+<li><p><strong>Code:</strong> 200 <br /> <strong>Content:</strong> <code>{&quot;cast&quot;:&quot;#n&quot;,&quot;status&quot;:&quot;OK&quot;}</code></p></li>
+#n: number of cast elements retrieved
+<li><p><strong>Error Response:</strong></p></li>
+<li><p><strong>Code:</strong> 404 NOT FOUND <br /> <strong>Content:</strong> <code>{ error 404 }</code></p></li>
+</ul>
+<p>OR</p>
+<ul>
+<li><p><strong>Code:</strong> 401 UNAUTHORIZED <br /> <strong>Content:</strong> <code>{ error : &quot;You are unauthorized to make this request.&quot; }</code></p></li>
+<li><p><strong>Sample Call:</strong></p></li>
+</ul>
+<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/db/cast&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>

@@ -18,7 +18,6 @@ package com.socialgeomovie.clients;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +36,7 @@ import com.socialgeomovie.pojos.EntityType;
  */
 public class Analyze {
 
-	private static Analyze app;
+	private Analyze app;
 
 	/**
 	 * Filter by type and return values
@@ -81,7 +80,7 @@ public class Analyze {
 		}
 	}
 
-	private static LanguageServiceClient languageApi;
+	private LanguageServiceClient languageApi;
 
 	/**
 	 * Constructs a {@link Analyze} which connects to the Cloud Natural Language
@@ -96,7 +95,7 @@ public class Analyze {
 	/**
 	 * Gets {@link Entity}s from the string {@code text}.
 	 */
-	public static List<Entity> analyzeEntitiesText(String text) throws IOException {
+	public List<Entity> analyzeEntitiesText(String text) throws IOException {
 		// Note: This does not work on App Engine standard.
 		Document doc = Document.newBuilder().setContent(text).setType(Type.PLAIN_TEXT).build();
 		AnalyzeEntitiesRequest request = AnalyzeEntitiesRequest.newBuilder().setDocument(doc)
@@ -117,5 +116,4 @@ public class Analyze {
 		AnalyzeEntitiesResponse response = languageApi.analyzeEntities(request);
 		return response.getEntitiesList();
 	}
-
 }
