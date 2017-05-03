@@ -39,11 +39,11 @@ $(document).ready(function() {
     });
     
     $.ajax({
-        url: "/aw2017/rest/movie/120/people"
+        url: "/aw2017/rest/movie/Deadpool/people"
     }).then(function(data) 
     {
     	var tableMoviePeople = "<table class=\"w3-table w3-striped w3-border\">";
-    	tableMoviePeople += "<caption>Tabela com cast do filme id: 120</caption>";
+    	tableMoviePeople += "<caption>Tabela com cast do filme id: Deadpool</caption>";
     	tableMoviePeople += "<tr><th>Name</th><th>ID</th></tr>";
     	for(var i=0; i<data.length; i++)
     	{

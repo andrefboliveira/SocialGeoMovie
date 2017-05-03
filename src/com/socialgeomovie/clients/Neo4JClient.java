@@ -15,8 +15,6 @@ import java.util.Map.Entry;
 
 import javax.ws.rs.core.MediaType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -30,7 +28,6 @@ import com.sun.jersey.json.impl.provider.entity.JSONObjectProvider;
 
 import com.socialgeomovie.pojos.neo4j.*;
 import com.socialgeomovie.pojos.neo4j.cypher.*;
-import com.socialgeomovie.servlets.DeprecatedMoviesServlet;
 import com.socialgeomovie.utils.Neo4JRequestException;
 
 public abstract class Neo4JClient {

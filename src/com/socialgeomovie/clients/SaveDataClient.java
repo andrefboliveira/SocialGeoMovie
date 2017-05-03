@@ -25,7 +25,6 @@ import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.Subtitle;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
-import com.socialgeomovie.servlets.DeprecatedMoviesServlet;
 import com.socialgeomovie.utils.Converter;
 import com.socialgeomovie.utils.Neo4JRequestException;
 import com.uwetrottmann.trakt5.entities.CastMember;

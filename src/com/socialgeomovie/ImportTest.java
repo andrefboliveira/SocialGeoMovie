@@ -106,8 +106,13 @@ public class ImportTest {
 //			Neo4JConfig.cleanDB();
 //			Neo4JConfig.deleteAll();
 //			Neo4JConfig.setUniqueConstraints();
-//			System.out.println(IDParser.createURI(" ola tTESte asd153 olá é um dia cão"));
-			int id = 293660;
+//			System.out.println(IDParser.createURI(" ola tTESte asd153a 'olá' é um dia cão"));
+			//int id = 293660;
+			
+			GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", "Deadpool");
+			for (GetNodesByLabel getNodesByLabel : movieNodes) {
+				System.out.println(getNodesByLabel.getSelf());
+			}
 			
 		
 			

@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response.Status;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.socialgeomovie.clients.Neo4JClient;
+import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 
 @Path("/person")
@@ -129,7 +130,7 @@ public class PersonServlet {
 	 * update person info
 	 */
 	@PUT
-	@Path("put/{person_uri}")
+	@Path("/{person_uri}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updatePerson(@PathParam("person_uri") int person_uri) {
@@ -140,7 +141,7 @@ public class PersonServlet {
 	 * delete person
 	 */
 	@DELETE
-	@Path("delete/{person_uri}")
+	@Path("/{person_uri}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deletePerson(@PathParam("person_uri") int person_uri) {
 		Neo4JClient.safeDeleteNode(person_uri);

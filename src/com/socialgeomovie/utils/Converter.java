@@ -25,7 +25,7 @@ public class Converter
 		movieData.put("released", movie.released.toString());
 		movieData.put("runtime", movie.runtime);
 		movieData.put("overview", movie.overview);
-		movieData.put("genres",  String.join(", ", movie.genres));
+		movieData.put("genres",  movie.genres);
 		movieData.put("url_trakt", "https://trakt.tv/movies/" + movie.ids.slug);
 		movieData.put("url_imdb", "http://www.imdb.com/title/" + movie.ids.imdb);
 		try {

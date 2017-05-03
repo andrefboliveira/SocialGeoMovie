@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.socialgeomovie.clients.Neo4JClient;
+import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 
@@ -137,7 +138,7 @@ public class MovieServelt {
 	 * Update info about a movie
 	 */
 	@PUT
-	@Path("put/{movie_id}")
+	@Path("/{movie_id}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateMovie(@PathParam("movie_id") int movie_id) {
@@ -148,7 +149,7 @@ public class MovieServelt {
 	 * Delete a movie
 	 */
 	@DELETE
-	@Path("delete/{movie_id}")
+	@Path("/{movie_id}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteMovie(@PathParam("movie_id") int movie_id) {
 		// TODO Return type
@@ -220,9 +221,8 @@ public class MovieServelt {
 					} else {
 						nodeInfo.put("name", propertiesResponse.get("name"));
 					}
-
+					
 					nodeList.add(nodeInfo);
-
 				}
 
 			} catch (UnsupportedEncodingException e1) {
