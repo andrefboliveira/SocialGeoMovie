@@ -1,6 +1,8 @@
 
 package com.socialgeomovie.pojos.neo4j;
 
+import java.util.Map;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -11,7 +13,7 @@ public class GetNodesByLabel {
     private Metadata_GetNodesByLabel metadata;
     @SerializedName("data")
     @Expose
-    private Data_GetNodesByLabel data;
+    private Map<String, Object> data;
     @SerializedName("paged_traverse")
     @Expose
     private String pagedTraverse;
@@ -63,11 +65,11 @@ public class GetNodesByLabel {
         this.metadata = metadata;
     }
 
-    public Data_GetNodesByLabel getData() {
+    public Map<String, Object> getData() {
         return data;
     }
 
-    public void setData(Data_GetNodesByLabel data) {
+    public void setData(Map<String, Object> data) {
         this.data = data;
     }
 

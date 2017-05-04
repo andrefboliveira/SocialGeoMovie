@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.socialgeomovie.clients.Neo4JClient;
+import com.socialgeomovie.pojos.neo4j.Data_GetNodesByLabel;
 import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
@@ -37,14 +38,13 @@ public class MovieServelt {
 	// http://localhost:8080/aw2017/rest/movie
 
 	private static final Logger logger = LoggerFactory.getLogger(MovieServelt.class);
-	
+
 	/**
 	 * Get all movies. // Include filtering number of results option
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMovies(
-			@DefaultValue("false") @QueryParam("include_details") final boolean details,
+	public Response getMovies(@DefaultValue("false") @QueryParam("include_details") final boolean details,
 			@DefaultValue("-1") @QueryParam("limit") final int limit,
 			@DefaultValue("1") @QueryParam("page") final int page) {
 		List<Map<String, Object>> nodeList = new ArrayList<>();
@@ -61,31 +61,24 @@ public class MovieServelt {
 			firstResult = 0;
 			lastResult = length;
 		}
-		
+
 		for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
 			GetNodesByLabel getNodesByLabel = movieNodes[nodeNumber];
-			
+
 			Map<String, Object> nodeInfo = new HashMap<String, Object>();
-			try {
-				URI propertiesURI = new URI(getNodesByLabel.getSelf());
-				LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
-						.getNodeProperties(propertiesURI);
+			Map<String, Object> propertiesResponse = getNodesByLabel.getData();
 
-				nodeInfo.put("uri", propertiesResponse.get("uri"));
+			nodeInfo.put("uri", propertiesResponse.get("uri"));
 
-				if (details) {
-					nodeInfo.putAll(propertiesResponse);
-				} else {
-					nodeInfo.put("title", propertiesResponse.get("title"));
-					nodeInfo.put("poster", propertiesResponse.get("poster"));
-				}
-
-				nodeList.add(nodeInfo);
-
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (details) {
+				nodeInfo.putAll(propertiesResponse);
+			} else {
+				nodeInfo.put("title", propertiesResponse.get("title"));
+				nodeInfo.put("poster", propertiesResponse.get("poster"));
 			}
+
+			nodeList.add(nodeInfo);
+
 		}
 		return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 	}
@@ -99,10 +92,10 @@ public class MovieServelt {
 	public Response createMovie() {
 		return null;
 	}
-	
+
 	/**
-	 * Get movie info by given movie name
-	 * Example(deadpool): http://localhost:8080/aw2017/rest/movie/deadpool
+	 * Get movie info by given movie name Example(deadpool):
+	 * http://localhost:8080/aw2017/rest/movie/Deadpool
 	 */
 	@GET
 	@Path("/{movie_id}")
@@ -116,16 +109,11 @@ public class MovieServelt {
 			GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_id);
 
 			for (GetNodesByLabel getNodesByLabel : movieNodes) {
-
-				URI propertiesURI = new URI(getNodesByLabel.getSelf());
-				LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
-						.getNodeProperties(propertiesURI);
-
-				nodeInfo.putAll(propertiesResponse);
+				nodeInfo.putAll(getNodesByLabel.getData());
 
 			}
 
-		} catch (UnsupportedEncodingException | URISyntaxException e1) {
+		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
@@ -155,15 +143,15 @@ public class MovieServelt {
 		// TODO Return type
 		// Using trakt id
 		Neo4JClient.safeDeleteNode(movie_id);
-		
-//		return null;
+
+		// return null;
 		return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
 	}
-	
+
 	@Path("/{movie_id}/people")
-    public MoviePeople peopleSubResource() {
-        return new MoviePeople();
-    }
+	public MoviePeople peopleSubResource() {
+		return new MoviePeople();
+	}
 
 	public class MoviePeople {
 		// http://localhost:8080/aw2017/rest/movie/{movie_id}/people
@@ -173,20 +161,19 @@ public class MovieServelt {
 		 */
 		@GET
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response getMovie(
-				@PathParam("movie_id") String movie_id,
+		public Response getMovie(@PathParam("movie_id") String movie_id,
 				@DefaultValue("false") @QueryParam("include_details") final boolean details,
 				@DefaultValue("-1") @QueryParam("limit") final int limit,
 				@DefaultValue("1") @QueryParam("page") final int page) {
 
 			List<Map<String, Object>> nodeList = new ArrayList<>();
 			Gson gson = new Gson();
-			
+
 			try {
 				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_id);
 				String movieRelationURI = movieNodes[0].getAllRelationships();
 				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationships(movieRelationURI);
-				
+
 				int length = nodeRelationship.length;
 
 				int firstResult, lastResult;
@@ -197,19 +184,19 @@ public class MovieServelt {
 					firstResult = 0;
 					lastResult = length;
 				}
-				
+
 				for (int i = 0; i < nodeRelationship.length; i++) {
-					
+
 				}
-				
+
 				for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
 					GetNodeRelationship getNodeRelationship = nodeRelationship[nodeNumber];
-					
+
 					Map<String, Object> nodeInfo = new HashMap<String, Object>();
-					
+
 					String nodeID = getNodeRelationship.getStart();
 					String nodePropertiesURI = Neo4JClient.getNode(nodeID).getProperties();
-					
+
 					LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
 							.getNodeProperties(nodePropertiesURI);
 
@@ -221,7 +208,7 @@ public class MovieServelt {
 					} else {
 						nodeInfo.put("name", propertiesResponse.get("name"));
 					}
-					
+
 					nodeList.add(nodeInfo);
 				}
 
@@ -229,7 +216,6 @@ public class MovieServelt {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
 
 			return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 		}

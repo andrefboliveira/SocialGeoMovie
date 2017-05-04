@@ -10,11 +10,11 @@ import java.util.Map;
 import com.google.gson.Gson;
 
 public class OMDbClient {
-	
+
 	public static Map<String, Object> getOMDbMovie(int imdb_id) throws IOException {
-		URL url= new URL("http://www.omdbapi.com/?i=" + imdb_id);
+		URL url = new URL("http://www.omdbapi.com/?i=" + imdb_id);
 		InputStreamReader reader = new InputStreamReader(url.openStream());
 		return new Gson().fromJson(reader, new HashMap<String, Object>().getClass());
-		
+
 	}
 }

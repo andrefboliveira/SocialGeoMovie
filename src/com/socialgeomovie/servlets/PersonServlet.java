@@ -59,25 +59,19 @@ public class PersonServlet {
 			GetNodesByLabel getNodesByLabel = personNodes[nodeNumber];
 
 			Map<String, Object> nodeInfo = new HashMap<String, Object>();
-			try {
-				URI propertiesURI = new URI(getNodesByLabel.getSelf());
-				LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
-						.getNodeProperties(propertiesURI);
 
-				nodeInfo.put("uri", propertiesResponse.get("uri"));
+			Map<String, Object> propertiesResponse = getNodesByLabel.getData();
 
-				if (details) {
-					nodeInfo.putAll(propertiesResponse);
-				} else {
-					nodeInfo.put("name", propertiesResponse.get("name"));
-				}
+			nodeInfo.put("uri", propertiesResponse.get("uri"));
 
-				nodeList.add(nodeInfo);
-
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			if (details) {
+				nodeInfo.putAll(propertiesResponse);
+			} else {
+				nodeInfo.put("name", propertiesResponse.get("name"));
 			}
+
+			nodeList.add(nodeInfo);
+
 		}
 		return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 	}
@@ -109,15 +103,13 @@ public class PersonServlet {
 
 			for (GetNodesByLabel getNodesByLabel : personNodes) {
 
-				URI propertiesURI = new URI(getNodesByLabel.getSelf());
-				LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
-						.getNodeProperties(propertiesURI);
+				Map<String, Object> propertiesResponse = getNodesByLabel.getData();
 
 				nodeInfo.putAll(propertiesResponse);
 
 			}
 
-		} catch (UnsupportedEncodingException | URISyntaxException e) {
+		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -31,12 +31,12 @@ public class ImportTest {
 
 	public static void imp() throws URISyntaxException, IOException{
 		TraktClient trakt = new TraktClient();
-		OpenSubsClient openSubs = new OpenSubsClient();
-		TwitterClient twitterClient = new TwitterClient();
+//		OpenSubsClient openSubs = new OpenSubsClient();
+//		TwitterClient twitterClient = new TwitterClient();
 
 		Map<String, Integer> report = new HashMap<String, Integer>();
 
-		Neo4JConfig.setUniqueConstraints();
+//		Neo4JConfig.setUniqueConstraints();
 
 		List<Movie> movies;
 
@@ -53,14 +53,14 @@ public class ImportTest {
 
 			System.out.println("Processing movie: " + movie.title);
 			// TODO store movie data
-			URI movieNode;			
-
-			try {
-				movieNode = Neo4JClient.createNodeWithProperties("Movie", Converter.traktMovie2Map(movie));
-			} catch (Neo4JRequestException e) {
-				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "id_trakt", movie.ids.trakt);
-				movieNode = new URI(movieNodes[0].getSelf());
-			}
+//			URI movieNode;			
+//
+//			try {
+//				movieNode = Neo4JClient.createNodeWithProperties("Movie", Converter.traktMovie2Map(movie));
+//			} catch (Neo4JRequestException e) {
+//				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "id_trakt", movie.ids.trakt);
+//				movieNode = new URI(movieNodes[0].getSelf());
+//			}
 
 
 			//System.out.println(movie.ids.imdb);
@@ -72,29 +72,31 @@ public class ImportTest {
 				CastMember castMember = cast.get(j);
 				System.out.println("adding cast :" +castMember.person.name);
 				// TODO store cast information
+				
+				System.out.println(castMember.person.birthplace != null);
 
-				Map<String, Object> castData = Converter.traktCast2Map(castMember);
-				String character = (String) castData.get("character");
-				castData.remove("character");
+//				Map<String, Object> castData = Converter.traktCast2Map(castMember);
+//				String character = (String) castData.get("character");
+//				castData.remove("character");
 				List<String> castLabels = new ArrayList<String>();
 				castLabels.add("Cast");
 				castLabels.add("Person");
 
 
 
-				URI castNode;
-				try {
-					castNode = Neo4JClient.createNodeWithProperties(castLabels, castData);
-
-				} catch (Neo4JRequestException e) {
-					GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "id_trakt", castMember.person.ids.trakt);
-					castNode = new URI(castNodes[0].getSelf());
-					
-				}
-
-				Map<String, Object> characterMap = new HashMap<String, Object>();
-				characterMap.put("character", character);
-				URI relationship = Neo4JClient.createRelationshipWithProperties(castNode, movieNode, "acts in", characterMap);
+//				URI castNode;
+//				try {
+//					castNode = Neo4JClient.createNodeWithProperties(castLabels, castData);
+//
+//				} catch (Neo4JRequestException e) {
+//					GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "id_trakt", castMember.person.ids.trakt);
+//					castNode = new URI(castNodes[0].getSelf());
+//					
+//				}
+//
+//				Map<String, Object> characterMap = new HashMap<String, Object>();
+//				characterMap.put("character", character);
+//				URI relationship = Neo4JClient.createRelationshipWithProperties(castNode, movieNode, "acts in", characterMap);
 			}
 		
 		}
@@ -102,17 +104,13 @@ public class ImportTest {
 	}
 
 		public static void main(String[] args) throws URISyntaxException, IOException {
-//			imp();
+			imp();
 //			Neo4JConfig.cleanDB();
 //			Neo4JConfig.deleteAll();
 //			Neo4JConfig.setUniqueConstraints();
 //			System.out.println(IDParser.createURI(" ola tTESte asd153a 'olá' é um dia cão"));
 			//int id = 293660;
 			
-			GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", "Deadpool");
-			for (GetNodesByLabel getNodesByLabel : movieNodes) {
-				System.out.println(getNodesByLabel.getSelf());
-			}
 			
 		
 			
