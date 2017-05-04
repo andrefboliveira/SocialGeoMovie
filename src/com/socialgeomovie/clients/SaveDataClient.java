@@ -26,6 +26,7 @@ import com.socialgeomovie.pojos.Subtitle;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.utils.Converter;
+import com.socialgeomovie.utils.Merge;
 import com.socialgeomovie.utils.Neo4JRequestException;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
@@ -170,12 +171,6 @@ public class SaveDataClient {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		try {
-			addMovieLinks();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
 		return moviesURI;
 	}
@@ -199,12 +194,7 @@ public class SaveDataClient {
 
 		}
 
-		try {
-			addCastLinks();
-		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 		return movieCastURI;
 	}
 
@@ -286,9 +276,26 @@ public class SaveDataClient {
 
 	}
 
-	private static Map<String, URI> addingOMDbData() {
-		return null;
+	public static void addingOMDbData() throws IOException, URISyntaxException {
+		GetNodesByLabel[] movies = Neo4JClient.getNodesByLabel("Movie");
+		for (GetNodesByLabel getNodesByLabel : movies) {
+			Map<String, Object> movieProperties = getNodesByLabel.getData();
+			String id_imdb = (String) movieProperties.get("id_imdb");
+			Map<String, Object> omdbProperties = OMDbClient.getOMDbMovie(id_imdb);
+			logger.info("Search OMDb for id: " + id_imdb);
 
+//			Map<String, Object> resultMap = Merge.mergeMap(movieProperties, omdbProperties);
+			
+			Map<String, Object> resultMap = movieProperties;
+			resultMap.put("poster", omdbProperties.get("Poster"));
+			
+			
+			Neo4JClient.updateNodeProperties(new URI(getNodesByLabel.getSelf()), resultMap);
+			logger.info("Added OMDb info for: " + movieProperties.get("title"));
+
+
+			
+		}
 	}
 
 }

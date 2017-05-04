@@ -11,8 +11,8 @@ import com.google.gson.Gson;
 
 public class OMDbClient {
 
-	public static Map<String, Object> getOMDbMovie(int imdb_id) throws IOException {
-		URL url = new URL("http://www.omdbapi.com/?i=" + imdb_id);
+	public static Map<String, Object> getOMDbMovie(String id_imdb) throws IOException {
+		URL url = new URL("http://www.omdbapi.com/?i=" + id_imdb);
 		InputStreamReader reader = new InputStreamReader(url.openStream());
 		return new Gson().fromJson(reader, new HashMap<String, Object>().getClass());
 
