@@ -228,10 +228,13 @@ public class MovieServlet {
 		/**
 		 * Add a movie person relationship
 		 */
-		@POST
+		@PUT
+		@Path("/{person_uri}")
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response addMoviePerson() {
+		public Response addMoviePerson(
+				@PathParam("movie_uri") String movie_uri, 
+				@PathParam("person_uri") String person_uri) {
 			return null;
 		}
 
@@ -239,10 +242,11 @@ public class MovieServlet {
 		 * Delete a movie person relationship
 		 */
 		@DELETE
-		@Path("/{person_id}")
+		@Path("/{person_uri}")
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response deleteMoviePerson(@PathParam("movie_uri") String movie_uri, 
-				@PathParam("person_id") String person_id) {
+		public Response deleteMoviePerson(
+				@PathParam("movie_uri") String movie_uri, 
+				@PathParam("person_uri") String person_uri) {
 			return null;
 		}
 	}
