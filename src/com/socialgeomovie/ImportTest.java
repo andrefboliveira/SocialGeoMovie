@@ -2,6 +2,7 @@ package com.socialgeomovie;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
@@ -9,6 +10,7 @@ import java.net.URLEncoder;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,15 +114,37 @@ public class ImportTest {
 //			System.out.println(IDParser.createURI(" ola tTESte asd153a 'olá' é um dia cão"));
 			//int id = 293660;
 //			
-//			Map<String, Object> h1 = new HashMap<String, Object>();
-//			Map<String, Object> h2 = new HashMap<String, Object>();
-//			
-//			
-//			h1.put("teste", 1);
-//			h2.put("teste", 1);
-//			Map<String, Object> result = Merge.mergeMap(h1, h2);
-//			System.out.println(result.values());
+			Map<String, Object> h1 = new HashMap<String, Object>();
+			Map<String, Object> h2 = new HashMap<String, Object>();
 			
+			ArrayList<Object> s1 = new ArrayList<Object>();
+			s1.add("teste");
+			s1.add("ola");
+			s1.add(123);
+
+
+			
+			h1.put("teste", s1);
+			h2.put("teste", "asda");
+			h2.put("teste", 122);
+
+			h2.put("123", "asd");
+
+			Map<String, Object> result = Merge.mergeMap(h1, h2);
+			Collection<Object> list =  result.values();
+//			for (Object o : list) {
+//				ArrayList<Object> l2 = (ArrayList<Object>) o;
+//				for (Object object : l2) {
+//					System.out.println(object);
+//					System.out.println(object instanceof String);
+//					System.out.println(object instanceof Number);
+//				}
+//				
+//			}
+			System.out.println(list);
+//			GetNodesByLabel[] result = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", "Deadpool");
+//			Object a = result[0].getData().get("genres");
+//			System.out.println(a instanceof List);
 		}
 
 	}

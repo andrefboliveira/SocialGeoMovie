@@ -1,6 +1,7 @@
 package com.socialgeomovie.servlets;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -27,17 +28,19 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
+import com.google.gson.reflect.TypeToken;
 import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.pojos.neo4j.Data_GetNodesByLabel;
 import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
+import com.socialgeomovie.utils.Servlet;
 
 @Path("/movie")
-public class MovieServelt {
+public class MovieServlet {
 	// http://localhost:8080/aw2017/rest/movie
 
-	private static final Logger logger = LoggerFactory.getLogger(MovieServelt.class);
+	private static final Logger logger = LoggerFactory.getLogger(MovieServlet.class);
 
 	/**
 	 * Get all movies. // Include filtering number of results option
@@ -89,7 +92,7 @@ public class MovieServelt {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createMovie() {
+	public Response createMovie(String requestJSON) {
 		return null;
 	}
 
@@ -98,20 +101,17 @@ public class MovieServelt {
 	 * http://localhost:8080/aw2017/rest/movie/Deadpool
 	 */
 	@GET
-	@Path("/{movie_id}")
+	@Path("/{movie_uri}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMovie(@PathParam("movie_id") String movie_id) {
+	public Response getMovie(@PathParam("movie_uri") String movie_uri) {
 		Gson gson = new Gson();
 
 		Map<String, Object> nodeInfo = new HashMap<String, Object>();
 
 		try {
-			GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_id);
+			GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
 
-			for (GetNodesByLabel getNodesByLabel : movieNodes) {
-				nodeInfo.putAll(getNodesByLabel.getData());
-
-			}
+			nodeInfo.putAll((movieNodes[0].getData()));
 
 		} catch (UnsupportedEncodingException e1) {
 			// TODO Auto-generated catch block
@@ -126,42 +126,47 @@ public class MovieServelt {
 	 * Update info about a movie
 	 */
 	@PUT
-	@Path("/{movie_id}")
+	@Path("/{movie_uri}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateMovie(@PathParam("movie_id") int movie_id) {
-		return null;
+	public Response updateMovie(
+			@PathParam("movie_uri") String movie_uri, 
+			String requestJSON) {
+		Gson gson = new Gson();
+		
+		Map<String, Object> nodeInfo = Servlet.updateResource("Movie", movie_uri, requestJSON);
+
+		return Response.status(Status.OK).entity(gson.toJson(nodeInfo)).build();
 	}
 
 	/**
 	 * Delete a movie
 	 */
 	@DELETE
-	@Path("/{movie_id}")
+	@Path("/{movie_uri}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deleteMovie(@PathParam("movie_id") int movie_id) {
+	public Response deleteMovie(@PathParam("movie_uri") String movie_uri) {
 		// TODO Return type
-		// Using trakt id
-		Neo4JClient.safeDeleteNode(movie_id);
+		Neo4JClient.safeDeleteNode(movie_uri);
 
 		// return null;
 		return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
 	}
 
-	@Path("/{movie_id}/people")
+	@Path("/{movie_uri}/people")
 	public MoviePeople peopleSubResource() {
 		return new MoviePeople();
 	}
 
 	public class MoviePeople {
-		// http://localhost:8080/aw2017/rest/movie/{movie_id}/people
+		// http://localhost:8080/aw2017/rest/movie/{movie_uri}/people
 
 		/**
 		 * Add info about a movie
 		 */
 		@GET
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response getMovie(@PathParam("movie_id") String movie_id,
+		public Response getMoviePeople(@PathParam("movie_uri") String movie_uri,
 				@DefaultValue("false") @QueryParam("include_details") final boolean details,
 				@DefaultValue("-1") @QueryParam("limit") final int limit,
 				@DefaultValue("1") @QueryParam("page") final int page) {
@@ -170,7 +175,7 @@ public class MovieServelt {
 			Gson gson = new Gson();
 
 			try {
-				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_id);
+				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
 				String movieRelationURI = movieNodes[0].getAllRelationships();
 				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationships(movieRelationURI);
 
@@ -221,22 +226,23 @@ public class MovieServelt {
 		}
 
 		/**
-		 * Add a movie
+		 * Add a movie person relationship
 		 */
 		@POST
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response createMovie() {
+		public Response addMoviePerson() {
 			return null;
 		}
 
 		/**
-		 * Delete a movie
+		 * Delete a movie person relationship
 		 */
 		@DELETE
 		@Path("/{person_id}")
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response deleteMovie(@PathParam("movie_id") int movie_id, @PathParam("person_id") int person_id) {
+		public Response deleteMoviePerson(@PathParam("movie_uri") String movie_uri, 
+				@PathParam("person_id") String person_id) {
 			return null;
 		}
 	}

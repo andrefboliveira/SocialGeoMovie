@@ -14,26 +14,66 @@ public class Merge {
 			if (mainMap.containsKey(aditionalKey)) {
 				Object mainValue = mainMap.get(aditionalKey);
 				Object otherValue = aditionalMap.get(aditionalKey);
-				if (mainValue instanceof String) {
-					String mainValueString = (String) mainValue;
-					String otherValueString = (String) otherValue;
-					if (!mainValueString.contains(otherValueString)) {
-						mainMap.put(aditionalKey, String.join(",", mainValueString, otherValueString));
-					}	
-				} else if (mainValue instanceof List) {
+				if (mainValue instanceof List) {
 					List mainValueList = (List) mainValue;
-					List otherValueList = (List) otherValue;
 					
-					if (!mainValueList.containsAll(otherValueList)) {
-						mainMap.put(aditionalKey, new HashSet<>(ListUtils.union(mainValueList, otherValueList)));
+					if (otherValue instanceof List) {
+						List otherValueList = (List) otherValue;
+						if (!mainValueList.containsAll(otherValueList)) {
+							mainMap.put(aditionalKey, new ArrayList<>(new HashSet<>(ListUtils.union(mainValueList, otherValueList))));
+						}
+						
+					} else if (otherValue instanceof String || otherValue instanceof Number) {
+						if (!mainValueList.contains(otherValue)) {
+							ArrayList<Object> newList = new ArrayList<Object>();
+							newList.addAll(mainValueList);
+							newList.add(otherValue);
+							mainMap.put(aditionalKey, newList);
+						}
 					}
+				} else if (mainValue instanceof String) {
+					String mainValueString = (String) mainValue;
+					 if (otherValue instanceof String) {
+						String otherValueString = (String) otherValue;
+						if (!mainValueString.contains(otherValueString)) {
+							ArrayList<Object> newList = new ArrayList<Object>();
+							newList.add(mainValueString);
+							newList.add(otherValueString);
+							mainMap.put(aditionalKey, newList);
+						}	
+
+					 } else if (otherValue instanceof List) {
+							List otherValueList = (List) otherValue;
+							if (!otherValueList.contains(mainValueString)) {
+								ArrayList<Object> newList = new ArrayList<Object>();
+								newList.add(mainValueString);
+								newList.addAll(otherValueList);
+								mainMap.put(aditionalKey, newList);
+							}
+					 }
+			
+					
 				} else if (mainValue instanceof Number) {
 					Number mainValueNumber = (Number) mainValue;
-					Number otherValueNumber = (Number) otherValue;
-					
-					if (!mainValueNumber.equals(otherValueNumber)) {
-						mainMap.put(aditionalKey, String.join(",", String.valueOf(mainValueNumber), String.valueOf(otherValueNumber)));
-					}
+					 if (otherValue instanceof Number) {
+						 Number otherValueNumber = (Number) otherValue;
+						if (!mainValueNumber.equals(otherValueNumber)) {
+							ArrayList<Object> newList = new ArrayList<Object>();
+							newList.add(mainValueNumber);
+							newList.add(mainValueNumber);
+							mainMap.put(aditionalKey, newList);
+						}	
+
+					 } else if (otherValue instanceof List) {
+							List otherValueList = (List) otherValue;
+							if (!otherValueList.contains(mainValueNumber)) {
+								ArrayList<Object> newList = new ArrayList<Object>();
+								newList.add(mainValueNumber);
+								newList.addAll(otherValueList);
+								mainMap.put(aditionalKey, newList);
+							}
+					 }
+			
 					
 				}
 			} else {
@@ -45,3 +85,4 @@ public class Merge {
 		
 	}
 }
+

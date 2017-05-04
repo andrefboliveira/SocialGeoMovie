@@ -27,6 +27,7 @@ import com.google.gson.internal.LinkedTreeMap;
 import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
+import com.socialgeomovie.utils.Servlet;
 
 @Path("/person")
 public class PersonServlet {
@@ -82,7 +83,7 @@ public class PersonServlet {
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createPerson() {
+	public Response createPerson(String requestJSON) {
 		return null;
 	}
 
@@ -101,13 +102,8 @@ public class PersonServlet {
 		try {
 			GetNodesByLabel[] personNodes = Neo4JClient.getNodesByLabelAndProperty("Person", "uri", person_uri);
 
-			for (GetNodesByLabel getNodesByLabel : personNodes) {
+			nodeInfo.putAll((personNodes[0].getData()));
 
-				Map<String, Object> propertiesResponse = getNodesByLabel.getData();
-
-				nodeInfo.putAll(propertiesResponse);
-
-			}
 
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
@@ -125,8 +121,13 @@ public class PersonServlet {
 	@Path("/{person_uri}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updatePerson(@PathParam("person_uri") int person_uri) {
-		return null;
+	public Response updatePerson(@PathParam("person_uri") String person_uri,
+			String requestJSON) {
+		Gson gson = new Gson();
+		
+		Map<String, Object> nodeInfo = Servlet.updateResource("Person", person_uri, requestJSON);
+
+		return Response.status(Status.OK).entity(gson.toJson(nodeInfo)).build();
 	}
 
 	/**
@@ -135,7 +136,7 @@ public class PersonServlet {
 	@DELETE
 	@Path("/{person_uri}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response deletePerson(@PathParam("person_uri") int person_uri) {
+	public Response deletePerson(@PathParam("person_uri") String person_uri) {
 		Neo4JClient.safeDeleteNode(person_uri);
 		// return null;
 		return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();

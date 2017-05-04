@@ -19,7 +19,7 @@ import com.google.gson.Gson;
 import com.socialgeomovie.clients.SaveDataClient;
 
 @Path("/db")
-public class AdminServelt {
+public class AdminServlet {
 	// http://localhost:8080/aw2017/rest/db
 
 	/**
