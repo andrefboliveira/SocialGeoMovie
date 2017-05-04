@@ -1,8 +1,10 @@
 package com.socialgeomovie.utils;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
+
 
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
@@ -20,7 +22,7 @@ public class Converter {
 		movieData.put("certification", movie.certification);
 		movieData.put("homepage", movie.homepage);
 		movieData.put("trailer", movie.trailer);
-		movieData.put("released", movie.released.toString());
+		movieData.put("released", new SimpleDateFormat("yyyy-MM-dd").format(movie.released.toDate()));
 		movieData.put("runtime", movie.runtime);
 		movieData.put("overview", movie.overview);
 		movieData.put("genres", movie.genres);

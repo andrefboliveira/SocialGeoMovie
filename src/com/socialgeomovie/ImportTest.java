@@ -22,6 +22,7 @@ import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.utils.Converter;
 import com.socialgeomovie.utils.IDParser;
+import com.socialgeomovie.utils.Merge;
 import com.socialgeomovie.utils.Neo4JRequestException;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
@@ -104,15 +105,21 @@ public class ImportTest {
 	}
 
 		public static void main(String[] args) throws URISyntaxException, IOException {
-			imp();
+//			imp();
 //			Neo4JConfig.cleanDB();
 //			Neo4JConfig.deleteAll();
 //			Neo4JConfig.setUniqueConstraints();
 //			System.out.println(IDParser.createURI(" ola tTESte asd153a 'olá' é um dia cão"));
 			//int id = 293660;
-			
-			
-		
+//			
+//			Map<String, Object> h1 = new HashMap<String, Object>();
+//			Map<String, Object> h2 = new HashMap<String, Object>();
+//			
+//			
+//			h1.put("teste", 1);
+//			h2.put("teste", 1);
+//			Map<String, Object> result = Merge.mergeMap(h1, h2);
+//			System.out.println(result.values());
 			
 		}
 
