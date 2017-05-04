@@ -17,6 +17,33 @@
 		</nav>
 	</div>
 	<div id="page_content">
+		<div id="movie-details-left" class="detail-left">
+			<div class="movie-roll" title="Deadpool">
+				<img id="poster">
+			</div>
+			<div style="display: inline-block">
+				<h1 id="title"></h1>
+				<h4 id="tagline"></h4>
+				<div>
+					<b class="label">Rating:</b>
+					<div id="rating" class="value"></div>
+				</div>
+				<div>
+					<b class="label">Runtime:</b>
+					<div id="runtime" class="value"></div>
+				</div>
+				<div>
+					<b class="label">Release:</b>
+					<div id="release" class="value"></div>
+				</div>
+				
+			</div>
+			<div id="description"></div>
+		</div>
+		<div id="movie-details-right" class="detail-right">
+			<h4>Cast</h4>
+			<div id="cast_list"></div>
+		</div>
 	</div>
 	<script>load_movie_details();</script>
 </body>

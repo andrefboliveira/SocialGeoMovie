@@ -82,3 +82,28 @@ nav li a
 	height: 100%;
 }
 
+
+.detail-left
+{
+	width: 60%;
+	text-align: justify;
+	float: left;
+}
+
+.detail-left .label, .detail-left .value
+{
+	display: inline-block;
+}
+
+.detail-right
+{
+	width: 35%;
+    text-align: justify;
+    min-height: 200px;
+    float: right;
+}	
+		
+
+	
+	
+	

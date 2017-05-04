@@ -1,4 +1,4 @@
-var url_all_movies = "http://localhost:8080/aw2017/rest/movie?include_details=true";
+var url_all_movies = "http://localhost:8080/aw2017/rest/movie";
 var url_movie_details = "http://localhost:8080/aw2017/rest/movie/";
 var omdb_key = "55808bd4";
 
@@ -48,18 +48,26 @@ var load_movie_details = function()
 	$.getJSON( url_movie_details+uri)
 	.done(function( data ) 
 	{
-		$.each( data, function( i, item ) 
-		{
-			$([
-				"<div class='movie-roll' title='"+item.title+"'>",
-				"	<a href='movie-details.html?id="+item.uri+"'>",
-				"		<img src='"+item.poster+"'>",
-				"	</a>",
-				"</div>"
-			].join("\n")).appendTo( "#page_content" );
-		});
+		$("#poster").attr("src",data.poster);
+		$("#title").html(data.title);
+		$("#tagline").html(data.tagline);
+		$("#description").html(data.overview);
+		$("#rating").html(data.rating);
+		$("#runtime").html(data.runtime);
+		$("#release").html(data.released);
 	});
-
+	
+	var uri = $.urlParam("id");
+	$.getJSON( url_movie_details+uri+"/people")
+	.done(function( data ) 
+	{
+		var cast_div = $("#cast_list");
+		for(var i=0; i<data.length; i++)
+		{
+			var d = data[i];
+			cast_div.append("<a href='"+d.uri+"'>"+d.name+"</a><br>")
+		}
+	});
 }
 
 var init_map = function()
