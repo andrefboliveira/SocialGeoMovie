@@ -1,6 +1,10 @@
 var url_all_movies = "http://localhost:8080/aw2017/rest/movie";
 var url_movie_details = "http://localhost:8080/aw2017/rest/movie/";
+var url_geo_movie = "http://localhost:8080/aw2017/website/geo.json";
 var omdb_key = "55808bd4";
+
+var map_markers = {};
+var map;
 
 var fetch_movies= function()
 {
@@ -73,9 +77,9 @@ var load_movie_details = function()
 var init_map = function()
 {
 	var center = {lat: 38.769281, lng: -9.296047};
-	var map = new google.maps.Map(document.getElementById('map'), 
+	map = new google.maps.Map(document.getElementById('map'), 
 	{
-		zoom: 12,
+		zoom: 2,
 		center: center
 	});
 	
@@ -102,12 +106,55 @@ var init_map = function()
 		//handleLocationError(false, infoWindow, map.getCenter());
 	}
 	
-	
+	$.getJSON(url_geo_movie)
+	.done(function( data ) 
+	{
+		for(var i=0; i<data.length; i++)
+		{
+			var d = data[i];
+			
+			if(!map_markers[d.movie_name])
+			{
+				map_markers[d.movie_name] = [];
+				$("#movie_select").append("<option val='"+d.movie_name+"'>"+d.movie_name+"</option>")
+			}
+		
+			var marker = new google.maps.Marker(
+			{
+				position: {
+					lat: parseFloat(d.lat),
+					lng: parseFloat(d.lng)
+				},
+				map: map
+			});
+			
+			map_markers[d.movie_name].push(marker);
+		}
+		console.log(data);
+	});
+	/*
 	var marker = new google.maps.Marker(
 	{
 		position: center,
 		map: map
-	});
+	});*/
+	
+	
+}
+
+var change_map_markers = function()
+{
+	var selected = $("#movie_select").val();
+	
+	$.each( map_markers, function(value, x)
+	{
+		if(value == $("#movie_select").val() || $("#movie_select").val() == 'All')
+			for(var i=0; i<map_markers[value].length; i++)
+				map_markers[value][i].setMap(map);
+		else
+			for(var i=0; i<map_markers[value].length; i++)
+				map_markers[value][i].setMap(null);
+	})
 }
 
 
