@@ -1,6 +1,15 @@
-var url_all_movies = "http://localhost:8080/aw2017/rest/movie";
-var url_movie_details = "http://localhost:8080/aw2017/rest/movie/";
-var url_geo_movie = "http://localhost:8080/aw2017/website/geo.json";
+var url_base = "http://localhost:8080/aw2017/rest";
+var url_all_movies = 	url_base+"/movie";
+var url_movie_details = url_base+"/movie/";
+var url_geo_movie = 	"http://localhost:8080/aw2017/website/geo.json";
+
+var url_admin_movie_trakt = url_base+"/db/movies/trakt";
+var url_admin_movie_omdb = url_base+"/db/movies/omdb";
+var url_admin_movie_process = url_base+"/db/movies/process";
+var url_admin_cast = url_base+"/db/people/cast";
+var url_admin_cast_process = url_base+"/db/people/process";
+var url_admin_tweets = url_base+"/db/tweets";
+
 var omdb_key = "55808bd4";
 
 var map_markers = {};
@@ -56,9 +65,57 @@ var load_movie_details = function()
 		$("#title").html(data.title);
 		$("#tagline").html(data.tagline);
 		$("#description").html(data.overview);
-		$("#rating").html(data.rating);
+		$("#rating").html(data.imdb_rating);
 		$("#runtime").html(data.runtime);
 		$("#release").html(data.released);
+		$("#certification").html(data.certification);
+		$("#trailer").attr('src', "https://www.youtube.com/embed/"+data.trailer.substring(data.trailer.indexOf('?v=')+3))
+		$("#trakt").attr('href', data.url_trakt);
+		$("#imdb").attr('href', "http://www.imdb.com/title/"+data.id_imdb);
+		$("#tmdb").attr('href', "https://www.themoviedb.org/movie/"+data.id_tmdb);
+		
+		var chart = c3.generate(
+		{
+			bindto: '#rating',
+			data: 
+			{
+				columns: 
+				[
+					['data1', data.imdb_rating],
+					['data2', 10 - data.imdb_rating]
+				],
+				type : 'donut',
+				labels: false,
+				colors:
+				{
+					data1: '#1f77b4',
+					data2: '#cccccc'
+				}
+			},
+			donut: {
+				title: data.imdb_rating.toFixed(2),
+				label: 
+				{
+					show: false,
+					threshold: 0
+				},
+				expand: false,
+				width: 10
+			},
+			legend:
+			{
+				show: false
+			},
+			interaction: 
+			{
+				enabled: false
+			},
+			size: 
+			{
+				width: 80,
+				height: 80
+			},
+		});
 	});
 	
 	var uri = $.urlParam("id");
@@ -157,7 +214,59 @@ var change_map_markers = function()
 	})
 }
 
-
+var admin_import = 
+{
+	movies: function()
+	{
+		var trakt = document.getElementById("opt_trakt").checked;
+		
+		if(trakt == true)
+		{
+			$("#movie_import_start").toggleClass("loading_button");
+			$.get(url_admin_movie_trakt, function(data, status)
+			{
+				var omdb  = document.getElementById("opt_omdb").checked;
+				if(omdb == true)
+				{
+					$.get(url_admin_movie_omdb, function(data, status)
+					{
+						
+						$.get(url_admin_movie_process, function(data, status)
+						{
+							$("#movie_import_start").toggleClass("loading_button");
+						});
+					});
+				}
+				else
+				{
+					$.get(url_admin_movie_process, function(data, status)
+					{
+						$("#movie_import_start").toggleClass("loading_button");
+					});
+				}	
+			})
+		}
+	},
+	cast: function()
+	{
+		$("#cast_import_start").toggleClass("loading_button");
+		$.get(url_admin_cast, function(data, status)
+		{
+			$.get(url_admin_cast_process, function(data, status)
+			{
+				$("#cast_import_start").toggleClass("loading_button");
+			});
+		});
+	},
+	tweet: function()
+	{
+		$("#tweet_import_start").toggleClass("loading_button");
+		$.get(url_admin_tweets, function(data, status)
+		{
+			$("#tweet_import_start").toggleClass("loading_button");
+		});
+	}
+}
 
 $.urlParam = function(name)
 {

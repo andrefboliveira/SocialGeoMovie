@@ -1,0 +1,160 @@
+<html>
+<head>
+	<link href="https://fonts.googleapis.com/css?family=Exo" rel="stylesheet"> 
+
+	<link href="style/style.css" rel="stylesheet" type="text/css" />
+	<link href="scripts/libs/c3.min.css" rel="stylesheet" type="text/css" />
+	
+	<script src="scripts/libs/jquery-3.2.1.min.js" type="text/javascript"></script>
+	<script src="scripts/libs/d3.min.js" type="text/javascript"></script>
+	<script src="scripts/libs/c3.min.js" type="text/javascript"></script>
+	<script src="scripts/main.js" type="text/javascript"></script>
+</head>
+<body>
+	<div id="page_header">
+		<h1>Social Geo Movie</h1>
+		<nav>
+			<ul>
+				<li><a href="index.html"><strong>Home</strong></a></li>
+				<li><a href="geomovies.html">Geo Movies</a></li>
+				<li><a href="about.html">About Us</a></li>
+				<li><a href="api.html">API</a></li>
+				<li><a href="admin.html">Admin</a></li>
+			</ul>
+		</nav>
+	</div>
+	<div id="page_content">
+		<h1><strong>SocialGeoMovie Endpoint's</strong></h1>
+		<!--  PEOPLE -->
+		<h2><strong>Show Person's</strong></h2>
+		<p>Returns json data of all Person's in database.</p>
+		<ul>
+		<li><strong>URL: http://localhost:8080/aw2017/rest/person</strong></li>
+		</ul>
+		<p><code>GET</code></p>
+		<ul>
+		<li><strong>URL Params: No Params</strong></li>
+		</ul>
+		<li><p><strong>Success Response:</strong></p></li>
+		<li><p><strong>Code:</strong> 200 <br /> <strong>Content:</strong> <code>[{&quot;name&quot;:&quot;Henardo Rodriguez&quot;,&quot;id&quot;:852544}, ... ]</code></p></li>
+		<li><p><strong>Error Response:</strong></p></li>
+		<li><p><strong>Code:</strong> 404 NOT FOUND <br /> <strong>Content:</strong> <code>{ error : &quot;User doesn't exist&quot; }</code></p></li>
+		</ul>
+		<p>OR</p>
+		<ul>
+		<li><p><strong>Code:</strong> 401 UNAUTHORIZED <br /> <strong>Content:</strong> <code>{ error : &quot;You are unauthorized to make this request.&quot; }</code></p></li>
+		<li><p><strong>Sample Call:</strong></p></li>
+		</ul>
+		<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/person&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>
+
+
+		<h2><strong>Show Person by Id</strong></h2>
+		<p>Returns json data of a given Person by URI.</p>
+		<ul>
+		<li><strong>URL: http://localhost:8080/aw2017/rest/person/{person_uri}</strong></li>
+		</ul>
+		<p><code>GET</code></p>
+		<ul>
+		<li><strong>URL Params: {person_uri}</strong></li>
+		</ul>
+		<li><p><strong>Success Response:</strong></p></li>
+		<li><p><strong>Code:</strong> 200 <br /> <strong>Content:</strong> <code>{&quot;id_trakt&quot;:413655.0,&quot;name&quot;:&quot;Eleanor Witt&quot;,&quot;id_imdb&quot;:&quot;nm0936860&quot;,&quot;id_tmdb&quot;:1209244.0}</code></p></li>
+		<li><p><strong>Error Response:</strong></p></li>
+		<li><p><strong>Code:</strong> 404 NOT FOUND <br /> <strong>Content:</strong> <code>{ error : &quot;User doesn't exist&quot; }</code></p></li>
+		</ul>
+		<p>OR</p>
+		<ul>
+		<li><p><strong>Code:</strong> 401 UNAUTHORIZED <br /> <strong>Content:</strong> <code>{ error : &quot;You are unauthorized to make this request.&quot; }</code></p></li>
+		<li><p><strong>Sample Call:</strong></p></li>
+		</ul>
+		<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/person/{person_uri}&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>
+
+		<h2><strong>Delete Person by URI</strong></h2>
+		<p>Returns json data of a given Person by URI.</p>
+		<ul>
+		<li><strong>URL: http://localhost:8080/aw2017/rest/person/delete/{person_uri}</strong></li>
+		</ul>
+		<p><code>DELETE</code></p>
+		<ul>
+		<li><strong>URL Params: {person_uri}</strong></li>
+		</ul>
+		<li><p><strong>Success Response:</strong></p></li>
+		<li><p><strong>Code:</strong> 200 <br /> <strong>Content:</strong> <code>{&quot;id_trakt&quot;:413655.0,&quot;name&quot;:&quot;Eleanor Witt&quot;,&quot;id_imdb&quot;:&quot;nm0936860&quot;,&quot;id_tmdb&quot;:1209244.0}</code></p></li>
+		<li><p><strong>Error Response:</strong></p></li>
+		<li><p><strong>Code:</strong> 404 NOT FOUND <br /> <strong>Content:</strong> <code>{ error : &quot;User doesn't exist&quot; }</code></p></li>
+		</ul>
+		<p>OR</p>
+		<ul>
+		<li><p><strong>Code:</strong> 401 UNAUTHORIZED <br /> <strong>Content:</strong> <code>{ error : &quot;You are unauthorized to make this request.&quot; }</code></p></li>
+		<li><p><strong>Sample Call:</strong></p></li>
+		</ul>
+		<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/person/delete/{person_uri}&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>
+
+		<!--  MOVIES -->
+		<h2><strong>Show Movies</strong></h2>
+		<p>Returns json data of all Movies in database.</p>
+		<ul>
+		<li><strong>URL: http://localhost:8080/aw2017/rest/movie</strong></li>
+		</ul>
+		<p><code>GET</code></p>
+		<ul>
+		<li><strong>URL Params: No Params</strong></li>
+		</ul>
+		<li><p><strong>Success Response:</strong></p></li>
+		<li><p><strong>Code:</strong> 200 <br /> <strong>Content:</strong> <code>[{&quot;title&quot;:&quot;Star Wars: The Force Awakens&quot;,&quot;uri&quot;:&quot;StarWarsTheForceAwakens&quot;}, ... ]</code></p></li>
+		<li><p><strong>Error Response:</strong></p></li>
+		<li><p><strong>Code:</strong> 404 NOT FOUND <br /> <strong>Content:</strong> <code>{ error : &quot;Movie doesn't exist&quot; }</code></p></li>
+		</ul>
+		<p>OR</p>
+		<ul>
+		<li><p><strong>Code:</strong> 401 UNAUTHORIZED <br /> <strong>Content:</strong> <code>{ error : &quot;You are unauthorized to make this request.&quot; }</code></p></li>
+		<li><p><strong>Sample Call:</strong></p></li>
+		</ul>
+		<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/movie&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>
+
+
+		<h2><strong>Show Movie by URI</strong></h2>
+		<p>Returns json data of a given Movie by URI.</p>
+		<ul>
+		<li><strong>URL: http://localhost:8080/aw2017/rest/movie/{movie_uri}</strong></li>
+		</ul>
+		<p><code>GET</code></p>
+		<ul>
+		<li><strong>URL Params: {movie_uri}</strong></li>
+		</ul>
+		<li><p><strong>Success Response:</strong></p></li>
+		<li><p><strong>Code:</strong> 200 <br /> <strong>Content:</strong> <code>{&quot;overview&quot;:&quot;From DC Comics comes the Suicide Squad, an antihero team of incarcerated supervillains who act as deniable assets for the United States government, undertaking high-risk black ops missions in exchange for commuted prison sentences.&quot;,&quot;runtime&quot;:123.0,&quot;url_tmdb&quot;:&quot;https://www.themoviedb.org/movie/297761-suicide-squad&quot;,&quot;title&quot;:&quot;Suicide Squad&quot;,&quot;uri&quot;:&quot;SuicideSquad&quot;,&quot;certification&quot;:&quot;PG-13&quot;,&quot;trailer&quot;:&quot;http://youtube.com/watch?v\u003d3QrnT3K-Xao&quot;,&quot;url_imdb&quot;:&quot;http://www.imdb.com/title/tt1386697&quot;,&quot;genres&quot;:&quot;action, crime, fantasy, science-fiction&quot;,&quot;id_trakt&quot;:&quot;193079&quot;,&quot;tagline&quot;:&quot;Worst Heroes Ever&quot;,&quot;id_imdb&quot;:&quot;tt1386697&quot;,&quot;imdb_rating&quot;:7.02965,&quot;url_trakt&quot;:&quot;https://trakt.tv/movies/suicide-squad-2016&quot;,&quot;released&quot;:&quot;2016-08-05T00:00:00.000Z&quot;,&quot;homepage&quot;:&quot;http://www.suicidesquad.com/&quot;,&quot;id_tmdb&quot;:&quot;297761&quot;}</code></p></li>
+		<li><p><strong>Error Response:</strong></p></li>
+		<li><p><strong>Code:</strong> 404 NOT FOUND <br /> <strong>Content:</strong> <code>{ error : &quot;Movie doesn't exist&quot; }</code></p></li>
+		</ul>
+		<p>OR</p>
+		<ul>
+		<li><p><strong>Code:</strong> 401 UNAUTHORIZED <br /> <strong>Content:</strong> <code>{ error : &quot;You are unauthorized to make this request.&quot; }</code></p></li>
+		<li><p><strong>Sample Call:</strong></p></li>
+		</ul>
+		<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/movie/{movie_uri}&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>
+
+		<h2><strong>Delete Person by URI</strong></h2>
+		<p>Returns json delete response data of a given Movie by URI.</p>
+		<ul>
+		<li><strong>URL: http://localhost:8080/aw2017/rest/movie/delete/{movie_uri}</strong></li>
+		</ul>
+		<p><code>DELETE</code></p>
+		<ul>
+		<li><strong>URL Params: {movie_uri}</strong></li>
+		</ul>
+		<li><p><strong>Success Response:</strong></p></li>
+		<li><p><strong>Code:</strong> 200 <br /> <strong>Content:</strong> <code>{&quot;id_trakt&quot;:413655.0,&quot;name&quot;:&quot;Eleanor Witt&quot;,&quot;id_imdb&quot;:&quot;nm0936860&quot;,&quot;id_tmdb&quot;:1209244.0}</code></p></li>
+		<li><p><strong>Error Response:</strong></p></li>
+		<li><p><strong>Code:</strong> 404 NOT FOUND <br /> <strong>Content:</strong> <code>{ error : &quot;Movie doesn't exist&quot; }</code></p></li>
+		</ul>
+		<p>OR</p>
+		<ul>
+		<li><p><strong>Code:</strong> 401 UNAUTHORIZED <br /> <strong>Content:</strong> <code>{ error : &quot;You are unauthorized to make this request.&quot; }</code></p></li>
+		<li><p><strong>Sample Call:</strong></p></li>
+		</ul>
+		<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/movie/delete/{movie_uri}&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>
+
+	</div>
+</body>
+</html>
