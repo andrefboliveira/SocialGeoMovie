@@ -57,10 +57,11 @@ public class Merge {
 					Number mainValueNumber = (Number) mainValue;
 					 if (otherValue instanceof Number) {
 						 Number otherValueNumber = (Number) otherValue;
-						if (!mainValueNumber.equals(otherValueNumber)) {
+						 Double otherValueDouble =  otherValueNumber.doubleValue();
+						if (!mainValueNumber.equals(otherValueDouble)) {
 							ArrayList<Object> newList = new ArrayList<Object>();
 							newList.add(mainValueNumber);
-							newList.add(mainValueNumber);
+							newList.add(otherValueDouble);
 							mainMap.put(aditionalKey, newList);
 						}	
 
