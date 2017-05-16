@@ -290,12 +290,10 @@ public class SaveDataClient {
 			String id_imdb = (String) movieProperties.get("id_imdb");
 			Map<String, Object> omdbProperties = OMDbClient.getOMDbMovie(id_imdb);
 			logger.info("Search OMDb for id: " + id_imdb);
+			
+			Map<String, Object> omdbProcessed = Converter.omdbMap(omdbProperties);
 
-//			Map<String, Object> resultMap = Merge.mergeMap(movieProperties, omdbProperties);
-			
-			Map<String, Object> resultMap = movieProperties;
-			resultMap.put("poster", omdbProperties.get("Poster"));
-			
+			Map<String, Object> resultMap = Merge.mergeMap(movieProperties, omdbProcessed);			
 			
 			Neo4JClient.updateNodeProperties(new URI(getNodesByLabel.getSelf()), resultMap);
 			logger.info("Added OMDb info for: " + movieProperties.get("title"));

@@ -1,8 +1,13 @@
 package com.socialgeomovie.utils;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -73,7 +78,60 @@ public class Converter {
 	}
 
 	public static Map<String, Object> omdbMap(Map<String, Object> omdbResponse) {
-		return omdbResponse;
+		Map<String, Object> omdbData = new HashMap<String, Object>();
+		omdbData.put("title", omdbResponse.get("Title"));
+		omdbData.put("poster", omdbResponse.get("Poster"));
+		omdbData.put("certification", omdbResponse.get("Rated"));
+		
+		DateFormat format = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+		try {
+			String releasedString = (String) omdbResponse.get("Released");
+			Date date = format.parse(releasedString);
+			omdbData.put("released", new SimpleDateFormat("yyyy-MM-dd").format(date));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		String runtimeString = (String) omdbResponse.get("Runtime");
+		omdbData.put("runtime", runtimeString.split(" ")[0]);
+		
+		String genresString = (String) omdbResponse.get("Genre");
+		omdbData.put("genres", genresString.split(", "));
+		
+//		omdbData.put("overview", omdbResponse.get("Plot"));
+		omdbData.put("homepage", omdbResponse.get("Website"));
+		omdbData.put("imdb_rating", omdbResponse.get("imdbRating"));
+		omdbData.put("imdb_votes", omdbResponse.get("imdbVotes"));
+		omdbData.put("metacritic_rating", omdbResponse.get("Metascore"));
+		
+		List<Map<String, String>> ratingsList = (List<Map<String, String>>) omdbResponse.get("Ratings");
+		Map<String, String> RottenTomatoesMap = ratingsList.get(1);
+		if (RottenTomatoesMap.get("Source").equals("Rotten Tomatoes")) {
+			String RTRatingString = (String) RottenTomatoesMap.get("Value");
+			omdbData.put("rotten_tomatoes_rating", RTRatingString.split("%")[0]);
+		}
+		
+		omdbData.put("production", omdbResponse.get("Production"));
+		omdbData.put("box_office", omdbResponse.get("BoxOffice"));
+		omdbData.put("awards", omdbResponse.get("Awards"));
+		omdbData.put("language", omdbResponse.get("Language"));
+		
+//		String countryString = (String) omdbResponse.get("Country");
+//		omdbData.put("country", countryString.split(", "));
+//		
+//		String directorString = (String) omdbResponse.get("Director");
+//		omdbData.put("director", directorString.split(", "));
+//		
+//		String writerString = (String) omdbResponse.get("Writer");
+//		omdbData.put("writer", writerString.split(", "));
+//		
+//		String actorsString = (String) omdbResponse.get("Actors");
+//		omdbData.put("actors", actorsString.split(", "));
+//		
+//		omdbData.put("year", omdbResponse.get("Year"));
+
+		
+		return omdbData;
 
 	}
 }

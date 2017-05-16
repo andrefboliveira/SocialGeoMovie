@@ -35,7 +35,7 @@ public class Merge {
 					String mainValueString = (String) mainValue;
 					 if (otherValue instanceof String) {
 						String otherValueString = (String) otherValue;
-						if (!mainValueString.contains(otherValueString)) {
+						if (!mainValueString.toLowerCase().contains(otherValueString.toLowerCase())) {
 							ArrayList<Object> newList = new ArrayList<Object>();
 							newList.add(mainValueString);
 							newList.add(otherValueString);
@@ -56,9 +56,12 @@ public class Merge {
 				} else if (mainValue instanceof Number) {
 					Number mainValueNumber = (Number) mainValue;
 					 if (otherValue instanceof Number) {
+						 Double mainValueDouble =  mainValueNumber.doubleValue();
 						 Number otherValueNumber = (Number) otherValue;
 						 Double otherValueDouble =  otherValueNumber.doubleValue();
-						if (!mainValueNumber.equals(otherValueDouble)) {
+//						if (!mainValueNumber.equals(otherValueDouble)) {
+						if (!(Math.abs(mainValueDouble - otherValueDouble) < 0.1)) {
+
 							ArrayList<Object> newList = new ArrayList<Object>();
 							newList.add(mainValueNumber);
 							newList.add(otherValueDouble);

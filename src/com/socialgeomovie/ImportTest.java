@@ -7,15 +7,21 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.text.DateFormat;
 import java.text.Normalizer;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import com.socialgeomovie.clients.Neo4JClient;
+import com.socialgeomovie.clients.OMDbClient;
 import com.socialgeomovie.clients.OpenSubsClient;
 import com.socialgeomovie.clients.SaveDataClient;
 import com.socialgeomovie.clients.TraktClient;
@@ -161,6 +167,38 @@ public class ImportTest {
 //			for (String key : resultMap.keySet()) {
 //				System.out.println(key + ": " + resultMap.get(key));
 //			}
+//			
+			
+			GetNodesByLabel[] movies = Neo4JClient.getNodesByLabel("Movie");
+			for (GetNodesByLabel getNodesByLabel : movies) {
+				Map<String, Object> movieProperties = getNodesByLabel.getData();
+				String id_imdb = (String) movieProperties.get("id_imdb");
+				Map<String, Object> omdbData = OMDbClient.getOMDbMovie(id_imdb);
+				System.out.println("Search OMDb for id: " + id_imdb);
+
+//				Map<String, Object> resultMap = Merge.mergeMap(movieProperties, omdbProperties);
+//				
+//				for (String key : resultMap.keySet()) {
+//					System.out.println(key + ": " + resultMap.get(key));
+//				}
+//				
+//				
+
+				Map<String, Object> omdbProcessed = Converter.omdbMap(omdbData);
+
+				Map<String, Object> resultMap = Merge.mergeMap(movieProperties, omdbProcessed);
+
+				for (String key : resultMap.keySet()) {
+					System.out.println(key + ": " + resultMap.get(key));
+				}
+				
+				
+				System.out.println("Added OMDb info for: " + movieProperties.get("title"));
+				System.out.println("\n\n");
+
+
+				
+			}
 			
 		}
 
