@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -185,6 +186,16 @@ public class ImportTest {
 //				
 
 				Map<String, Object> omdbProcessed = Converter.omdbMap(omdbData);
+//				omdbProcessed.values().removeAll(Collections.singleton("N/A"));
+				
+//				List<Object> nullList = new ArrayList<Object>();
+				
+				List<Object> nullList = Arrays.asList("N/A", "NA", "null", "empty", null);
+				omdbProcessed.values().removeIf(val -> nullList.contains(val));
+				
+				
+
+
 
 				Map<String, Object> resultMap = Merge.mergeMap(movieProperties, omdbProcessed);
 

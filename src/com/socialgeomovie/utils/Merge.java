@@ -1,6 +1,7 @@
 package com.socialgeomovie.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,9 @@ import org.apache.commons.collections.ListUtils;
 public class Merge {
 
 	public static Map<String, Object> mergeMap(Map<String, Object> mainMap, Map<String, Object> aditionalMap){
+		List<Object> nullList = Arrays.asList("N/A", "NA", "null", "empty", null);
+		aditionalMap.values().removeIf(val -> nullList.contains(val));
+		
 		for (String aditionalKey : aditionalMap.keySet()) {
 			if (mainMap.containsKey(aditionalKey)) {
 				Object mainValue = mainMap.get(aditionalKey);

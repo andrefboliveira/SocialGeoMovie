@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -292,6 +293,7 @@ public class SaveDataClient {
 			logger.info("Search OMDb for id: " + id_imdb);
 			
 			Map<String, Object> omdbProcessed = Converter.omdbMap(omdbProperties);
+			omdbProcessed.values().removeAll(Collections.singleton("N/A"));
 
 			Map<String, Object> resultMap = Merge.mergeMap(movieProperties, omdbProcessed);			
 			

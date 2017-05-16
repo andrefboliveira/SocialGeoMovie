@@ -818,7 +818,6 @@ public abstract class Neo4JClient {
 
 	public static void safeDeleteNode(String nodeID) {
 		String query = "MATCH (n {uri:" + nodeID + "}) DETACH DELETE n";
-		System.out.println(query);
 		sendTransactionalCypherQuery(query);
 	}
 
