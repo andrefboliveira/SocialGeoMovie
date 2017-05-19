@@ -176,8 +176,14 @@ public class MovieServlet {
 
 			try {
 				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
-				String movieRelationURI = movieNodes[0].getAllRelationships();
-				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationships(movieRelationURI);
+				String movieNodeURI = movieNodes[0].getSelf();
+				GetNodeRelationship[] nodeRelationship = null;
+				try {
+					nodeRelationship = Neo4JClient.getNodeRelationshipsByType(new URI(movieNodeURI), "acts in");
+				} catch (URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 				int length = nodeRelationship.length;
 
