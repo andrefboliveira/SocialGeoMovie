@@ -10,7 +10,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-
+import com.socialgeomovie.pojos.tmdb.TMDbConfiguration;
+import com.socialgeomovie.pojos.tmdb.TMDbMovie;
+import com.socialgeomovie.pojos.tmdb.TMDbPerson;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
 
@@ -135,14 +137,24 @@ public class Converter {
 		return omdbData;
 	}
 	
-//	public static Map<String, Object> tmdbMovie2Map(MovieDb movie, TmdbConfiguration config) {
-//		return null;
-//		
-//	}
-//	
-//	public static Map<String, Object> tmdbPerson2Map(PersonPeople person, TmdbConfiguration config) {
-//		person.
-//		return null;
-//		
-//	}
+	public static Map<String, Object> tmdbMovie2Map(TMDbMovie movie, TMDbConfiguration config) {
+		Map<String, Object> tmdbPersonData = new HashMap<String, Object>();
+
+		return tmdbPersonData;
+		
+	}
+	
+	public static Map<String, Object> tmdbPerson2Map(TMDbPerson person, TMDbConfiguration config) {
+		Map<String, Object> tmdbPersonData = new HashMap<String, Object>();
+		
+		String profilePath = person.getProfilePath();
+		String baseURL = config.getImages().getSecureBaseUrl();
+		List<String> imageSize = config.getImages().getProfileSizes();
+		
+		tmdbPersonData.put("profile_image_" + imageSize.get(0), baseURL +  imageSize.get(0) + profilePath);
+		tmdbPersonData.put("profile_image_" + imageSize.get(1), baseURL +  imageSize.get(1) + profilePath);
+		
+		return tmdbPersonData;
+		
+	}
 }

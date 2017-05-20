@@ -32,7 +32,7 @@ import com.socialgeomovie.servlets.MovieServlet.MoviePeople;
 @Path("/db")
 public class AdminServlet {
 	// http://localhost:8080/aw2017/rest/db
-	
+
 	@Path("/movies")
 	public ImportMovies moviesSubResource() {
 		return new ImportMovies();
@@ -46,89 +46,132 @@ public class AdminServlet {
 		@Path("/trakt")
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response importTraktMovies(@DefaultValue("10") @QueryParam("quantity") final int quantity) 
-		{
+		public Response importTraktMovies(@DefaultValue("10") @QueryParam("quantity") final int quantity) {
 			Map<String, URI> moviesReport = SaveDataClient.saveAllTraktMovies(quantity);
-			Map<String, String> report = new HashMap<String,String>();
+			Map<String, String> report = new HashMap<String, String>();
 			report.put("status", "OK");
-			report.put("movies", ""+moviesReport.size());
+			report.put("movies", "" + moviesReport.size());
 			Gson gson = new Gson();
 			return Response.status(Status.OK).entity(gson.toJson(report)).build();
 		}
-		
+
 		@GET
 		@Path("/omdb")
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response importOMDBMovies() 
-		{	
-			
-				try {
-					SaveDataClient.addingOMDbData();
-				} catch (IOException | URISyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			
-			Map<String, String> report = new HashMap<String,String>();
-			report.put("status", "OK");
-			Gson gson = new Gson();
-			return Response.status(Status.OK).entity(gson.toJson(report)).build();
+		public Response importOMDbMovies() {
+			Map<String, String> report = new HashMap<String, String>();
+			try {
+				SaveDataClient.addOMDbData();
+				report.put("status", "OK");
+				Gson gson = new Gson();
+				return Response.status(Status.OK).entity(gson.toJson(report)).build();
+			} catch (IOException | URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			return null;
 		}
-		
+
+		@GET
+		@Path("/tmdb")
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response importTMDbMovies() {
+			Map<String, String> report = new HashMap<String, String>();
+
+			try {
+				SaveDataClient.addTMDbMovieData();
+				report.put("status", "OK");
+				Gson gson = new Gson();
+				return Response.status(Status.OK).entity(gson.toJson(report)).build();
+			} catch (NumberFormatException | UnsupportedEncodingException | URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			return null;
+		}
+
 		@GET
 		@Path("/process")
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response processMovies() 
-		{	
+		public Response processMovies() {
 			try {
 				SaveDataClient.addMovieLinks();
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Map<String, String> report = new HashMap<String,String>();
+			Map<String, String> report = new HashMap<String, String>();
 			report.put("status", "OK");
 			Gson gson = new Gson();
 			return Response.status(Status.OK).entity(gson.toJson(report)).build();
 		}
 	}
-	
+
 	@Path("/people")
 	public ImportPeople peopleSubResource() {
 		return new ImportPeople();
 	}
 
 	public class ImportPeople {
-		/**
-		 * Import Cast Data
-		 */
-		@GET
+		
 		@Path("/cast")
-		@Consumes(MediaType.APPLICATION_JSON)
-		@Produces(MediaType.APPLICATION_JSON)
-		public Response importTraktCast() 
-		{
-			Map<String, URI> castReport = SaveDataClient.saveAllTraktMovieCast();
-			Map<String, String> report = new HashMap<String,String>();
-			report.put("status", "OK");
-			report.put("cast", ""+castReport.size());
-			Gson gson = new Gson();
-			return Response.status(Status.OK).entity(gson.toJson(report)).build();
+		public ImportCast castSubResource() {
+			return new ImportCast();
 		}
 		
+		public class ImportCast {
+			/**
+			 * Import Cast Data
+			 */
+			@GET
+			@Path("/trakt")
+			@Consumes(MediaType.APPLICATION_JSON)
+			@Produces(MediaType.APPLICATION_JSON)
+			public Response importTraktCast() {
+				Map<String, URI> castReport = SaveDataClient.saveAllTraktMovieCast();
+				Map<String, String> report = new HashMap<String, String>();
+				report.put("status", "OK");
+				report.put("cast", "" + castReport.size());
+				Gson gson = new Gson();
+				return Response.status(Status.OK).entity(gson.toJson(report)).build();
+			}
+			
+			
+			@GET
+			@Path("/tmdb")
+			@Produces(MediaType.APPLICATION_JSON)
+			public Response importTMDbCast() {
+				Map<String, String> report = new HashMap<String, String>();
+
+				try {
+					SaveDataClient.addTMDbCastData();
+					report.put("status", "OK");
+					Gson gson = new Gson();
+					return Response.status(Status.OK).entity(gson.toJson(report)).build();
+				} catch (NumberFormatException | UnsupportedEncodingException | URISyntaxException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				return null;
+			}
+			
+		}
 		
+
 		@GET
 		@Path("/process")
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response processCast() 
-		{	
+		public Response processCast() {
 			try {
 				SaveDataClient.addCastLinks();
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Map<String, String> report = new HashMap<String,String>();
+			Map<String, String> report = new HashMap<String, String>();
 			report.put("status", "OK");
 			Gson gson = new Gson();
 			return Response.status(Status.OK).entity(gson.toJson(report)).build();
@@ -136,66 +179,55 @@ public class AdminServlet {
 	}
 
 	@GET
-    @Path("/tweets")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response importTweets() 
-    {
+	@Path("/tweets")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response importTweets() {
 		SaveDataClient.saveTweets();
-		
-		/*GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabel("Movie");
-		NewTwitterClient client = new NewTwitterClient();
-		for(int i=0; i<movieNodes.length; i++)
-		{
-			GetNodesByLabel movie = movieNodes[i];
-			try {
-				URI movieURI = new URI(movie.getSelf());
-				String a = movie.getProperties();
-				Map<String, Object> nodeRelationship = Neo4JClient.getNodeProperties(a);
 
-				String uri = (String) nodeRelationship.get("uri");
-				List<HashMap<String, Object>> tweets = client.fetchTweets("#" + uri + " -filter:retweets");
-				
-				
-				
-				System.out.println("asdf");
-			} catch (URISyntaxException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-		}*/
-		
-		
-		
-		
-		//client.fetchTweets(movie_id+"");
-		//List<HashMap<String, Object>> tweets = client.fetchTweets("#guardiansofthegalaxy");
-		
-		/*try
-		{
-			//GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
-			System.out.println("asdf");
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-
-		//nodeInfo.putAll((movieNodes[0].getData()));
-		
 		/*
-		//        TwitterClient twitterClient = new TwitterClient();
-
-        // TODO needs to fetch the movie title from the database
-        try {
-            List<String> tweets = TwitterClient.getTweets("movie.title");
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+		 * GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabel("Movie");
+		 * NewTwitterClient client = new NewTwitterClient(); for(int i=0;
+		 * i<movieNodes.length; i++) { GetNodesByLabel movie = movieNodes[i];
+		 * try { URI movieURI = new URI(movie.getSelf()); String a =
+		 * movie.getProperties(); Map<String, Object> nodeRelationship =
+		 * Neo4JClient.getNodeProperties(a);
+		 * 
+		 * String uri = (String) nodeRelationship.get("uri");
+		 * List<HashMap<String, Object>> tweets = client.fetchTweets("#" + uri +
+		 * " -filter:retweets");
+		 * 
+		 * 
+		 * 
+		 * System.out.println("asdf"); } catch (URISyntaxException e) { // TODO
+		 * Auto-generated catch block e.printStackTrace(); }
+		 * 
+		 * }
 		 */
-        Gson gson = new Gson();
-        return Response.status(Status.OK).entity("gson.toJson(tweets)").build();
-        
-    }
+
+		// client.fetchTweets(movie_id+"");
+		// List<HashMap<String, Object>> tweets =
+		// client.fetchTweets("#guardiansofthegalaxy");
+
+		/*
+		 * try { //GetNodesByLabel[] movieNodes =
+		 * Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
+		 * System.out.println("asdf"); } catch (UnsupportedEncodingException e)
+		 * { // TODO Auto-generated catch block e.printStackTrace(); }
+		 */
+
+		// nodeInfo.putAll((movieNodes[0].getData()));
+
+		/*
+		 * // TwitterClient twitterClient = new TwitterClient();
+		 * 
+		 * // TODO needs to fetch the movie title from the database try {
+		 * List<String> tweets = TwitterClient.getTweets("movie.title"); } catch
+		 * (InterruptedException e) { // TODO Auto-generated catch block
+		 * e.printStackTrace(); }
+		 */
+		Gson gson = new Gson();
+		return Response.status(Status.OK).entity("gson.toJson(tweets)").build();
+
+	}
 }

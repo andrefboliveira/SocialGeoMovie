@@ -10,7 +10,7 @@ import org.apache.commons.collections.ListUtils;
 
 public class Merge {
 
-	public static Map<String, Object> mergeMap(Map<String, Object> mainMap, Map<String, Object> aditionalMap){
+	public static Map<String, Object> mergeMapCombine(Map<String, Object> mainMap, Map<String, Object> aditionalMap){
 		List<Object> nullList = Arrays.asList("N/A", "NA", "null", "empty", null);
 		aditionalMap.values().removeIf(val -> nullList.contains(val));
 		
@@ -91,6 +91,14 @@ public class Merge {
 		
 		return mainMap;
 		
+	}
+	
+	public static Map<String, Object> mergeMapOverwrite(Map<String, Object> mainMap, Map<String, Object> aditionalMap){
+		List<Object> nullList = Arrays.asList("N/A", "NA", "null", "empty", null);
+		mainMap.putAll(aditionalMap);
+		mainMap.values().removeIf(val -> nullList.contains(val));
+		
+		return mainMap;
 	}
 }
 

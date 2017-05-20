@@ -31,8 +31,9 @@ import com.socialgeomovie.clients.TwitterClient;
 
 import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
-import com.socialgeomovie.pojos.tmdb.Configuration;
-import com.socialgeomovie.pojos.tmdb.Person;
+import com.socialgeomovie.pojos.tmdb.TMDbConfiguration;
+import com.socialgeomovie.pojos.tmdb.Images_Config;
+import com.socialgeomovie.pojos.tmdb.TMDbPerson;
 import com.socialgeomovie.utils.Converter;
 import com.socialgeomovie.utils.IDParser;
 import com.socialgeomovie.utils.Merge;
@@ -139,10 +140,17 @@ public class ImportTest {
 //			s1.add(123);
 //
 //
+			
+//			Map<String,Object> result = gson.fromJson(output, Map.class);
+//			System.out.println(result.keySet());
+			
 			TMDbClient tmdb = new TMDbClient();
-			Configuration c = tmdb.getConfiguration();
-			System.out.println(c.getImages().getBaseUrl());
-			 Person m = tmdb.getPerson(10859);
+			
+			Images_Config i = tmdb.getConfiguration().getImages();
+			
+
+			
+			 TMDbPerson m = tmdb.getPerson(10859);
 			 System.out.println(m.getName());
 		
 			

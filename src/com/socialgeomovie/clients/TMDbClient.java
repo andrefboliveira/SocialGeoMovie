@@ -11,9 +11,9 @@ import javax.ws.rs.core.MediaType;
 
 import com.google.gson.Gson;
 import com.socialgeomovie.pojos.neo4j.GetNodeByID;
-import com.socialgeomovie.pojos.tmdb.Configuration;
-import com.socialgeomovie.pojos.tmdb.Movie;
-import com.socialgeomovie.pojos.tmdb.Person;
+import com.socialgeomovie.pojos.tmdb.TMDbConfiguration;
+import com.socialgeomovie.pojos.tmdb.TMDbMovie;
+import com.socialgeomovie.pojos.tmdb.TMDbPerson;
 import com.socialgeomovie.utils.Neo4JRequestException;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
@@ -34,7 +34,7 @@ public class TMDbClient {
 	}
 	
 
-	public Movie getMovie(int movieTMDbId) throws UnsupportedEncodingException {
+	public TMDbMovie getMovie(int movieTMDbId) throws UnsupportedEncodingException {
 		String language = "en";
 		String append_to_response = "credits, alternative_titles, images, videos";
 		String queryURL = "https://api.themoviedb.org/3/movie/" + movieTMDbId + "?api_key=" + ApiKey + "&language=" + language + "&append_to_response=" +  URLEncoder.encode(append_to_response, "UTF-8");
@@ -49,7 +49,7 @@ public class TMDbClient {
 
 		String output = response.getEntity(String.class);
 		
-		Movie movie = gson.fromJson(output, Movie.class);
+		TMDbMovie movie = gson.fromJson(output, TMDbMovie.class);
 
 		response.close();
 
@@ -57,7 +57,7 @@ public class TMDbClient {
 	}
 	
 	
-	public Person getPerson(int personTMDbId) throws UnsupportedEncodingException {
+	public TMDbPerson getPerson(int personTMDbId) throws UnsupportedEncodingException {
 		String language = "en";
 		String append_to_response = "images, tagged_images, external_ids";
 				
@@ -71,8 +71,8 @@ public class TMDbClient {
 			throw new RuntimeException("TMDb Request Failed! " + response.toString());
 		}
 
-		String output = response.getEntity(String.class);		
-		Person person = gson.fromJson(output, Person.class);
+		String output = response.getEntity(String.class);
+		TMDbPerson person = gson.fromJson(output, TMDbPerson.class);
 
 		response.close();
 
@@ -80,7 +80,7 @@ public class TMDbClient {
 	}
 	
 	
-	public Configuration getConfiguration() {
+	public TMDbConfiguration getConfiguration() {
 				
 		String queryURL = "https://api.themoviedb.org/3/configuration?api_key=" + ApiKey;
 		
@@ -93,7 +93,7 @@ public class TMDbClient {
 		}
 
 		String output = response.getEntity(String.class);		
-		Configuration config = gson.fromJson(output, Configuration.class);
+		TMDbConfiguration config = gson.fromJson(output, TMDbConfiguration.class);
 
 		response.close();
 

@@ -27,10 +27,8 @@ public class Servlet {
 			GetNodesByLabel[] resourceNodes = Neo4JClient.getNodesByLabelAndProperty(resourceType, "uri", resourceID);
 			GetNodesByLabel resourceNode = resourceNodes[0];
 			
-				nodeInfo.putAll(resourceNode.getData());
-				nodeInfo.putAll(request);
-				
-				Neo4JClient.updateNodeProperties(new URI(resourceNode.getSelf()), nodeInfo);
+			nodeInfo = Merge.mergeMapOverwrite(resourceNode.getData(), request);
+			Neo4JClient.updateNodeProperties(new URI(resourceNode.getSelf()), nodeInfo);
 
 		} catch (UnsupportedEncodingException | URISyntaxException e1) {
 			// TODO Auto-generated catch block
