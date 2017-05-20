@@ -146,13 +146,21 @@ public class Converter {
 	
 	public static Map<String, Object> tmdbPerson2Map(TMDbPerson person, TMDbConfiguration config) {
 		Map<String, Object> tmdbPersonData = new HashMap<String, Object>();
+		tmdbPersonData.put("biography", person.getBiography());
+		tmdbPersonData.put("birthday", person.getBirthday());
+		tmdbPersonData.put("deathday", person.getDeathday());
+		Integer intGender = person.getGender();
+		tmdbPersonData.put("gender", intGender == 0 ? "Male" : (intGender == 1 ? "Female" : ""));
+		tmdbPersonData.put("homepage", person.getHomepage());
 		
 		String profilePath = person.getProfilePath();
 		String baseURL = config.getImages().getSecureBaseUrl();
 		List<String> imageSize = config.getImages().getProfileSizes();
 		
-		tmdbPersonData.put("profile_image_" + imageSize.get(0), baseURL +  imageSize.get(0) + profilePath);
-		tmdbPersonData.put("profile_image_" + imageSize.get(1), baseURL +  imageSize.get(1) + profilePath);
+		for (String size : imageSize) {
+			tmdbPersonData.put("profile_image_" + size, baseURL +  size + profilePath);
+		}
+		
 		
 		return tmdbPersonData;
 		

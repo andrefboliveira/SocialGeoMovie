@@ -508,6 +508,13 @@ public abstract class Neo4JClient {
 
 		return relationships;
 	}
+	
+	public static GetNodeRelationship[] getNodeRelationshipsByType(String nodeUri, String type) throws UnsupportedEncodingException{
+		List<String> types = new ArrayList<String>();
+		types.add(type);
+		
+		return getNodeRelationshipsByType(nodeUri, types);
+	}
 
 	public static GetNodeRelationship[] getNodeRelationshipsByType(String nodeUri, List<String> types) throws UnsupportedEncodingException
 	{

@@ -162,9 +162,8 @@ public class MovieServlet {
 		try 
 		{
 			GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
-			List<String> types = new ArrayList<String>();
-			types.add("talks about");
-			GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(), types);
+			
+			GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(), "talks about");
 			for(int i=0; i<nodeRelationship.length; i++)
 			{
 				GetNodeRelationship getNodeRelationship = nodeRelationship[i];
@@ -210,9 +209,7 @@ public class MovieServlet {
 
 			try {
 				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
-				List<String> types = new ArrayList<String>();
-				types.add("acts in");
-				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(), types);
+				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(), "acts in");
 
 				int length = nodeRelationship.length;
 

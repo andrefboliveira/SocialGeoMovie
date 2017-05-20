@@ -26,7 +26,9 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.pojos.neo4j.GetNodeByID;
+import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
+import com.socialgeomovie.servlets.MovieServlet.MoviePeople;
 import com.socialgeomovie.utils.Servlet;
 
 @Path("/person")
@@ -141,4 +143,98 @@ public class PersonServlet {
 		// return null;
 		return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
 	}
+	
+	@Path("/{person_uri}/movies")
+	public MoviePeople peopleSubResource() {
+		return new MoviePeople();
+	}
+
+	public class MoviePeople {
+		// http://localhost:8080/aw2017/rest/person/{person_uri}/movies
+		/**
+		 * Add info about a movie
+		 */
+		@GET
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response getMoviePeople(@PathParam("person_uri") String person_uri,
+				@DefaultValue("false") @QueryParam("include_details") final boolean details,
+				@DefaultValue("-1") @QueryParam("limit") final int limit,
+				@DefaultValue("1") @QueryParam("page") final int page) {
+
+			List<Map<String, Object>> nodeList = new ArrayList<>();
+			Gson gson = new Gson();
+
+			try {
+				GetNodesByLabel[] castNodes = Neo4JClient.getNodesByLabelAndProperty("Cast", "uri", person_uri);
+				
+				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(castNodes[0].getSelf(), "acts in");
+
+				int length = nodeRelationship.length;
+
+				int firstResult, lastResult;
+				if (limit > -1) {
+					firstResult = Integer.min(length, ((page - 1) * limit));
+					lastResult = Integer.min(length, (firstResult + limit));
+				} else {
+					firstResult = 0;
+					lastResult = length;
+				}
+
+				for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
+					GetNodeRelationship getNodeRelationship = nodeRelationship[nodeNumber];
+
+					Map<String, Object> nodeInfo = new HashMap<String, Object>();
+
+					String nodeID = getNodeRelationship.getEnd();
+					String nodePropertiesURI = Neo4JClient.getNode(nodeID).getProperties();
+
+					LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
+							.getNodeProperties(nodePropertiesURI);
+
+					String uri = (String) propertiesResponse.get("uri");
+					nodeInfo.put("uri", uri);
+
+					if (details) {
+						nodeInfo.putAll(propertiesResponse);
+					} else {
+						nodeInfo.put("title", propertiesResponse.get("title"));
+					}
+
+					nodeList.add(nodeInfo);
+				}
+
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
+		}
+
+		/**
+		 * Add a movie person relationship
+		 */
+		@PUT
+		@Path("/{movie_uri}")
+		@Consumes(MediaType.APPLICATION_JSON)
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response addMoviePerson(
+				@PathParam("movie_uri") String movie_uri, 
+				@PathParam("person_uri") String person_uri) {
+			return null;
+		}
+
+		/**
+		 * Delete a movie person relationship
+		 */
+		@DELETE
+		@Path("/{movie_uri}")
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response deleteMoviePerson(
+				@PathParam("movie_uri") String movie_uri, 
+				@PathParam("person_uri") String person_uri) {
+			return null;
+		}
+	}
+
 }

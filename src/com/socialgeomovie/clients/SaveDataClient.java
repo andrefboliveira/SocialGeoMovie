@@ -358,6 +358,9 @@ public class SaveDataClient {
 
 				Map<String, Object> resultMap = Merge.mergeMapCombine(castProperties,
 						Converter.tmdbPerson2Map(person, tmdb.getConfiguration()));
+				
+				logger.info(resultMap.values().toString());		
+				
 
 				Neo4JClient.updateNodeProperties(new URI(getNodesByLabel.getSelf()), resultMap);
 				logger.info("Added TMDb People info for: " + castProperties.get("name"));
