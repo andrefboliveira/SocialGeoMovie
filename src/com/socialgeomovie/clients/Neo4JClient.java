@@ -220,22 +220,10 @@ public abstract class Neo4JClient {
 	}
 
 	private static URI addNodeLabel(URI nodeUri, String label) {
-		final String nodeLabelsUri = nodeUri.toString() + "/labels";
-		// http://localhost:7474/db/data/node/{nodeID}/labels
+		List<String> labels = new ArrayList<String>();
+		labels.add(label);
 
-		WebResource resource = createWebResource(nodeLabelsUri);
-
-		// POST {} to the node entry point URI
-		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
-				.entity(gson.toJson(label)).post(ClientResponse.class);
-
-		if (response.getStatus() != ClientResponse.Status.NO_CONTENT.getStatusCode()) {
-			throw new Neo4JRequestException("Failed! " + response.toString());
-		}
-
-		response.close();
-
-		return nodeUri;
+		return addNodeLabels(nodeUri, labels);
 	}
 
 	private static URI addNodeLabels(URI nodeUri, List<String> labels) {

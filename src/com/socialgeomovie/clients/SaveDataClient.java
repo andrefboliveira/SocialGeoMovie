@@ -39,7 +39,7 @@ public class SaveDataClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(SaveDataClient.class);
 
-	private static boolean checkRelationExists(URI startNodeURI, URI endNodeURI, String type)
+	public static boolean checkRelationExists(URI startNodeURI, URI endNodeURI, String type)
 			throws UnsupportedEncodingException {
 		List<String> types = new ArrayList<String>();
 		types.add(type);
@@ -232,12 +232,10 @@ public class SaveDataClient {
 					HashMap<String, Object> tweet = tweets.get(j);
 					String tweetUrl = (String) tweet.get("url");
 					
-					List<String> tweetLabels = new ArrayList<String>();
-					tweetLabels.add("Tweet");
 					
 					URI tweetNode;
 					try {
-						tweetNode = Neo4JClient.createNodeWithProperties(tweetLabels, tweet);
+						tweetNode = Neo4JClient.createNodeWithProperties("Tweet", tweet);
 						logger.info("adding tweet from: " + tweet.get("user"));
 						
 					} catch (Neo4JRequestException e) {
@@ -290,7 +288,9 @@ public class SaveDataClient {
 		}
 	}
 
-	public static List<Subtitle> saveAllMovieSubtitles() {
+	public static List<Subtitle> saveAllMovieSubtitles() throws UnsupportedEncodingException {
+		Neo4JConfig.setUniqueConstraints();
+
 		OpenSubsClient openSubs = new OpenSubsClient();
 		List<Subtitle> subtitles = new ArrayList<Subtitle>();
 
@@ -299,10 +299,32 @@ public class SaveDataClient {
 			try {
 				URI movieURI = new URI(getNodesByLabel.getSelf());
 				String id_imdb = (String) getNodesByLabel.getData().get("id_imdb");
-				// String id_imdb = (String)
-				// Neo4JClient.getNodeProperty(movieURI, "id_imdb");
+				String title = (String) getNodesByLabel.getData().get("title");
+				
 				Subtitle subtitle = openSubs.getSubtitle(id_imdb);
 				subtitles.add(subtitle);
+				// Falta adicionar à db
+				
+//				Map<String, Object> subtitlesMap = null;
+//				
+//				URI subtitleNode = null;
+//				try {
+//					subtitleNode = Neo4JClient.createNodeWithProperties("Subtitles", subtitlesMap);
+//					logger.info("adding Subtitles from Movie: " + title);
+//					
+//				} catch (Neo4JRequestException e) {
+////					GetNodesByLabel[] subtitleNodes = Neo4JClient.getNodesByLabelAndProperty("Subtitles", chave_subtitle,
+////							valor_da_chave_subtitle);
+////					subtitleNode = new URI(subtitleNodes[0].getSelf());
+//				}
+//				
+//				
+//				boolean existingRelation = checkRelationExists(movieURI, subtitleNode, "has");
+//
+//				if (!existingRelation) {
+//					URI relationship = Neo4JClient.createRelationship(movieURI, subtitleNode, "has");
+////					logger.info("Connecting subtitle with id: " + valor_da_chave_subtitle + " to Movie: " + title);
+//				}
 
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block

@@ -66,8 +66,13 @@ public abstract class Neo4JConfig {
 		}  catch (Neo4JRequestException e) {
 		}
 		
+//		try {
+//			Neo4JClient.createUniquenessConstraint("Location", "uri");
+//		}  catch (Neo4JRequestException e) {
+//		}
+		
 		try {
-			Neo4JClient.createUniquenessConstraint("Location", "uri");
+			Neo4JClient.createUniquenessConstraint("Location", "entity");
 		}  catch (Neo4JRequestException e) {
 		}
 		

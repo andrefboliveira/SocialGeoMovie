@@ -143,16 +143,17 @@ public class ImportTest {
 			
 //			Map<String,Object> result = gson.fromJson(output, Map.class);
 //			System.out.println(result.keySet());
-			
-			TMDbClient tmdb = new TMDbClient();
-			
-			Images_Config i = tmdb.getConfiguration().getImages();
-			
-
-			
-			 TMDbPerson m = tmdb.getPerson(10859);
-			 System.out.println(m.getName());
+//			
+//			TMDbClient tmdb = new TMDbClient();
+//			
+//			Images_Config i = tmdb.getConfiguration().getImages();
+//			
+//
+//			
+//			 TMDbPerson m = tmdb.getPerson(10859);
+//			 System.out.println(m.getName());
 		
+			SaveLocationData.saveData();
 			
 		}
 
