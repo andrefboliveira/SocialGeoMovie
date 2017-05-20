@@ -74,6 +74,7 @@ public class TwitterClient {
 		
 		// on a different thread, or multiple different threads....
 		Gson gson = new Gson();
+		int i =0;
 		while (!hosebirdClient.isDone())
 		{
 			try
@@ -82,6 +83,9 @@ public class TwitterClient {
 				Type token = new TypeToken<HashMap<String,Object>>(){}.getType();
 				Map<String,Object> tweet = gson.fromJson(msg, token);
 				System.out.println(tweet.get("text"));
+				i++;
+				if(i >= 10)
+					hosebirdClient.stop();
 			} 
 			catch (InterruptedException e)
 			{

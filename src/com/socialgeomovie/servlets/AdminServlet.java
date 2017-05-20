@@ -1,6 +1,7 @@
 package com.socialgeomovie.servlets;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -20,8 +21,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.google.gson.Gson;
+import com.socialgeomovie.clients.Neo4JClient;
+import com.socialgeomovie.clients.NewTwitterClient;
 import com.socialgeomovie.clients.SaveDataClient;
 import com.socialgeomovie.clients.TwitterClient;
+import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
+import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.servlets.MovieServlet.MoviePeople;
 
 @Path("/db")
@@ -134,9 +139,52 @@ public class AdminServlet {
     @Path("/tweets")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response importTweets(@PathParam("movie_id") int movie_id) 
+    public Response importTweets() 
     {
-//        TwitterClient twitterClient = new TwitterClient();
+		SaveDataClient.saveTweets();
+		
+		/*GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabel("Movie");
+		NewTwitterClient client = new NewTwitterClient();
+		for(int i=0; i<movieNodes.length; i++)
+		{
+			GetNodesByLabel movie = movieNodes[i];
+			try {
+				URI movieURI = new URI(movie.getSelf());
+				String a = movie.getProperties();
+				Map<String, Object> nodeRelationship = Neo4JClient.getNodeProperties(a);
+
+				String uri = (String) nodeRelationship.get("uri");
+				List<HashMap<String, Object>> tweets = client.fetchTweets("#" + uri + " -filter:retweets");
+				
+				
+				
+				System.out.println("asdf");
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}*/
+		
+		
+		
+		
+		//client.fetchTweets(movie_id+"");
+		//List<HashMap<String, Object>> tweets = client.fetchTweets("#guardiansofthegalaxy");
+		
+		/*try
+		{
+			//GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
+			System.out.println("asdf");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+
+		//nodeInfo.putAll((movieNodes[0].getData()));
+		
+		/*
+		//        TwitterClient twitterClient = new TwitterClient();
 
         // TODO needs to fetch the movie title from the database
         try {
@@ -145,8 +193,9 @@ public class AdminServlet {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
+		 */
         Gson gson = new Gson();
-        return Response.status(Status.OK).entity("gson.toJson(report)").build();
+        return Response.status(Status.OK).entity("gson.toJson(tweets)").build();
+        
     }
 }

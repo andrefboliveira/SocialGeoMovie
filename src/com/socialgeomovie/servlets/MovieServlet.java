@@ -153,6 +153,40 @@ public class MovieServlet {
 		return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
 	}
 
+	@GET
+	@Path("/{movie_uri}/tweets")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response tweetsResource(@PathParam("movie_uri") String movie_uri) 
+	{
+		List<LinkedTreeMap> tweets = new ArrayList<LinkedTreeMap>();
+		try 
+		{
+			GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
+			List<String> types = new ArrayList<String>();
+			types.add("talks about");
+			GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(), types);
+			for(int i=0; i<nodeRelationship.length; i++)
+			{
+				GetNodeRelationship getNodeRelationship = nodeRelationship[i];
+				Map<String, Object> nodeInfo = new HashMap<String, Object>();
+				
+				String nodeID = getNodeRelationship.getStart();
+				String nodePropertiesURI = Neo4JClient.getNode(nodeID).getProperties();
+
+				LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient.getNodeProperties(nodePropertiesURI);
+				tweets.add(propertiesResponse);
+			}
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Gson gson = new Gson();
+		return Response.status(Status.OK).entity(gson.toJson(tweets)).build();
+	}
+	
 	@Path("/{movie_uri}/people")
 	public MoviePeople peopleSubResource() {
 		return new MoviePeople();
@@ -176,14 +210,9 @@ public class MovieServlet {
 
 			try {
 				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
-				String movieNodeURI = movieNodes[0].getSelf();
-				GetNodeRelationship[] nodeRelationship = null;
-				try {
-					nodeRelationship = Neo4JClient.getNodeRelationshipsByType(new URI(movieNodeURI), "acts in");
-				} catch (URISyntaxException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				List<String> types = new ArrayList<String>();
+				types.add("acts in");
+				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(), types);
 
 				int length = nodeRelationship.length;
 
@@ -194,10 +223,6 @@ public class MovieServlet {
 				} else {
 					firstResult = 0;
 					lastResult = length;
-				}
-
-				for (int i = 0; i < nodeRelationship.length; i++) {
-
 				}
 
 				for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {

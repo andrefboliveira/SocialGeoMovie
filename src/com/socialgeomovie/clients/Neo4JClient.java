@@ -508,18 +508,11 @@ public abstract class Neo4JClient {
 
 		return relationships;
 	}
-	
-	public static GetNodeRelationship[] getNodeRelationshipsByType(URI nodeUri, String type) throws UnsupportedEncodingException{
-		List<String> types = new ArrayList<String>();
-		types.add(type);
-		return getNodeRelationshipsByType(nodeUri, types);
-		
-	}
 
-	public static GetNodeRelationship[] getNodeRelationshipsByType(URI nodeUri, List<String> types)
-			throws UnsupportedEncodingException {
+	public static GetNodeRelationship[] getNodeRelationshipsByType(String nodeUri, List<String> types) throws UnsupportedEncodingException
+	{
 		String safe_types = URLEncoder.encode(String.join("&", types), "UTF-8").replace("+", "%20");
-		String relationsUri = nodeUri.toString() + "/relationships/all/" + safe_types;
+		String relationsUri = nodeUri + "/relationships/all/" + safe_types;
 
 		WebResource resource = createWebResource(relationsUri);
 		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
@@ -569,7 +562,8 @@ public abstract class Neo4JClient {
 		relationship.put("to", endNode.toString());
 		relationship.put("type", relationshipType);
 
-		if (!(relationAtributes == null && relationAtributes.isEmpty())) {
+		if ( relationAtributes != null && !relationAtributes.isEmpty()) 
+		{
 			relationship.put("data", relationAtributes);
 		}
 
