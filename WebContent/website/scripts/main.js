@@ -2,11 +2,14 @@ var url_base = "http://localhost:8080/aw2017/rest";
 var url_all_movies = 	url_base+"/movie";
 var url_movie_details = url_base+"/movie/";
 var url_geo_movie = 	"http://localhost:8080/aw2017/website/geo.json";
+var url_movie_tweets = url_base+"/movie/[ID]/tweets";
+
 
 var url_admin_movie_trakt = url_base+"/db/movies/trakt";
 var url_admin_movie_omdb = url_base+"/db/movies/omdb";
 var url_admin_movie_process = url_base+"/db/movies/process";
-var url_admin_cast = url_base+"/db/people/cast";
+var url_admin_cast_trakt = url_base+"/db/people/cast/trakt";
+var url_admin_cast_tmdb = url_base+"/db/people/cast/tmdb";
 var url_admin_cast_process = url_base+"/db/people/process";
 var url_admin_tweets = url_base+"/db/tweets";
 
@@ -62,6 +65,7 @@ var load_movie_details = function()
 	.done(function( data ) 
 	{
 		$("#poster").attr("src",data.poster);
+		$("#poster").attr("title",data.title);
 		$("#title").html(data.title);
 		$("#tagline").html(data.tagline);
 		$("#description").html(data.overview);
@@ -116,17 +120,47 @@ var load_movie_details = function()
 				height: 80
 			},
 		});
+		
+		
+	});
+	
+	var url = url_movie_tweets;
+	url = url.replace("[ID]",uri);
+	$.getJSON( url)
+	.done(function( data ) 
+	{
+		var tweet_container = $("#tweet_list");
+		for(var i=0; i<data.length;i++)
+		{
+			var tweet = data[i];
+			tweet_container.append(
+			"<a href='"+tweet.url+"'>"+
+			"	<div class='movie-roll' style='margin: 10px 0; padding: 5px 30px;'>"+
+			"		<h4>"+tweet.user+" says:</h4>"+
+			"		<div style='margin-bottom: 10px;' >"+tweet.text+"</div>"+
+			"		<div style='display:inline-block; margin-right:10px'>retweets: "+tweet.retweet_count+"</div><div style='display:inline-block;'>"+tweet.date+"</div>"+
+			"	</div>"+
+			"</a>"
+			);
+		}
+		console.log(data);
 	});
 	
 	var uri = $.urlParam("id");
-	$.getJSON( url_movie_details+uri+"/people")
+	$.getJSON( url_movie_details+uri+"/people?include_details=true")
 	.done(function( data ) 
 	{
 		var cast_div = $("#cast_list");
 		for(var i=0; i<data.length; i++)
 		{
 			var d = data[i];
-			cast_div.append("<a href='"+d.uri+"'>"+d.name+"</a><br>")
+			cast_div.append(
+			"<a href='"+d.url_imdb+"' style='text-decoration: none;'>"+
+			"	<div style='padding: 2px; display: inline-block; background-color: #000; margin: 5px 0;'>"+
+			"		<img src='"+d.profile_image_w185+"' title='"+d.name+"' style='width: 70px'>"+
+			"	</div>"+
+			"</a>"
+			);
 		}
 	});
 }
@@ -166,6 +200,8 @@ var init_map = function()
 	$.getJSON(url_geo_movie)
 	.done(function( data ) 
 	{
+		var colors = {};
+		
 		for(var i=0; i<data.length; i++)
 		{
 			var d = data[i];
@@ -175,19 +211,54 @@ var init_map = function()
 				map_markers[d.movie_name] = [];
 				$("#movie_select").append("<option val='"+d.movie_name+"'>"+d.movie_name+"</option>")
 			}
-		
+			
+			if(!colors[d.movie_name])
+				colors[d.movie_name] = '#'+Math.floor(Math.random() * 16777216).toString(16);
+	
 			var marker = new google.maps.Marker(
 			{
 				position: {
 					lat: parseFloat(d.lat),
 					lng: parseFloat(d.lng)
 				},
-				map: map
+				map: map,
+				icon: 
+				{
+					path: "M27.648 -41.399q0 -3.816 -2.7 -6.516t-6.516 -2.7 -6.516 2.7 -2.7 6.516 2.7 6.516 6.516 2.7 6.516 -2.7 2.7 -6.516zm9.216 0q0 3.924 -1.188 6.444l-13.104 27.864q-0.576 1.188 -1.71 1.872t-2.43 0.684 -2.43 -0.684 -1.674 -1.872l-13.14 -27.864q-1.188 -2.52 -1.188 -6.444 0 -7.632 5.4 -13.032t13.032 -5.4 13.032 5.4 5.4 13.032z",
+					scale: 0.6,
+					strokeWeight: 1,
+					strokeColor: 'black',
+					strokeOpacity: 1,
+					fillColor: colors[d.movie_name],
+					fillOpacity: 1,
+				}
 			});
 			
 			map_markers[d.movie_name].push(marker);
 		}
-		console.log(data);
+		
+		var columns = [];
+		
+		for (var key in map_markers) 
+		{
+			if (map_markers.hasOwnProperty(key)) 
+				columns.push([key, map_markers[key].length]);
+		}
+		
+		var chart = c3.generate(
+		{
+			bindto: '#reference_chart',
+			data: 
+			{
+				// iris data from R
+				columns: columns,
+				type : 'bar',
+				onclick: function (d, i) { console.log("onclick", d, i); },
+				onmouseover: function (d, i) { console.log("onmouseover", d, i); },
+				onmouseout: function (d, i) { console.log("onmouseout", d, i); },
+				colors: colors
+			}
+		});
 	});
 	/*
 	var marker = new google.maps.Marker(
@@ -250,11 +321,14 @@ var admin_import =
 	cast: function()
 	{
 		$("#cast_import_start").toggleClass("loading_button");
-		$.get(url_admin_cast, function(data, status)
+		$.get(url_admin_cast_trakt, function(data, status)
 		{
-			$.get(url_admin_cast_process, function(data, status)
+			$.get(url_admin_cast_tmdb, function(data, status)
 			{
-				$("#cast_import_start").toggleClass("loading_button");
+				$.get(url_admin_cast_process, function(data, status)
+				{
+					$("#cast_import_start").toggleClass("loading_button");
+				});
 			});
 		});
 	},

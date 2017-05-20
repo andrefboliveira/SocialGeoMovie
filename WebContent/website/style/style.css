@@ -108,8 +108,30 @@ nav li a
 
 .detail-right #cast_list
 {
-	max-height: calc(100% - 60px);
+	height: calc(60% - 60px);
     overflow-y: scroll;
+}
+
+.detail-right #tweet_list
+{
+	height: calc(40% - 60px);
+    overflow-y: scroll;
+	cursor: pointer;
+	
+}
+
+.detail-right #tweet_list h4
+{
+	margin: 10px 0 15px;
+    text-decoration: underline;
+}
+	
+.detail-right #tweet_list .movie-roll
+{
+	margin: 10px 0;
+    padding: 5px 30px;
+    color: #858585 !important;
+    font-size: 13px;
 }
 	
 #certification
