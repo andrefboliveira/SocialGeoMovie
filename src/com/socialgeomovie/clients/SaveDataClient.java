@@ -99,16 +99,6 @@ public class SaveDataClient {
 
 	}
 
-	private static String saveTweet(URI movieURI, HashMap<String, Object> tweet) throws URISyntaxException {
-		List<String> tweetLabels = new ArrayList<String>();
-		tweetLabels.add("Tweet");
-		URI tweetNode = Neo4JClient.createNodeWithProperties(tweetLabels, tweet);
-		URI relationship = Neo4JClient.createRelationship(tweetNode, movieURI, "talks about");
-		logger.info("adding tweet from: " + tweet.get("user"));
-
-		return tweetNode.toString();
-	}
-
 	private static Map<String, URI> saveTraktMovieCast(String traktID, URI movieURI, boolean updateData,
 			boolean override) throws IOException, URISyntaxException {
 		Map<String, URI> castURI = new HashMap<String, URI>();
@@ -206,8 +196,7 @@ public class SaveDataClient {
 			try {
 				URI movieURI = new URI(getNodesByLabel.getSelf());
 				String id_trakt = (String) getNodesByLabel.getData().get("id_trakt");
-				// String id_trakt = (String)
-				// Neo4JClient.getNodeProperty(movieURI, "id_trakt");
+			
 				movieCastURI = saveTraktMovieCast(id_trakt, movieURI, true, false);
 			} catch (URISyntaxException | IOException e) {
 				// TODO Auto-generated catch block
@@ -219,24 +208,51 @@ public class SaveDataClient {
 		return movieCastURI;
 	}
 
-	public static void saveTweets() {
+
+	public static void saveTweets() throws UnsupportedEncodingException {
 		Neo4JConfig.setUniqueConstraints();
 
-		GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabel("Movie");
 		NewTwitterClient client = new NewTwitterClient();
-		for (int i = 0; i < movieNodes.length; i++) {
-			GetNodesByLabel movie = movieNodes[i];
+		
+		GetNodesByLabel[] movies = Neo4JClient.getNodesByLabel("Movie");
+		for (GetNodesByLabel getNodesByLabel : movies) {
 			try {
-				URI movieURI = new URI(movie.getSelf());
-				String a = movie.getProperties();
-				Map<String, Object> nodeRelationship = Neo4JClient.getNodeProperties(a);
+				URI movieURI = new URI(getNodesByLabel.getSelf());
+				String uri = (String) getNodesByLabel.getData().get("uri");
+				String title = (String) getNodesByLabel.getData().get("title");
+				
+				logger.info("Search tweets for movie: " + title);
 
-				String uri = (String) nodeRelationship.get("uri");
-				List<HashMap<String, Object>> tweets = client.fetchTweets("#" + uri + " -filter:retweets");
+//				List<HashMap<String, Object>> tweets = client.fetchTweets("#" + uri + " -filter:retweets");
+				List<HashMap<String, Object>> tweets = client.fetchTweets(title + " -filter:retweets");
+
 
 				for (int j = 0; j < tweets.size(); j++) {
-					String tweetUri = saveTweet(movieURI, tweets.get(j));
-					System.out.println(tweetUri);
+					
+					HashMap<String, Object> tweet = tweets.get(j);
+					String tweetUrl = (String) tweet.get("url");
+					
+					List<String> tweetLabels = new ArrayList<String>();
+					tweetLabels.add("Tweet");
+					
+					URI tweetNode;
+					try {
+						tweetNode = Neo4JClient.createNodeWithProperties(tweetLabels, tweet);
+						logger.info("adding tweet from: " + tweet.get("user"));
+						
+					} catch (Neo4JRequestException e) {
+						GetNodesByLabel[] tweetNodes = Neo4JClient.getNodesByLabelAndProperty("Tweet", "url",
+								tweetUrl);
+						tweetNode = new URI(tweetNodes[0].getSelf());
+					}
+					
+					
+					boolean existingRelation = checkRelationExists(tweetNode, movieURI, "talks about");
+
+					if (!existingRelation) {
+						URI relationship = Neo4JClient.createRelationship(tweetNode, movieURI, "talks about");
+						logger.info("Connecting tweet from: " + tweet.get("user") + " to Movie: " + title);
+					}
 				}
 			} catch (URISyntaxException e) {
 				// TODO Auto-generated catch block
@@ -251,8 +267,7 @@ public class SaveDataClient {
 			URI movieURI = new URI(getNodesByLabel.getSelf());
 			if (movieURI != null) {
 				Map<String, Object> movieProperties = getNodesByLabel.getData();
-				// Map<String, Object> movieProperties =
-				// Neo4JClient.getNodeProperties(movieURI);
+		
 				Map<String, Object> newMovieProperties = Converter.traktMovieLinks(movieProperties);
 				Neo4JClient.updateNodeProperties(movieURI, newMovieProperties);
 				logger.info("added links to movie: " + movieProperties.get("title"));
@@ -267,8 +282,6 @@ public class SaveDataClient {
 			URI castPersonURI = new URI(getNodesByLabel.getSelf());
 			if (castPersonURI != null) {
 				Map<String, Object> castProperties = getNodesByLabel.getData();
-				// Map<String, Object> castProperties =
-				// Neo4JClient.getNodeProperties(castPersonURI);
 				Map<String, Object> newCastProperties = Converter.traktCastLinks(castProperties);
 				Neo4JClient.updateNodeProperties(castPersonURI, newCastProperties);
 				logger.info("added links to person: " + castProperties.get("name"));

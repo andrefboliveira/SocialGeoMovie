@@ -8,7 +8,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import com.socialgeomovie.clients.Neo4JClient;
-import com.socialgeomovie.clients.TwitterClient;
+import com.socialgeomovie.clients.OldTwitterClient;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 

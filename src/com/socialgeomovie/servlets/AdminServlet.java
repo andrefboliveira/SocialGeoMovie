@@ -24,7 +24,7 @@ import com.google.gson.Gson;
 import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.clients.NewTwitterClient;
 import com.socialgeomovie.clients.SaveDataClient;
-import com.socialgeomovie.clients.TwitterClient;
+import com.socialgeomovie.clients.OldTwitterClient;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.servlets.MovieServlet.MoviePeople;
@@ -184,9 +184,15 @@ public class AdminServlet {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response importTweets() 
 	{
-		SaveDataClient.saveTweets();
+		Map<String, String> report = new HashMap<String, String>();
+		report.put("status", "OK");
+		try {
+			SaveDataClient.saveTweets();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		Gson gson = new Gson();
-		return Response.status(Status.OK).entity("gson.toJson(tweets)").build();
-
+		return Response.status(Status.OK).entity(gson.toJson(report)).build();
 	}
 }

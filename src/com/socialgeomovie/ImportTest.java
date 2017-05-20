@@ -27,7 +27,7 @@ import com.socialgeomovie.clients.OpenSubsClient;
 import com.socialgeomovie.clients.SaveDataClient;
 import com.socialgeomovie.clients.TMDbClient;
 import com.socialgeomovie.clients.TraktClient;
-import com.socialgeomovie.clients.TwitterClient;
+import com.socialgeomovie.clients.OldTwitterClient;
 
 import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;

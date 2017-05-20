@@ -71,6 +71,11 @@ public abstract class Neo4JConfig {
 		}  catch (Neo4JRequestException e) {
 		}
 		
+		try {
+			Neo4JClient.createUniquenessConstraint("Tweet", "url");
+		}  catch (Neo4JRequestException e) {
+		}
+			
 		
 	}
 

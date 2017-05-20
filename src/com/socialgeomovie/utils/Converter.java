@@ -18,6 +18,8 @@ import com.uwetrottmann.trakt5.entities.Movie;
 
 
 public class Converter {
+	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+	
 	public static Map<String, Object> traktMovie2Map(Movie movie) {
 		Map<String, Object> movieData = new HashMap<String, Object>();
 		movieData.put("uri", IDParser.createURI(movie.title));
@@ -30,10 +32,11 @@ public class Converter {
 		movieData.put("certification", movie.certification);
 		movieData.put("homepage", movie.homepage);
 		movieData.put("trailer", movie.trailer);
-		movieData.put("released", new SimpleDateFormat("yyyy-MM-dd").format(movie.released.toDate()));
+		movieData.put("released", dateFormat.format(movie.released.toDate()));
 		movieData.put("runtime", movie.runtime);
 		movieData.put("overview", movie.overview);
 		movieData.put("genres", movie.genres);
+		movieData.put("year", movie.year);
 		movieData.put("url_trakt", "https://trakt.tv/movies/" + movie.ids.slug);
 
 		return movieData;
@@ -90,7 +93,7 @@ public class Converter {
 		try {
 			String releasedString = (String) omdbResponse.get("Released");
 			Date date = format.parse(releasedString);
-			omdbData.put("released", new SimpleDateFormat("yyyy-MM-dd").format(date));
+			omdbData.put("released", dateFormat.format(date));
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -147,8 +150,23 @@ public class Converter {
 	public static Map<String, Object> tmdbPerson2Map(TMDbPerson person, TMDbConfiguration config) {
 		Map<String, Object> tmdbPersonData = new HashMap<String, Object>();
 		tmdbPersonData.put("biography", person.getBiography());
-		tmdbPersonData.put("birthday", person.getBirthday());
-		tmdbPersonData.put("deathday", person.getDeathday());
+
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			Date birthdayDate = format.parse(person.getBirthday());
+			tmdbPersonData.put("birthday", dateFormat.format(birthdayDate));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			Date deathdayDate = format.parse(person.getDeathday());
+			tmdbPersonData.put("deathday", dateFormat.format(deathdayDate));
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	
 		Integer intGender = person.getGender();
 		tmdbPersonData.put("gender", intGender == 0 ? "Male" : (intGender == 1 ? "Female" : ""));
 		tmdbPersonData.put("homepage", person.getHomepage());
@@ -158,7 +176,9 @@ public class Converter {
 		List<String> imageSize = config.getImages().getProfileSizes();
 		
 		for (String size : imageSize) {
-			tmdbPersonData.put("profile_image_" + size, baseURL +  size + profilePath);
+			if (profilePath != null && !"".equals(profilePath)) {
+				tmdbPersonData.put("profile_image_" + size, baseURL +  size + profilePath);
+			}
 		}
 		
 		

@@ -21,7 +21,7 @@ import com.twitter.hbc.core.processor.StringDelimitedProcessor;
 import com.twitter.hbc.httpclient.auth.Authentication;
 import com.twitter.hbc.httpclient.auth.OAuth1;
 
-public class TwitterClient {
+public class OldTwitterClient {
 	private static final String CONSUMER_KEY = "E7uTIdET9uIZroI6w8GdgogsV";
 	private static final String CONSUMER_SECRET = "ZFCzHryhBHLovx06kUcAwYkVAoySGwCrNkr10bdspVmgAF1fQK";
 	private static final String ACCESS_TOKEN = "841224583051149313-vvUu5cxygGm9t1uZg0QPSgdgs9BTkww";
