@@ -157,7 +157,7 @@ var load_movie_details = function()
 			cast_div.append(
 			"<a href='"+d.url_imdb+"' style='text-decoration: none;'>"+
 			"	<div style='padding: 2px; display: inline-block; background-color: #000; margin: 5px 0;'>"+
-			"		<img src='"+d.profile_image_w185+"' title='"+d.name+"' style='width: 70px'>"+
+			"		<img src='"+((d.profile_image_w185 && d.profile_image_w185.indexOf("null") < 0)?d.profile_image_w185:'style/images/people-placeholder.png')+"' title='"+d.name+"' style='width: 70px; height: 105px'>"+
 			"	</div>"+
 			"</a>"
 			);
