@@ -353,5 +353,45 @@ public class SaveDataClient {
 			
 		}
 	}
+	
+	
+	public static void addingTMDbMovieData() throws URISyntaxException  {
+		GetNodesByLabel[] movies = Neo4JClient.getNodesByLabel("Movie");
+		for (GetNodesByLabel getNodesByLabel : movies) {
+			Map<String, Object> movieProperties = getNodesByLabel.getData();
+			String id_tmdb = (String) movieProperties.get("id_tmdb");
+			
+			
+
+			Map<String, Object> omdbProcessed = null;
+			Map<String, Object> resultMap = Merge.mergeMap(movieProperties, omdbProcessed);			
+			
+			Neo4JClient.updateNodeProperties(new URI(getNodesByLabel.getSelf()), resultMap);
+			logger.info("Added TMDb info for: " + "");
+			
+		}
+	}
+	
+	public static void addingTMDbCastData() throws URISyntaxException  {
+		GetNodesByLabel[] cast = Neo4JClient.getNodesByLabel("Cast");
+		for (GetNodesByLabel getNodesByLabel : cast) {
+			Map<String, Object> castProperties = getNodesByLabel.getData();
+			String id_tmdb = (String) castProperties.get("id_tmdb");
+			
+			TMDbClient tmdb = new TMDbClient();
+		
+			
+			
+			
+
+			Map<String, Object> omdbProcessed = null;
+			Map<String, Object> resultMap = Merge.mergeMap(castProperties, omdbProcessed);			
+			
+			Neo4JClient.updateNodeProperties(new URI(getNodesByLabel.getSelf()), resultMap);
+			logger.info("Added TMDb info for: " + "");
+			
+		}
+	}
+
 
 }

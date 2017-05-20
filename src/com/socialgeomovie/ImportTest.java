@@ -25,16 +25,23 @@ import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.clients.OMDbClient;
 import com.socialgeomovie.clients.OpenSubsClient;
 import com.socialgeomovie.clients.SaveDataClient;
+import com.socialgeomovie.clients.TMDbClient;
 import com.socialgeomovie.clients.TraktClient;
 import com.socialgeomovie.clients.TwitterClient;
+
 import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
+import com.socialgeomovie.pojos.tmdb.Configuration;
+import com.socialgeomovie.pojos.tmdb.Person;
 import com.socialgeomovie.utils.Converter;
 import com.socialgeomovie.utils.IDParser;
 import com.socialgeomovie.utils.Merge;
 import com.socialgeomovie.utils.Neo4JRequestException;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
+
+
+
 import java.net.URL;
 
 public class ImportTest {
@@ -112,6 +119,8 @@ public class ImportTest {
 		}
 		System.out.println("Import process done");
 	}
+	
+
 
 		public static void main(String[] args) throws URISyntaxException, IOException {
 //			imp();
@@ -130,86 +139,12 @@ public class ImportTest {
 //			s1.add(123);
 //
 //
-//			
-//			h1.put("teste", s1);
-//			h2.put("teste", "asda");
-//			h2.put("teste", 122);
-//
-//			h2.put("123", "asd");
-//
-//			Map<String, Object> result = Merge.mergeMap(h1, h2);
-//			Collection<Object> list =  result.values();
-//			for (Object o : list) {
-//				ArrayList<Object> l2 = (ArrayList<Object>) o;
-//				for (Object object : l2) {
-//					System.out.println(object);
-//					System.out.println(object instanceof String);
-//					System.out.println(object instanceof Number);
-//				}
-//				
-//			}
-//			System.out.println(list);
-//			GetNodesByLabel[] result = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", "Deadpool");
-//			Object a = result[0].getData().get("genres");
-//			System.out.println(a instanceof List);
-//			GetNodesByLabel[] result = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", "Deadpool");
-//			Map<String, Object> data = result[0].getData();
-//			
-//			Map<String, Object> newInfo = new HashMap<String, Object>();
-//			newInfo.put("uri", "abc");
-//			List<Number> list = new ArrayList<Number>();
-//			list.add(100);
-//			list.add(200);
-//			
-//			newInfo.put("runtime", list);
-//
-//			
-//			Map<String, Object> resultMap = Merge.mergeMap(data, newInfo);
-//			for (String key : resultMap.keySet()) {
-//				System.out.println(key + ": " + resultMap.get(key));
-//			}
-//			
-			
-			GetNodesByLabel[] movies = Neo4JClient.getNodesByLabel("Movie");
-			for (GetNodesByLabel getNodesByLabel : movies) {
-				Map<String, Object> movieProperties = getNodesByLabel.getData();
-				String id_imdb = (String) movieProperties.get("id_imdb");
-				Map<String, Object> omdbData = OMDbClient.getOMDbMovie(id_imdb);
-				System.out.println("Search OMDb for id: " + id_imdb);
-
-//				Map<String, Object> resultMap = Merge.mergeMap(movieProperties, omdbProperties);
-//				
-//				for (String key : resultMap.keySet()) {
-//					System.out.println(key + ": " + resultMap.get(key));
-//				}
-//				
-//				
-
-				Map<String, Object> omdbProcessed = Converter.omdbMap(omdbData);
-//				omdbProcessed.values().removeAll(Collections.singleton("N/A"));
-				
-//				List<Object> nullList = new ArrayList<Object>();
-				
-				List<Object> nullList = Arrays.asList("N/A", "NA", "null", "empty", null);
-				omdbProcessed.values().removeIf(val -> nullList.contains(val));
-				
-				
-
-
-
-				Map<String, Object> resultMap = Merge.mergeMap(movieProperties, omdbProcessed);
-
-				for (String key : resultMap.keySet()) {
-					System.out.println(key + ": " + resultMap.get(key));
-				}
-				
-				
-				System.out.println("Added OMDb info for: " + movieProperties.get("title"));
-				System.out.println("\n\n");
-
-
-				
-			}
+			TMDbClient tmdb = new TMDbClient();
+			Configuration c = tmdb.getConfiguration();
+			System.out.println(c.getImages().getBaseUrl());
+			 Person m = tmdb.getPerson(10859);
+			 System.out.println(m.getName());
+		
 			
 		}
 

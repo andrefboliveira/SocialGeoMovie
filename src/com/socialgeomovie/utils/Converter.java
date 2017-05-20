@@ -14,6 +14,7 @@ import java.util.Map;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
 
+
 public class Converter {
 	public static Map<String, Object> traktMovie2Map(Movie movie) {
 		Map<String, Object> movieData = new HashMap<String, Object>();
@@ -132,6 +133,16 @@ public class Converter {
 
 		
 		return omdbData;
-
 	}
+	
+//	public static Map<String, Object> tmdbMovie2Map(MovieDb movie, TmdbConfiguration config) {
+//		return null;
+//		
+//	}
+//	
+//	public static Map<String, Object> tmdbPerson2Map(PersonPeople person, TmdbConfiguration config) {
+//		person.
+//		return null;
+//		
+//	}
 }
