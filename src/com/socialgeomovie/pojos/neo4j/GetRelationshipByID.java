@@ -1,6 +1,8 @@
 
 package com.socialgeomovie.pojos.neo4j;
 
+import java.util.Map;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -32,7 +34,7 @@ public class GetRelationshipByID {
     private String properties;
     @SerializedName("data")
     @Expose
-    private Data data;
+    private Map<String, Object> data;
 
     public Extensions getExtensions() {
         return extensions;
@@ -98,11 +100,11 @@ public class GetRelationshipByID {
         this.properties = properties;
     }
 
-    public Data getData() {
+    public Map<String, Object> getData() {
         return data;
     }
 
-    public void setData(Data data) {
+    public void setData(Map<String, Object> data) {
         this.data = data;
     }
 

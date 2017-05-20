@@ -199,6 +199,8 @@ public class PersonServlet {
 					} else {
 						nodeInfo.put("title", propertiesResponse.get("title"));
 					}
+					
+					nodeInfo.put("character", getNodeRelationship.getData().get("character"));
 
 					nodeList.add(nodeInfo);
 				}

@@ -30,7 +30,6 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 import com.socialgeomovie.clients.Neo4JClient;
-import com.socialgeomovie.pojos.neo4j.Data_GetNodesByLabel;
 import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
@@ -241,6 +240,8 @@ public class MovieServlet {
 					} else {
 						nodeInfo.put("name", propertiesResponse.get("name"));
 					}
+					
+					nodeInfo.put("character", getNodeRelationship.getData().get("character"));
 
 					nodeList.add(nodeInfo);
 				}
