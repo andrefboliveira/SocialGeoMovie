@@ -2,7 +2,7 @@ var url_base = "http://localhost:8080/aw2017/rest";
 var url_all_movies = 	url_base+"/movie";
 var url_movie_details = url_base+"/movie/";
 var url_geo_movie = 	"http://localhost:8080/aw2017/website/geo.json";
-var url_movie_tweets = url_base+"/movie/[ID]/tweets?limit=10";
+var url_movie_tweets = url_base+"/movie/[ID]/tweets";
 
 
 var url_admin_movie_trakt = url_base+"/db/movies/trakt";
@@ -17,6 +17,8 @@ var omdb_key = "55808bd4";
 
 var map_markers = {};
 var map;
+
+var firebase_initialized = false;
 
 var fetch_movies= function()
 {
@@ -138,7 +140,7 @@ var load_movie_details = function()
 			"	<div class='movie-roll' style='margin: 10px 0; padding: 5px 30px;'>"+
 			"		<h4>"+tweet.user+" says:</h4>"+
 			"		<div style='margin-bottom: 10px;' >"+tweet.text+"</div>"+
-			"		<div style='display:inline-block; margin-right:10px'>"+tweet.date+"</div>"+ "<div style='display:inline-block'> retweets: "+tweet.retweet_count+"</div>"+
+			"		<div style='display:inline-block; margin-right:10px'>retweets: "+tweet.retweet_count+"</div><div style='display:inline-block;'>"+tweet.date+"</div>"+
 			"	</div>"+
 			"</a>"
 			);
@@ -162,6 +164,20 @@ var load_movie_details = function()
 			"</a>"
 			);
 		}
+	});
+	
+	initialize_firebase();
+	var comments_ref = firebase.database().ref('comments/' + uri);
+	comments_ref.on('child_added', function(snapshot) 
+	{
+		var comment = snapshot.val();
+		
+		$("#comment_list").prepend(
+		"<div class='movie-roll movie-comment' style='margin: 10px 0;'>"+
+		"	<div style='margin-bottom: 10px;'>"+comment.user+" says:</div>"+
+		"	<div>"+comment.comment+"</div>"+
+		"</div>"
+		);
 	});
 }
 
@@ -342,6 +358,26 @@ var admin_import =
 	}
 }
 
+var submit_comment = function()
+{
+	var user = $("#comment_user").val();
+	var comment = $("#comment_text").val();
+	var movie = $.urlParam("id");
+	
+	if(user == "" || comment == "")
+		return;
+	
+	var comment_ref = firebase.database().ref('comments/' + movie).push();
+	comment_ref.set(
+	{
+		user: user,
+		comment: comment,
+	});
+
+	//$("#comment_user").val("");
+	$("#comment_text").val("");
+}
+
 $.urlParam = function(name)
 {
     var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
@@ -354,3 +390,26 @@ $.urlParam = function(name)
        return results[1] || 0;
     }
 }
+
+var initialize_firebase = function()
+{
+	if(firebase_initialized == false)
+	{
+		var config =
+		{
+			apiKey: "AIzaSyA6pxczjF5BI8PVHKTihgb3_C8NdwSgMK4",
+			authDomain: "aw20162017-c1610.firebaseapp.com",
+			databaseURL: "https://aw20162017-c1610.firebaseio.com",
+			projectId: "aw20162017-c1610",
+			storageBucket: "aw20162017-c1610.appspot.com",
+			messagingSenderId: "348514365475"
+		};
+		firebase.initializeApp(config);
+		firebase_initialized = true;
+	}
+}
+
+$( document ).ready(function() 
+{
+	initialize_firebase();
+});
