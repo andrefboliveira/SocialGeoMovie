@@ -111,8 +111,9 @@ public class MovieServlet {
 			@DefaultValue("-1") @QueryParam("limit") final int limit, 
 			@DefaultValue("title") @QueryParam("property") final String propertyName, 
 			@QueryParam("value") final String propertyValue,
+			@DefaultValue("true") @QueryParam("compact") final boolean compact_mode,
 			@DefaultValue("false") @QueryParam("include_details") final boolean details) {
-		List<Map<String, Object>> nodeList = new ArrayList<>();
+		List<Object> nodeList = new ArrayList<Object>();
 		Gson gson = new Gson();
 
 		String query = "MATCH (n) WHERE n." + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
@@ -125,16 +126,17 @@ public class MovieServlet {
 			
 			Map<String, Object> nodeInfo = new HashMap<String, Object>();
 
-			if (details) {
-				nodeInfo.putAll(resultMap);
+			if (compact_mode) {
+				nodeList.add(resultMap.get(propertyName));
 			} else {
-				nodeInfo.put("title", resultMap.get("title"));
-				nodeInfo.put("uri", resultMap.get("uri"));
-
+				if (details) {
+					nodeInfo.putAll(resultMap);
+				} else {
+					nodeInfo.put(propertyName, resultMap.get(propertyName));
+					nodeInfo.put("uri", resultMap.get("uri"));
+				}
+				nodeList.add(nodeInfo);
 			}
-
-			nodeList.add(nodeInfo);
-
 		}
 		return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 	}
