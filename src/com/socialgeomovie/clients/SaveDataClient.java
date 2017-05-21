@@ -547,9 +547,16 @@ public class SaveDataClient {
 
 				Map<String, Object> resultMap = Merge.mergeMapCombine(castProperties,
 						Converter.tmdbPerson2Map(person, tmdb.getConfiguration()));
-								
+				
+				URI nodeURI = new URI(getNodesByLabel.getSelf());
+				
+				Integer gender = person.getGender();
+				String label = gender == 0 ? "Actor" : (gender == 1 ? "Actress" : "");
+				if (label != null && !("".equals(label))) {
+					Neo4JClient.addNodeLabel(nodeURI, label);
+				}							
 
-				Neo4JClient.updateNodeProperties(new URI(getNodesByLabel.getSelf()), resultMap);
+				Neo4JClient.updateNodeProperties(nodeURI, resultMap);
 				logger.info("Added TMDb People info for: " + castProperties.get("name"));
 			}
 

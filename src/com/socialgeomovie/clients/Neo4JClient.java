@@ -219,7 +219,7 @@ public abstract class Neo4JClient {
 		return labels;
 	}
 
-	private static URI addNodeLabel(URI nodeUri, String label) {
+	public static URI addNodeLabel(URI nodeUri, String label) {
 		List<String> labels = new ArrayList<String>();
 		labels.add(label);
 
