@@ -7,6 +7,7 @@ var url_movie_tweets = url_base+"/movie/[ID]/tweets";
 
 var url_admin_movie_trakt = url_base+"/db/movies/trakt";
 var url_admin_movie_omdb = url_base+"/db/movies/omdb";
+var url_admin_movie_tmdb = url_base+"/db/movies/tmdb";
 var url_admin_movie_process = url_base+"/db/movies/process";
 var url_admin_cast_trakt = url_base+"/db/people/cast/trakt";
 var url_admin_cast_tmdb = url_base+"/db/people/cast/tmdb";
@@ -77,8 +78,8 @@ var load_movie_details = function()
 		$("#certification").html(data.certification);
 		$("#trailer").attr('src', "https://www.youtube.com/embed/"+data.trailer.substring(data.trailer.indexOf('?v=')+3))
 		$("#trakt").attr('href', data.url_trakt);
-		$("#imdb").attr('href', "http://www.imdb.com/title/"+data.id_imdb);
-		$("#tmdb").attr('href', "https://www.themoviedb.org/movie/"+data.id_tmdb);
+		$("#imdb").attr('href', data.url_imdb);
+		$("#tmdb").attr('href', data.url_tmdb);
 		
 		var chart = c3.generate(
 		{
@@ -159,7 +160,7 @@ var load_movie_details = function()
 			cast_div.append(
 			"<a href='"+d.url_imdb+"' style='text-decoration: none;'>"+
 			"	<div style='padding: 2px; display: inline-block; background-color: #000; margin: 5px 0;'>"+
-			"		<img src='"+((d.profile_image_w185 && d.profile_image_w185.indexOf("null") < 0)?d.profile_image_w185:'style/images/people-placeholder.png')+"' title='"+d.name+"' style='width: 70px; height: 105px'>"+
+			"		<img src='"+((d.profile_image && d.profile_image.indexOf("null") < 0)?d.profile_image:'style/images/people-placeholder.png')+"' title='"+d.name+"' style='width: 70px; height: 105px'>"+
 			"	</div>"+
 			"</a>"
 			);

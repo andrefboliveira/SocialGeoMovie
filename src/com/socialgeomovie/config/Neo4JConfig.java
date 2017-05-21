@@ -1,7 +1,7 @@
 package com.socialgeomovie.config;
 
 import com.socialgeomovie.clients.Neo4JClient;
-import com.socialgeomovie.utils.Neo4JRequestException;
+import com.socialgeomovie.utils.exceptions.Neo4JRequestException;
 
 public abstract class Neo4JConfig {
 	
@@ -73,6 +73,11 @@ public abstract class Neo4JConfig {
 		
 		try {
 			Neo4JClient.createUniquenessConstraint("Location", "entity");
+		}  catch (Neo4JRequestException e) {
+		}
+		
+		try {
+			Neo4JClient.createUniquenessConstraint("Country", "iso_3166_1");
 		}  catch (Neo4JRequestException e) {
 		}
 		

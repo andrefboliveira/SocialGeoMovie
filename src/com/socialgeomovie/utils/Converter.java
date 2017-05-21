@@ -4,12 +4,17 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.socialgeomovie.pojos.tmdb.Genre;
+import com.socialgeomovie.pojos.tmdb.ProductionCompany;
+import com.socialgeomovie.pojos.tmdb.ProductionCountry;
+import com.socialgeomovie.pojos.tmdb.SpokenLanguage;
 import com.socialgeomovie.pojos.tmdb.TMDbConfiguration;
 import com.socialgeomovie.pojos.tmdb.TMDbMovie;
 import com.socialgeomovie.pojos.tmdb.TMDbPerson;
@@ -141,9 +146,68 @@ public class Converter {
 	}
 	
 	public static Map<String, Object> tmdbMovie2Map(TMDbMovie movie, TMDbConfiguration config) {
-		Map<String, Object> tmdbPersonData = new HashMap<String, Object>();
+		Map<String, Object> tmdbMovieData = new HashMap<String, Object>();
+		
 
-		return tmdbPersonData;
+		String baseURL = config.getImages().getSecureBaseUrl();
+		String posterPath = movie.getPosterPath();
+		List<String> posterSize = config.getImages().getPosterSizes();
+		List<String> poster = new ArrayList<String>();
+		for (String size : posterSize) {
+			if (posterPath != null && !"".equals(posterPath)) {
+				poster.add(baseURL +  size + posterPath);
+			}
+		}
+		tmdbMovieData.put("poster", baseURL +  posterSize.get(3) + posterPath);
+		tmdbMovieData.put("poster_tmdb", poster);
+		
+		String backdropPath = movie.getBackdropPath();
+		List<String> backdropSize = config.getImages().getBackdropSizes();
+		List<String> backdrop = new ArrayList<String>();
+		for (String size : backdropSize) {
+			if (backdropPath != null && !"".equals(backdropPath)) {
+				backdrop.add(baseURL +  size + backdropPath);
+			}
+		}
+		
+		tmdbMovieData.put("backdrop_tmdb", backdrop);
+		
+		
+		tmdbMovieData.put("homepage", movie.getHomepage());
+	
+		List<Genre> genresTMDb= movie.getGenres();
+		List<String> genreList = new ArrayList<String>();
+		for (Genre genre : genresTMDb) {
+			genreList.add(genre.getName());
+		}
+		
+		tmdbMovieData.put("genres", genreList);
+		
+		tmdbMovieData.put("title", movie.getTitle());
+		tmdbMovieData.put("popularity", movie.getPopularity());
+		
+		List<ProductionCompany> prodCompanyTMDb= movie.getProductionCompanies();
+		List<String> prodCompanyList = new ArrayList<String>();
+		for (ProductionCompany prodCompany : prodCompanyTMDb) {
+			prodCompanyList.add(prodCompany.getName());
+		}
+		tmdbMovieData.put("production_company", prodCompanyList);
+		
+		tmdbMovieData.put("tmdb_rating", movie.getVoteAverage());
+		tmdbMovieData.put("tmdb_votes", movie.getVoteCount());
+
+		
+		List<SpokenLanguage> languagesTMDb= movie.getSpokenLanguages();
+		List<String> languagesList = new ArrayList<String>();
+		for (SpokenLanguage language : languagesTMDb) {
+			languagesList.add(language.getName());
+		}
+		tmdbMovieData.put("language", languagesList);
+
+
+
+
+		return tmdbMovieData;
 		
 	}
 	
@@ -177,16 +241,24 @@ public class Converter {
 		Integer intGender = person.getGender();
 		tmdbPersonData.put("gender", intGender == 0 ? "Male" : (intGender == 1 ? "Female" : ""));
 		tmdbPersonData.put("homepage", person.getHomepage());
+		tmdbPersonData.put("popularity", person.getPopularity());
+
 		
 		String profilePath = person.getProfilePath();
 		String baseURL = config.getImages().getSecureBaseUrl();
 		List<String> imageSize = config.getImages().getProfileSizes();
+		List<String> profileImage = new ArrayList<String>();
+
 		
 		for (String size : imageSize) {
 			if (profilePath != null && !"".equals(profilePath)) {
-				tmdbPersonData.put("profile_image_" + size, baseURL +  size + profilePath);
+				profileImage.add(baseURL +  size + profilePath);
 			}
 		}
+		
+		tmdbPersonData.put("profile_image", baseURL +  imageSize.get(1) + profilePath);
+		tmdbPersonData.put("profile_image_tmdb", profileImage);
+
 		
 		
 		return tmdbPersonData;

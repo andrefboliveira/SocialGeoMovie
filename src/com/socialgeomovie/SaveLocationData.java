@@ -16,7 +16,7 @@ import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.clients.SaveDataClient;
 import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
-import com.socialgeomovie.utils.Neo4JRequestException;
+import com.socialgeomovie.utils.exceptions.Neo4JRequestException;
 
 public class SaveLocationData {
 	static void saveData() throws FileNotFoundException, UnsupportedEncodingException, URISyntaxException {

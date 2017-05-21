@@ -11,7 +11,7 @@ import org.apache.commons.collections.ListUtils;
 public class Merge {
 
 	public static Map<String, Object> mergeMapCombine(Map<String, Object> mainMap, Map<String, Object> aditionalMap){
-		List<Object> nullList = Arrays.asList("N/A", "NA", "null", "", " ", "empty", null);
+		List<Object> nullList = Arrays.asList("N/A", "NA", "null", "", " ", "empty", "[]", "[ ]", "{}", "{ }", new ArrayList<>(), null);
 		aditionalMap.values().removeIf(val -> nullList.contains(val));
 		
 		for (String aditionalKey : aditionalMap.keySet()) {
@@ -94,7 +94,7 @@ public class Merge {
 	}
 	
 	public static Map<String, Object> mergeMapOverwrite(Map<String, Object> mainMap, Map<String, Object> aditionalMap){
-		List<Object> nullList = Arrays.asList("N/A", "NA", "null", "", " ", "empty", null);
+		List<Object> nullList = Arrays.asList("N/A", "NA", "null", "", " ", "empty", "[]", "[ ]", "{}", "{ }", new ArrayList<>(), null);
 		mainMap.putAll(aditionalMap);
 		mainMap.values().removeIf(val -> nullList.contains(val));
 		

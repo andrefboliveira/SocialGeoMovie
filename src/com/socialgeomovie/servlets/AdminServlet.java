@@ -28,6 +28,7 @@ import com.socialgeomovie.clients.OldTwitterClient;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.servlets.MovieServlet.MoviePeople;
+import com.socialgeomovie.utils.exceptions.OMDbRequestException;
 
 @Path("/db")
 public class AdminServlet {
@@ -65,7 +66,7 @@ public class AdminServlet {
 				report.put("status", "OK");
 				Gson gson = new Gson();
 				return Response.status(Status.OK).entity(gson.toJson(report)).build();
-			} catch (IOException | URISyntaxException e) {
+			} catch (OMDbRequestException | IOException | URISyntaxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

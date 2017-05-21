@@ -25,7 +25,7 @@ import com.sun.jersey.json.impl.provider.entity.JSONObjectProvider;
 
 import com.socialgeomovie.pojos.neo4j.*;
 import com.socialgeomovie.pojos.neo4j.cypher.*;
-import com.socialgeomovie.utils.Neo4JRequestException;
+import com.socialgeomovie.utils.exceptions.Neo4JRequestException;
 
 public abstract class Neo4JClient {
 	private static final String SERVER_ROOT_URI = "http://localhost:7474/db/data/";

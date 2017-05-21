@@ -11,7 +11,8 @@ import javax.ws.rs.core.MediaType;
 
 import com.google.gson.Gson;
 import com.socialgeomovie.pojos.neo4j.GetNodeByID;
-import com.socialgeomovie.utils.Neo4JRequestException;
+import com.socialgeomovie.utils.exceptions.Neo4JRequestException;
+import com.socialgeomovie.utils.exceptions.OMDbRequestException;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -26,7 +27,7 @@ public class OMDbClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("OMDb Request Failed! " + response.toString());
+			throw new OMDbRequestException("OMDb Request Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);

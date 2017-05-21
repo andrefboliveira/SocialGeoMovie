@@ -14,7 +14,8 @@ import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.tmdb.TMDbConfiguration;
 import com.socialgeomovie.pojos.tmdb.TMDbMovie;
 import com.socialgeomovie.pojos.tmdb.TMDbPerson;
-import com.socialgeomovie.utils.Neo4JRequestException;
+import com.socialgeomovie.utils.exceptions.Neo4JRequestException;
+import com.socialgeomovie.utils.exceptions.TMDbRequestException;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -44,7 +45,7 @@ public class TMDbClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("TMDb Request Failed! " + response.toString());
+			throw new TMDbRequestException("TMDb Request Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -68,7 +69,7 @@ public class TMDbClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("TMDb Request Failed! " + response.toString());
+			throw new TMDbRequestException("TMDb Request Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);
@@ -89,7 +90,7 @@ public class TMDbClient {
 				.get(ClientResponse.class);
 
 		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
-			throw new RuntimeException("TMDb Request Failed! " + response.toString());
+			throw new TMDbRequestException("TMDb Request Failed! " + response.toString());
 		}
 
 		String output = response.getEntity(String.class);		

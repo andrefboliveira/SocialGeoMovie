@@ -37,7 +37,7 @@ import com.socialgeomovie.pojos.tmdb.TMDbPerson;
 import com.socialgeomovie.utils.Converter;
 import com.socialgeomovie.utils.IDParser;
 import com.socialgeomovie.utils.Merge;
-import com.socialgeomovie.utils.Neo4JRequestException;
+import com.socialgeomovie.utils.exceptions.Neo4JRequestException;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
 

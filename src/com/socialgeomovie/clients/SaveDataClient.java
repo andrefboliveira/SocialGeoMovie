@@ -29,12 +29,13 @@ import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.Subtitle;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
+import com.socialgeomovie.pojos.tmdb.ProductionCountry;
 import com.socialgeomovie.pojos.tmdb.TMDbConfiguration;
 import com.socialgeomovie.pojos.tmdb.TMDbMovie;
 import com.socialgeomovie.pojos.tmdb.TMDbPerson;
 import com.socialgeomovie.utils.Converter;
 import com.socialgeomovie.utils.Merge;
-import com.socialgeomovie.utils.Neo4JRequestException;
+import com.socialgeomovie.utils.exceptions.Neo4JRequestException;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
 
@@ -425,6 +426,47 @@ public class SaveDataClient {
 			
 		}
 	}
+	
+	private static void addLocationRelation(ProductionCountry prodCountry, URI nodeURI, String relationName, String nodeTag) throws UnsupportedEncodingException, URISyntaxException  {
+		
+		String countryISO = prodCountry.getIso31661();
+		String countryName = prodCountry.getName();
+		
+		if (countryISO != null && !("".equals(countryISO))) {
+			
+				URI countryNode;
+				try {
+					GetNodesByLabel[] countryNodes = Neo4JClient.getNodesByLabelAndProperty("Country", "iso_3166_1",
+							countryISO);
+					countryNode = new URI(countryNodes[0].getSelf());
+
+					
+				} catch (Neo4JRequestException | ArrayIndexOutOfBoundsException | NullPointerException e) {
+					List<String> countryLabels = new ArrayList<String>();
+					countryLabels.add("Location");
+					countryLabels.add("Country");
+					
+					Map<String, Object> countryMap = new HashMap<String, Object>();
+					countryMap.put("iso_3166_1", countryISO);
+					countryMap.put("name", countryName);
+
+					countryNode = Neo4JClient.createNodeWithProperties(countryLabels, countryMap);
+					logger.info("Adding Location node - Country: " + countryName);
+				}
+				
+				boolean existingRelation = checkRelationExists(nodeURI, countryNode, relationName);
+
+				if (!existingRelation) {
+					URI relationship = Neo4JClient.createRelationship(nodeURI, countryNode, relationName);
+					logger.info("Adding Location node - Country: " + countryName + " to " + nodeTag);
+				}
+				
+				
+		
+			
+			
+		}
+	}
 
 	public static void addCastLinks() throws URISyntaxException {
 
@@ -440,6 +482,9 @@ public class SaveDataClient {
 
 		}
 	}
+	
+	
+	
 
 	public static List<Subtitle> saveAllMovieSubtitles() throws UnsupportedEncodingException {
 		Neo4JConfig.setUniqueConstraints();
@@ -488,6 +533,7 @@ public class SaveDataClient {
 	}
 
 	public static void addOMDbData() throws IOException, URISyntaxException {
+		Neo4JConfig.setUniqueConstraints();
 		GetNodesByLabel[] movies = Neo4JClient.getNodesByLabel("Movie");
 		for (GetNodesByLabel getNodesByLabel : movies) {
 			Map<String, Object> movieProperties = getNodesByLabel.getData();
@@ -511,6 +557,7 @@ public class SaveDataClient {
 
 	public static void addTMDbMovieData()
 			throws URISyntaxException, NumberFormatException, UnsupportedEncodingException {
+		Neo4JConfig.setUniqueConstraints();
 		GetNodesByLabel[] movies = Neo4JClient.getNodesByLabel("Movie");
 		for (GetNodesByLabel getNodesByLabel : movies) {
 			Map<String, Object> movieProperties = getNodesByLabel.getData();
@@ -524,9 +571,19 @@ public class SaveDataClient {
 
 				Map<String, Object> resultMap = Merge.mergeMapCombine(movieProperties,
 						Converter.tmdbMovie2Map(movie, tmdb.getConfiguration()));
+				
+				URI movieURI = new URI(getNodesByLabel.getSelf());
 
-				Neo4JClient.updateNodeProperties(new URI(getNodesByLabel.getSelf()), resultMap);
+				Neo4JClient.updateNodeProperties(movieURI, resultMap);
 				logger.info("Added TMDb Movie info for: " + movieProperties.get("title"));
+				
+				List<ProductionCountry> countries = movie.getProductionCountries();
+				for (ProductionCountry prodCountry : countries) {
+					addLocationRelation(prodCountry,  movieURI, "created in",  (String) getNodesByLabel.getData().get("title"));
+
+				}
+				
+				
 			}
 
 		}
@@ -534,6 +591,7 @@ public class SaveDataClient {
 
 	public static void addTMDbCastData()
 			throws URISyntaxException, NumberFormatException, UnsupportedEncodingException {
+		Neo4JConfig.setUniqueConstraints();
 		GetNodesByLabel[] cast = Neo4JClient.getNodesByLabel("Cast");
 		for (GetNodesByLabel getNodesByLabel : cast) {
 			Map<String, Object> castProperties = getNodesByLabel.getData();

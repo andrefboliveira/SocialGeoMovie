@@ -81,7 +81,10 @@ public class TMDbMovie {
     private Double voteAverage;
     @SerializedName("vote_count")
     @Expose
-    private Integer voteCount;
+    private Integer voteCount; 
+    @SerializedName("alternative_titles")
+    @Expose
+    private AlternativeTitles alternativeTitles;
     @SerializedName("credits")
     @Expose
     private Credits credits;
@@ -292,6 +295,14 @@ public class TMDbMovie {
 
     public void setCredits(Credits credits) {
         this.credits = credits;
+    }
+    
+    public AlternativeTitles getAlternativeTitles() {
+        return alternativeTitles;
+    }
+
+    public void setAlternativeTitles(AlternativeTitles alternativeTitles) {
+        this.alternativeTitles = alternativeTitles;
     }
 
 }
