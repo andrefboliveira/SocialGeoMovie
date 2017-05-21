@@ -154,7 +154,7 @@ public class PersonServlet {
 	@GET
 	@Path("/search")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPeopkeByProperty(
+	public Response getPeopleByProperty(
 			@DefaultValue("-1") @QueryParam("limit") final int limit, 
 			@DefaultValue("name") @QueryParam("property") final String propertyName, 
 			@QueryParam("value") final String propertyValue,
@@ -177,7 +177,7 @@ public class PersonServlet {
 			if (details) {
 				nodeInfo.putAll(resultMap);
 			} else {
-				nodeInfo.put("name", resultMap.get("title"));
+				nodeInfo.put("name", resultMap.get("name"));
 				nodeInfo.put("uri", resultMap.get("uri"));
 
 			}
