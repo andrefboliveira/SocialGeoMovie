@@ -108,14 +108,14 @@ nav li a
 
 .detail-right #cast_list
 {
-	height: calc(60% - 60px);
-    overflow-y: scroll;
+	height: 350px;
+    overflow-y: auto;
 }
 
 .detail-right #tweet_list
 {
-	height: calc(70% - 60px);
-    overflow-y: scroll;
+	height: 700px;
+    overflow-y: auto;
 	cursor: pointer;
 	
 }

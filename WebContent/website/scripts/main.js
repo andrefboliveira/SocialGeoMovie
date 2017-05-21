@@ -20,6 +20,7 @@ var map_markers = {};
 var map;
 
 var firebase_initialized = false;
+var infowindow;
 
 var fetch_movies= function()
 {
@@ -157,10 +158,10 @@ var load_movie_details = function()
 		for(var i=0; i<data.length; i++)
 		{
 			var d = data[i];
-			cast_div.append(
+			cast_div.prepend(
 			"<a href='"+d.url_imdb+"' style='text-decoration: none;'>"+
 			"	<div style='padding: 2px; display: inline-block; background-color: #000; margin: 5px 0;'>"+
-			"		<img src='"+((d.profile_image && d.profile_image.indexOf("null") < 0)?d.profile_image:'style/images/people-placeholder.png')+"' title='"+d.name+"' style='width: 70px; height: 105px'>"+
+			"		<img src='"+((d.profile_image && d.profile_image.indexOf("null") < 0)?d.profile_image:'style/images/people-placeholder.png')+"' title='"+d.name+" as \'"+d.character+"\'' style='width: 70px; height: 105px'>"+
 			"	</div>"+
 			"</a>"
 			);
@@ -190,6 +191,7 @@ var init_map = function()
 		zoom: 2,
 		center: center
 	});
+	infowindow = new google.maps.InfoWindow();
 	
 	// Try HTML5 geolocation.
 	if (navigator.geolocation)
@@ -213,6 +215,8 @@ var init_map = function()
 		// Browser doesn't support Geolocation
 		//handleLocationError(false, infoWindow, map.getCenter());
 	}
+	
+	
 	
 	$.getJSON(url_geo_movie)
 	.done(function( data ) 
@@ -248,9 +252,17 @@ var init_map = function()
 					strokeOpacity: 1,
 					fillColor: colors[d.movie_name],
 					fillOpacity: 1,
-				}
+				},
+				location_name: d.entity_value,
+				movie: d.movie_name
 			});
 			
+			google.maps.event.addListener(marker, 'click', function()
+			{
+				infowindow.setContent("<b>location:</b> "+this.location_name+"<br><b>Movie:</b> "+this.movie)
+				infowindow.open(map, this);
+			});
+
 			map_markers[d.movie_name].push(marker);
 		}
 		
