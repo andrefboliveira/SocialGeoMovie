@@ -98,7 +98,8 @@ public class AdminServlet {
 		public Response processMovies() {
 			try {
 				SaveDataClient.addMovieLinks();
-			} catch (URISyntaxException e) {
+				SaveDataClient.addMovieDateRelation();
+			} catch (URISyntaxException | UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -167,7 +168,8 @@ public class AdminServlet {
 		public Response processCast() {
 			try {
 				SaveDataClient.addCastLinks();
-			} catch (URISyntaxException e) {
+				SaveDataClient.addCastDateRelation();
+			} catch (URISyntaxException | UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}

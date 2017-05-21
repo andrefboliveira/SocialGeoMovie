@@ -152,38 +152,60 @@ public class MovieServlet {
 		return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
 	}
 
-	@GET
 	@Path("/{movie_uri}/tweets")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response tweetsResource(@PathParam("movie_uri") String movie_uri) 
-	{
-		List<LinkedTreeMap> tweets = new ArrayList<LinkedTreeMap>();
-		try 
-		{
-			GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
-			
-			GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(), "talks about");
-			for(int i=0; i<nodeRelationship.length; i++)
-			{
-				GetNodeRelationship getNodeRelationship = nodeRelationship[i];
-				Map<String, Object> nodeInfo = new HashMap<String, Object>();
-				
-				String nodeID = getNodeRelationship.getStart();
-				String nodePropertiesURI = Neo4JClient.getNode(nodeID).getProperties();
+	public MovieTweets tweetsSubResource() {
+		return new MovieTweets();
+	}
 
-				LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient.getNodeProperties(nodePropertiesURI);
-				tweets.add(propertiesResponse);
-			}
-		}
-		catch (UnsupportedEncodingException e)
+	public class MovieTweets {
+		@GET
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response tweetsResource(@PathParam("movie_uri") String movie_uri,
+				@DefaultValue("-1") @QueryParam("limit") final int limit,
+				@DefaultValue("1") @QueryParam("page") final int page) 
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			List<LinkedTreeMap> tweets = new ArrayList<LinkedTreeMap>();
+			try 
+			{
+				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
+				
+				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(), "talks about");
+				
+				int length = nodeRelationship.length;
+
+				int firstResult, lastResult;
+				if (limit > -1) {
+					firstResult = Integer.min(length, ((page - 1) * limit));
+					lastResult = Integer.min(length, (firstResult + limit));
+				} else {
+					firstResult = 0;
+					lastResult = length;
+				}
+
+				for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
+				
+					GetNodeRelationship getNodeRelationship = nodeRelationship[nodeNumber];
+					Map<String, Object> nodeInfo = new HashMap<String, Object>();
+					
+					String nodeID = getNodeRelationship.getStart();
+					String nodePropertiesURI = Neo4JClient.getNode(nodeID).getProperties();
+
+					LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient.getNodeProperties(nodePropertiesURI);
+					tweets.add(propertiesResponse);
+				}
+			}
+			catch (UnsupportedEncodingException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			Gson gson = new Gson();
+			return Response.status(Status.OK).entity(gson.toJson(tweets)).build();
 		}
 		
-		Gson gson = new Gson();
-		return Response.status(Status.OK).entity(gson.toJson(tweets)).build();
 	}
+	
 	
 	@Path("/{movie_uri}/people")
 	public MoviePeople peopleSubResource() {

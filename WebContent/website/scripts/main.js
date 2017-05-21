@@ -2,7 +2,7 @@ var url_base = "http://localhost:8080/aw2017/rest";
 var url_all_movies = 	url_base+"/movie";
 var url_movie_details = url_base+"/movie/";
 var url_geo_movie = 	"http://localhost:8080/aw2017/website/geo.json";
-var url_movie_tweets = url_base+"/movie/[ID]/tweets";
+var url_movie_tweets = url_base+"/movie/[ID]/tweets?limit=10";
 
 
 var url_admin_movie_trakt = url_base+"/db/movies/trakt";
@@ -138,7 +138,7 @@ var load_movie_details = function()
 			"	<div class='movie-roll' style='margin: 10px 0; padding: 5px 30px;'>"+
 			"		<h4>"+tweet.user+" says:</h4>"+
 			"		<div style='margin-bottom: 10px;' >"+tweet.text+"</div>"+
-			"		<div style='display:inline-block; margin-right:10px'>retweets: "+tweet.retweet_count+"</div><div style='display:inline-block;'>"+tweet.date+"</div>"+
+			"		<div style='display:inline-block; margin-right:10px'>"+tweet.date+"</div>"+ "<div style='display:inline-block'> retweets: "+tweet.retweet_count+"</div>"+
 			"	</div>"+
 			"</a>"
 			);

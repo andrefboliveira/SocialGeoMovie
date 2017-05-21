@@ -80,6 +80,21 @@ public abstract class Neo4JConfig {
 			Neo4JClient.createUniquenessConstraint("Tweet", "url");
 		}  catch (Neo4JRequestException e) {
 		}
+		
+		try {
+			Neo4JClient.createUniquenessConstraint("Year", "year");
+		}  catch (Neo4JRequestException e) {
+		}
+		
+		try {
+			Neo4JClient.createUniquenessConstraint("Month", "month");
+		}  catch (Neo4JRequestException e) {
+		}
+		
+		try {
+			Neo4JClient.createUniquenessConstraint("Day", "day");
+		}  catch (Neo4JRequestException e) {
+		}
 			
 		
 	}

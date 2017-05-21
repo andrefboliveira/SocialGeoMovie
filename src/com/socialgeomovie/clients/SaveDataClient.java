@@ -7,9 +7,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +20,7 @@ import java.util.Map.Entry;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -272,6 +275,156 @@ public class SaveDataClient {
 			}
 		}
 	}
+	
+	public static void addMovieDateRelation() throws URISyntaxException, UnsupportedEncodingException {
+		Neo4JConfig.setUniqueConstraints();
+		
+		GetNodesByLabel[] movies = Neo4JClient.getNodesByLabel("Movie");
+		for (GetNodesByLabel getNodesByLabel : movies) {
+			URI movieURI = new URI(getNodesByLabel.getSelf());
+			if (movieURI != null) {
+				Map<String, Object> movieProperties = getNodesByLabel.getData();
+				Object releaseObject = movieProperties.get("released");
+						
+				addDateRelation(releaseObject, movieURI, "released in", (String) movieProperties.get("title"));
+				
+				
+			}
+		}
+	}
+
+	public static void addCastDateRelation() throws URISyntaxException, UnsupportedEncodingException {
+		Neo4JConfig.setUniqueConstraints();
+		
+		GetNodesByLabel[] cast = Neo4JClient.getNodesByLabel("Cast");
+		for (GetNodesByLabel getNodesByLabel : cast) {
+			URI castURI = new URI(getNodesByLabel.getSelf());
+			if (castURI != null) {
+				Map<String, Object> castProperties = getNodesByLabel.getData();
+				
+				addDateRelation(castProperties.get("birthday"), castURI, "born in", (String) castProperties.get("name"));
+				addDateRelation(castProperties.get("deathday"), castURI, "dead in", (String) castProperties.get("name"));
+
+
+				
+				
+			}
+		}
+	}
+	
+	private static void addDateRelation(Object dateObject, URI nodeURI, String relationName, String nodeTag) throws URISyntaxException, UnsupportedEncodingException {
+		String dateString = null;
+		
+		if (dateObject instanceof String) {
+			dateString = (String) dateObject;
+		} else  if (dateObject instanceof List<?>) {
+			dateString = (String) ((List) dateObject).get(0);
+		}
+		
+		if (dateString != null && !("".equals(dateString))) {
+			try {
+				DateTime date = new DateTime(Converter.dateFormat.parse(dateString));
+				logger.info("Processing Date node: " + date.toString("dd-MM-yyyy") + " for object " + nodeTag);
+
+				
+				// Year
+				int year = date.getYear();
+
+				URI yearNode;
+				try {
+					GetNodesByLabel[] yearNodes = Neo4JClient.getNodesByLabelAndProperty("Year", "year",
+							year);
+					yearNode = new URI(yearNodes[0].getSelf());
+
+					
+				} catch (Neo4JRequestException | ArrayIndexOutOfBoundsException | NullPointerException e) {
+					List<String> yearLabels = new ArrayList<String>();
+					yearLabels.add("Date");
+					yearLabels.add("Year");
+					
+					Map<String, Object> yearMap = new HashMap<String, Object>();
+					yearMap.put("year", year);
+
+					yearNode = Neo4JClient.createNodeWithProperties(yearLabels, yearMap);
+					logger.info("Adding Date node - Year: " + year);
+				}
+				
+				boolean existingRelationYear = checkRelationExists(nodeURI, yearNode, relationName);
+
+				if (!existingRelationYear) {
+					URI relationshipYear = Neo4JClient.createRelationship(nodeURI, yearNode, relationName);
+					logger.info("Connecting Date node - Year: " + year + " to " + nodeTag);
+				}
+				
+				
+				// Month
+				int month = date.getMonthOfYear();
+
+				URI monthNode;
+				try {
+					GetNodesByLabel[] monthNodes = Neo4JClient.getNodesByLabelAndProperty("Month", "month",
+							month);
+					monthNode = new URI(monthNodes[0].getSelf());
+					
+				} catch (Neo4JRequestException | ArrayIndexOutOfBoundsException | NullPointerException e) {
+					List<String> monthLabels = new ArrayList<String>();
+					monthLabels.add("Date");
+					monthLabels.add("Month");
+					
+					Map<String, Object> monthMap = new HashMap<String, Object>();
+					monthMap.put("month", month);
+
+					monthNode = Neo4JClient.createNodeWithProperties(monthLabels, monthMap);
+					logger.info("Adding Date node - Month: " + month);
+				}
+				
+				boolean existingRelationMonth = checkRelationExists(nodeURI, monthNode, relationName);
+
+				if (!existingRelationMonth) {
+					URI relationshipMonth = Neo4JClient.createRelationship(nodeURI, monthNode, relationName);
+					logger.info("Connecting Date node - Month: " + month + " to " + nodeTag);
+
+				}
+				
+				
+				// Day
+				int day = date.getDayOfMonth();
+
+				URI dayNode;
+				try {
+					GetNodesByLabel[] dayNodes = Neo4JClient.getNodesByLabelAndProperty("Day", "day",
+							day);
+					dayNode = new URI(dayNodes[0].getSelf());
+					
+				} catch (Neo4JRequestException | ArrayIndexOutOfBoundsException | NullPointerException e) {
+					List<String> dayLabels = new ArrayList<String>();
+					dayLabels.add("Date");
+					dayLabels.add("Day");
+					
+					Map<String, Object> dayMap = new HashMap<String, Object>();
+					dayMap.put("day", day);
+
+					dayNode = Neo4JClient.createNodeWithProperties(dayLabels, dayMap);
+					logger.info("Adding Date node - Day: " + day);
+				}
+				
+				boolean existingRelationDay = checkRelationExists(nodeURI, dayNode, relationName);
+
+				if (!existingRelationDay) {
+					URI relationshipDay = Neo4JClient.createRelationship(nodeURI, dayNode, relationName);
+					logger.info("Connecting Date node - Day: " + day + " to " + nodeTag);
+
+				}
+				
+				
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			
+		}
+	}
 
 	public static void addCastLinks() throws URISyntaxException {
 
@@ -343,12 +496,13 @@ public class SaveDataClient {
 			if (id_imdb != null && !id_imdb.equals("")) {
 				logger.info("Search OMDb for id: " + id_imdb);
 				Map<String, Object> omdbProperties = OMDbClient.getOMDbMovie(id_imdb);
+				if (omdbProperties != null) {
+					Map<String, Object> resultMap = Merge.mergeMapCombine(movieProperties,
+							Converter.omdbMap(omdbProperties));
 
-				Map<String, Object> resultMap = Merge.mergeMapCombine(movieProperties,
-						Converter.omdbMap(omdbProperties));
-
-				Neo4JClient.updateNodeProperties(new URI(getNodesByLabel.getSelf()), resultMap);
-				logger.info("Added OMDb info for: " + movieProperties.get("title"));
+					Neo4JClient.updateNodeProperties(new URI(getNodesByLabel.getSelf()), resultMap);
+					logger.info("Added OMDb info for: " + movieProperties.get("title"));
+				}
 
 			}
 		}
@@ -393,9 +547,7 @@ public class SaveDataClient {
 
 				Map<String, Object> resultMap = Merge.mergeMapCombine(castProperties,
 						Converter.tmdbPerson2Map(person, tmdb.getConfiguration()));
-				
-				logger.info(resultMap.values().toString());		
-				
+								
 
 				Neo4JClient.updateNodeProperties(new URI(getNodesByLabel.getSelf()), resultMap);
 				logger.info("Added TMDb People info for: " + castProperties.get("name"));

@@ -18,7 +18,7 @@ import com.uwetrottmann.trakt5.entities.Movie;
 
 
 public class Converter {
-	static SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+	public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 	
 	public static Map<String, Object> traktMovie2Map(Movie movie) {
 		Map<String, Object> movieData = new HashMap<String, Object>();
@@ -153,15 +153,22 @@ public class Converter {
 
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		try {
-			Date birthdayDate = format.parse(person.getBirthday());
-			tmdbPersonData.put("birthday", dateFormat.format(birthdayDate));
-		} catch (ParseException e) {
+			String birthdayString = person.getBirthday();
+			if (birthdayString != null && !("".equals(birthdayString))) {
+				Date birthdayDate = format.parse(birthdayString);
+				tmdbPersonData.put("birthday", dateFormat.format(birthdayDate));
+			}
+		} catch (ParseException  e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
-			Date deathdayDate = format.parse(person.getDeathday());
-			tmdbPersonData.put("deathday", dateFormat.format(deathdayDate));
+			String deathdayString = person.getDeathday();
+			if (deathdayString != null && !("".equals(deathdayString))) {
+				Date deathdayDate = format.parse(deathdayString);
+				tmdbPersonData.put("deathday", dateFormat.format(deathdayDate));
+			}
+			
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

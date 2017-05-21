@@ -1,8 +1,12 @@
 package com.socialgeomovie.clients;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import twitter4j.Query;
@@ -42,7 +46,9 @@ public class NewTwitterClient
 				HashMap<String, Object> tweet = new HashMap<String, Object>();
 				tweet.put("user", status.getUser().getScreenName());
 				tweet.put("text", status.getText());
-				tweet.put("date", status.getCreatedAt());
+				DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+				Date date = status.getCreatedAt();
+				tweet.put("date",dateFormat.format(date));
 				tweet.put("retweet_count", status.getRetweetCount());
 				tweet.put("url", "https://twitter.com/"+tweet.get("user")+"/status/"+status.getId());
 				tweets.add(tweet);
