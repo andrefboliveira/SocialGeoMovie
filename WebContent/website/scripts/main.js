@@ -151,7 +151,7 @@ var load_movie_details = function()
 	});
 	
 	var uri = $.urlParam("id");
-	$.getJSON( url_movie_details+uri+"/people?include_details=true")
+	$.getJSON( url_movie_details+uri+"/people/main?limit=12&include_details=true")
 	.done(function( data ) 
 	{
 		var cast_div = $("#cast_list");

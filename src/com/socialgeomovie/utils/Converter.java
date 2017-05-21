@@ -239,7 +239,7 @@ public class Converter {
 		}
 	
 		Integer intGender = person.getGender();
-		tmdbPersonData.put("gender", intGender == 0 ? "Male" : (intGender == 1 ? "Female" : ""));
+		tmdbPersonData.put("gender", intGender == 2 ? "Male" : (intGender == 1 ? "Female" : ""));
 		tmdbPersonData.put("homepage", person.getHomepage());
 		tmdbPersonData.put("popularity", person.getPopularity());
 

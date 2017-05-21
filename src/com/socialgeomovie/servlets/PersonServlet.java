@@ -163,7 +163,7 @@ public class PersonServlet {
 		Gson gson = new Gson();
 
 		String query = "MATCH (n) WHERE n." + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
-		query = limit > -1 ? query + "LIMIT " + limit : query;
+		query = limit > -1 ? (query + " LIMIT " + limit ): query;
 		System.out.println(query);
 		
 		List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
@@ -280,6 +280,45 @@ public class PersonServlet {
 				@PathParam("movie_uri") String movie_uri, 
 				@PathParam("person_uri") String person_uri) {
 			return null;
+		}
+		
+		/**
+		 * Main People
+		 * 
+		 * @param propertyName
+		 * @param propertyValue
+		 */
+		@GET
+		@Path("/main")
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response getMainMoviePeople(@PathParam("person_uri") String person_uri,
+				@DefaultValue("popularity") @QueryParam("order_by") final String orderby,
+				@DefaultValue("-1") @QueryParam("limit") final int limit,
+				@DefaultValue("false") @QueryParam("include_details") final boolean details) {
+			List<Object> nodeList = new ArrayList<Object>();
+			Gson gson = new Gson();
+
+			String query = "MATCH(movie:Movie) <-[r:`acts in`]- (cast:Cast {uri:\"" + person_uri
+					+ "\"}) RETURN movie, r ORDER BY movie." + orderby + " DESC";
+			query = limit > -1 ? (query + " LIMIT " + limit) : query;
+
+			List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
+			for (Datum line : results) {
+				Map<String, Object> resultMap = (Map<String, Object>) line.getRow().get(0);
+				Map<String, Object> relationMap = (Map<String, Object>) line.getRow().get(1);
+				Map<String, Object> nodeInfo = new HashMap<String, Object>();
+
+				if (details) {
+					nodeInfo.putAll(resultMap);
+				} else {
+					nodeInfo.put("uri", resultMap.get("uri"));
+					nodeInfo.put("title", resultMap.get("title"));
+				}
+				nodeInfo.put("character", relationMap.get("character"));
+				nodeList.add(nodeInfo);
+
+			}
+			return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 		}
 	}
 

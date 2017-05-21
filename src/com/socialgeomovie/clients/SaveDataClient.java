@@ -34,7 +34,7 @@ import com.socialgeomovie.pojos.tmdb.TMDbConfiguration;
 import com.socialgeomovie.pojos.tmdb.TMDbMovie;
 import com.socialgeomovie.pojos.tmdb.TMDbPerson;
 import com.socialgeomovie.utils.Converter;
-import com.socialgeomovie.utils.Merge;
+import com.socialgeomovie.utils.MapUtils;
 import com.socialgeomovie.utils.exceptions.Neo4JRequestException;
 import com.uwetrottmann.trakt5.entities.CastMember;
 import com.uwetrottmann.trakt5.entities.Movie;
@@ -83,7 +83,7 @@ public class SaveDataClient {
 					movieNode = new URI(movieNodes[0].getSelf());
 
 					if (!override) {
-						movieMap = Merge.mergeMapCombine(movieNodes[0].getData(), movieMap);
+						movieMap = MapUtils.mergeMapCombine(movieNodes[0].getData(), movieMap);
 					}
 
 					Neo4JClient.updateNodeProperties(movieNode, movieMap);
@@ -143,7 +143,7 @@ public class SaveDataClient {
 
 				if (updateData) {
 					if (!override) {
-						castData = Merge.mergeMapCombine(castNodes[0].getData(), castData);
+						castData = MapUtils.mergeMapCombine(castNodes[0].getData(), castData);
 					}
 					Neo4JClient.updateNodeProperties(castNode, castData);
 
@@ -543,7 +543,7 @@ public class SaveDataClient {
 				logger.info("Search OMDb for id: " + id_imdb);
 				Map<String, Object> omdbProperties = OMDbClient.getOMDbMovie(id_imdb);
 				if (omdbProperties != null) {
-					Map<String, Object> resultMap = Merge.mergeMapCombine(movieProperties,
+					Map<String, Object> resultMap = MapUtils.mergeMapCombine(movieProperties,
 							Converter.omdbMap(omdbProperties));
 
 					Neo4JClient.updateNodeProperties(new URI(getNodesByLabel.getSelf()), resultMap);
@@ -569,7 +569,7 @@ public class SaveDataClient {
 				TMDbClient tmdb = new TMDbClient();
 				TMDbMovie movie = tmdb.getMovie(Integer.valueOf(id_tmdb));
 
-				Map<String, Object> resultMap = Merge.mergeMapCombine(movieProperties,
+				Map<String, Object> resultMap = MapUtils.mergeMapCombine(movieProperties,
 						Converter.tmdbMovie2Map(movie, tmdb.getConfiguration()));
 				
 				URI movieURI = new URI(getNodesByLabel.getSelf());
@@ -603,13 +603,13 @@ public class SaveDataClient {
 				TMDbClient tmdb = new TMDbClient();
 				TMDbPerson person = tmdb.getPerson(Integer.valueOf(id_tmdb));
 
-				Map<String, Object> resultMap = Merge.mergeMapCombine(castProperties,
+				Map<String, Object> resultMap = MapUtils.mergeMapCombine(castProperties,
 						Converter.tmdbPerson2Map(person, tmdb.getConfiguration()));
 				
 				URI nodeURI = new URI(getNodesByLabel.getSelf());
 				
 				Integer gender = person.getGender();
-				String label = gender == 0 ? "Actor" : (gender == 1 ? "Actress" : "");
+				String label = gender == 2 ? "Actor" : (gender == 1 ? "Actress" : "");
 				if (label != null && !("".equals(label))) {
 					Neo4JClient.addNodeLabel(nodeURI, label);
 				}							

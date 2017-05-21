@@ -8,7 +8,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.ListUtils;
 
-public class Merge {
+public class MapUtils {
 
 	public static Map<String, Object> mergeMapCombine(Map<String, Object> mainMap, Map<String, Object> aditionalMap){
 		List<Object> nullList = Arrays.asList("N/A", "NA", "null", "", " ", "empty", "[]", "[ ]", "{}", "{ }", new ArrayList<>(), null);
@@ -100,5 +100,6 @@ public class Merge {
 		
 		return mainMap;
 	}
+	
 }
 

@@ -14,6 +14,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import com.google.gson.Gson;
 import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.pojos.neo4j.cypher.Datum;
@@ -39,8 +41,8 @@ public class SearchServlet {
 		List<Object> nodeList = new ArrayList<Object>();
 		Gson gson = new Gson();
 
-		String query = "MATCH (n) WHERE n"+ (nodeLabel != null  && !("".equals(nodeLabel)) ? ":" + nodeLabel : "") + "."  + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
-		query = limit > -1 ? query + "LIMIT " + limit : query;
+		String query = "MATCH (n"+ (nodeLabel != null  && !("".equals(nodeLabel)) ? ":" + WordUtils.capitalize(nodeLabel) : "") + ") WHERE n."  + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
+		query = limit > -1 ? (query + " LIMIT " + limit ): query;
 		System.out.println(query);
 		
 		List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();

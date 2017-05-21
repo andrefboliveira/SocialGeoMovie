@@ -5,6 +5,9 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,19 +100,18 @@ public class MovieServlet {
 	public Response createMovie(String requestJSON) {
 		return null;
 	}
-	
 
 	/**
 	 * Autocomplete
-	 * @param propertyName 
-	 * @param propertyValue 
+	 * 
+	 * @param propertyName
+	 * @param propertyValue
 	 */
 	@GET
 	@Path("/search")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMoviesByProperty(
-			@DefaultValue("-1") @QueryParam("limit") final int limit, 
-			@DefaultValue("title") @QueryParam("property") final String propertyName, 
+	public Response getMoviesByProperty(@DefaultValue("-1") @QueryParam("limit") final int limit,
+			@DefaultValue("title") @QueryParam("property") final String propertyName,
 			@QueryParam("value") final String propertyValue,
 			@DefaultValue("true") @QueryParam("compact") final boolean compact_mode,
 			@DefaultValue("false") @QueryParam("include_details") final boolean details) {
@@ -117,13 +119,12 @@ public class MovieServlet {
 		Gson gson = new Gson();
 
 		String query = "MATCH (n) WHERE n." + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
-		query = limit > -1 ? query + "LIMIT " + limit : query;
-		
-		
+		query = limit > -1 ? (query + " LIMIT " + limit) : query;
+
 		List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
 		for (Datum line : results) {
 			Map<String, Object> resultMap = (Map<String, Object>) line.getRow().get(0);
-			
+
 			Map<String, Object> nodeInfo = new HashMap<String, Object>();
 
 			if (compact_mode) {
@@ -140,7 +141,6 @@ public class MovieServlet {
 		}
 		return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 	}
-
 
 	/**
 	 * Get movie info by given movie name Example(deadpool):
@@ -175,11 +175,9 @@ public class MovieServlet {
 	@Path("/{movie_uri}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response updateMovie(
-			@PathParam("movie_uri") String movie_uri, 
-			String requestJSON) {
+	public Response updateMovie(@PathParam("movie_uri") String movie_uri, String requestJSON) {
 		Gson gson = new Gson();
-		
+
 		Map<String, Object> nodeInfo = Servlet.updateResource("Movie", movie_uri, requestJSON);
 
 		return Response.status(Status.OK).entity(gson.toJson(nodeInfo)).build();
@@ -209,15 +207,14 @@ public class MovieServlet {
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response tweetsResource(@PathParam("movie_uri") String movie_uri,
 				@DefaultValue("-1") @QueryParam("limit") final int limit,
-				@DefaultValue("1") @QueryParam("page") final int page) 
-		{
+				@DefaultValue("1") @QueryParam("page") final int page) {
 			List<LinkedTreeMap> tweets = new ArrayList<LinkedTreeMap>();
-			try 
-			{
+			try {
 				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
-				
-				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(), "talks about");
-				
+
+				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(),
+						"talks about");
+
 				int length = nodeRelationship.length;
 
 				int firstResult, lastResult;
@@ -230,30 +227,28 @@ public class MovieServlet {
 				}
 
 				for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
-				
+
 					GetNodeRelationship getNodeRelationship = nodeRelationship[nodeNumber];
 					Map<String, Object> nodeInfo = new HashMap<String, Object>();
-					
+
 					String nodeID = getNodeRelationship.getStart();
 					String nodePropertiesURI = Neo4JClient.getNode(nodeID).getProperties();
 
-					LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient.getNodeProperties(nodePropertiesURI);
+					LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
+							.getNodeProperties(nodePropertiesURI);
 					tweets.add(propertiesResponse);
 				}
-			}
-			catch (UnsupportedEncodingException e)
-			{
+			} catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			
+
 			Gson gson = new Gson();
 			return Response.status(Status.OK).entity(gson.toJson(tweets)).build();
 		}
-		
+
 	}
-	
-	
+
 	@Path("/{movie_uri}/people")
 	public MoviePeople peopleSubResource() {
 		return new MoviePeople();
@@ -268,16 +263,17 @@ public class MovieServlet {
 		@GET
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response getMoviePeople(@PathParam("movie_uri") String movie_uri,
-				@DefaultValue("false") @QueryParam("include_details") final boolean details,
 				@DefaultValue("-1") @QueryParam("limit") final int limit,
-				@DefaultValue("1") @QueryParam("page") final int page) {
+				@DefaultValue("1") @QueryParam("page") final int page,
+				@DefaultValue("false") @QueryParam("include_details") final boolean details) {
 
 			List<Map<String, Object>> nodeList = new ArrayList<>();
 			Gson gson = new Gson();
 
 			try {
 				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
-				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(), "acts in");
+				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(),
+						"acts in");
 
 				int length = nodeRelationship.length;
 
@@ -308,8 +304,9 @@ public class MovieServlet {
 						nodeInfo.putAll(propertiesResponse);
 					} else {
 						nodeInfo.put("name", propertiesResponse.get("name"));
+
 					}
-					
+
 					nodeInfo.put("character", getNodeRelationship.getData().get("character"));
 
 					nodeList.add(nodeInfo);
@@ -330,8 +327,7 @@ public class MovieServlet {
 		@Path("/{person_uri}")
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response addMoviePerson(
-				@PathParam("movie_uri") String movie_uri, 
+		public Response addMoviePerson(@PathParam("movie_uri") String movie_uri,
 				@PathParam("person_uri") String person_uri) {
 			return null;
 		}
@@ -342,10 +338,49 @@ public class MovieServlet {
 		@DELETE
 		@Path("/{person_uri}")
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response deleteMoviePerson(
-				@PathParam("movie_uri") String movie_uri, 
+		public Response deleteMoviePerson(@PathParam("movie_uri") String movie_uri,
 				@PathParam("person_uri") String person_uri) {
 			return null;
+		}
+
+		/**
+		 * Main People
+		 * 
+		 * @param propertyName
+		 * @param propertyValue
+		 */
+		@GET
+		@Path("/main")
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response getMainMoviePeople(@PathParam("movie_uri") String movie_uri,
+				@DefaultValue("popularity") @QueryParam("order_by") final String orderby,
+				@DefaultValue("-1") @QueryParam("limit") final int limit,
+				@DefaultValue("false") @QueryParam("include_details") final boolean details) {
+			List<Object> nodeList = new ArrayList<Object>();
+			Gson gson = new Gson();
+
+			String query = "MATCH(cast:Cast) -[r:`acts in`]-> (movie:Movie {uri:\"" + movie_uri
+					+ "\"}) RETURN cast, r ORDER BY cast." + orderby + " DESC";
+			query = limit > -1 ? (query + " LIMIT " + limit) : query;
+
+
+			List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
+			for (Datum line : results) {
+				Map<String, Object> resultMap = (Map<String, Object>) line.getRow().get(0);
+				Map<String, Object> relationMap = (Map<String, Object>) line.getRow().get(1);
+				Map<String, Object> nodeInfo = new HashMap<String, Object>();
+
+				if (details) {
+					nodeInfo.putAll(resultMap);
+				} else {
+					nodeInfo.put("uri", resultMap.get("uri"));
+					nodeInfo.put("name", resultMap.get("name"));
+				}
+				nodeInfo.put("character", relationMap.get("character"));
+				nodeList.add(nodeInfo);
+
+			}
+			return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 		}
 	}
 }
