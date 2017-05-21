@@ -28,6 +28,7 @@ import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
+import com.socialgeomovie.pojos.neo4j.cypher.Datum;
 import com.socialgeomovie.servlets.MovieServlet.MoviePeople;
 import com.socialgeomovie.utils.Servlet;
 
@@ -142,6 +143,49 @@ public class PersonServlet {
 		Neo4JClient.safeDeleteNode(person_uri);
 		// return null;
 		return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
+	}
+	
+	
+	/**
+	 * Autocomplete
+	 * @param propertyName 
+	 * @param propertyValue 
+	 */
+	@GET
+	@Path("/search")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getPeopkeByProperty(
+			@DefaultValue("-1") @QueryParam("limit") final int limit, 
+			@DefaultValue("name") @QueryParam("property") final String propertyName, 
+			@QueryParam("value") final String propertyValue,
+			@DefaultValue("false") @QueryParam("include_details") final boolean details) {
+		List<Map<String, Object>> nodeList = new ArrayList<>();
+		Gson gson = new Gson();
+
+		String query = "MATCH (n) WHERE n." + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
+		query = limit > -1 ? query + "LIMIT " + limit : query;
+		System.out.println(query);
+		
+		List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
+		
+		
+		for (Datum line : results) {
+			Map<String, Object> resultMap = (Map<String, Object>) line.getRow().get(0);
+			
+			Map<String, Object> nodeInfo = new HashMap<String, Object>();
+
+			if (details) {
+				nodeInfo.putAll(resultMap);
+			} else {
+				nodeInfo.put("name", resultMap.get("title"));
+				nodeInfo.put("uri", resultMap.get("uri"));
+
+			}
+
+			nodeList.add(nodeInfo);
+
+		}
+		return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 	}
 	
 	@Path("/{person_uri}/movies")

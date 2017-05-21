@@ -2,6 +2,8 @@
 package com.socialgeomovie.pojos.neo4j.cypher;
 
 import java.util.List;
+import java.util.Map;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -9,16 +11,16 @@ public class Datum {
 
     @SerializedName("row")
     @Expose
-    private List<Integer> row = null;
+    private List<Object> row = null;
     @SerializedName("meta")
     @Expose
     private List<Object> meta = null;
 
-    public List<Integer> getRow() {
+    public List<Object> getRow() {
         return row;
     }
 
-    public void setRow(List<Integer> row) {
+    public void setRow(List<Object> row) {
         this.row = row;
     }
 
