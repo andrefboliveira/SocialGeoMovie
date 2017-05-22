@@ -19,7 +19,7 @@ import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.utils.exceptions.Neo4JRequestException;
 
 public class SaveLocationData {
-	static void saveData() throws FileNotFoundException, UnsupportedEncodingException, URISyntaxException 
+	public static void saveData() throws FileNotFoundException, UnsupportedEncodingException, URISyntaxException 
 	{
 		// TODO Auto-generated method stub
 		Gson gson = new Gson();
