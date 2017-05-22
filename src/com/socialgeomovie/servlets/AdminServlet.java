@@ -144,76 +144,34 @@ public class AdminServlet {
 			}
 
 		}
+	}
 
-		@Path("/people")
-		public ImportPeople peopleSubResource() {
-			return new ImportPeople();
+	@Path("/people")
+	public ImportPeople peopleSubResource() {
+		return new ImportPeople();
+	}
+
+	public class ImportPeople {
+	
+		@Path("/cast")
+		public ImportCast castSubResource() {
+			return new ImportCast();
 		}
-
-		public class ImportPeople {
-
-			@Path("/cast")
-			public ImportCast castSubResource() {
-				return new ImportCast();
-			}
-
-			public class ImportCast {
-				/**
-				 * Import Cast Data
-				 */
-				@GET
-				@Path("/trakt")
-				@Consumes(MediaType.APPLICATION_JSON)
-				@Produces(MediaType.APPLICATION_JSON)
-				public Response importTraktCast() {
-					try{
-						Map<String, URI> castReport = SaveDataClient.saveAllTraktMovieCast();
-						Map<String, String> report = new HashMap<String, String>();
-						report.put("status", "OK");
-						report.put("cast", "" + castReport.size());
-						Gson gson = new Gson();
-						return Response.status(Status.OK).entity(gson.toJson(report)).build();
-					} catch (Exception e) {
-						// TODO: handle exception
-						e.printStackTrace();
-						return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
-					}
-				}
-
-
-				@GET
-				@Path("/tmdb")
-				@Produces(MediaType.APPLICATION_JSON)
-				public Response importTMDbCast() {
-
-					try {
-						Map<String, String> report = new HashMap<String, String>();
-
-						SaveDataClient.addTMDbCastData();
-						report.put("status", "OK");
-						Gson gson = new Gson();
-						return Response.status(Status.OK).entity(gson.toJson(report)).build();
-					} catch (Exception e) {
-						// TODO: handle exception
-						e.printStackTrace();
-						return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
-					}
-
-				}
-
-			}
-
-
+	
+		public class ImportCast {
+			/**
+			 * Import Cast Data
+			 */
 			@GET
-			@Path("/process")
+			@Path("/trakt")
+			@Consumes(MediaType.APPLICATION_JSON)
 			@Produces(MediaType.APPLICATION_JSON)
-			public Response processCast() {
-				try {
-					SaveDataClient.addCastLinks();
-					SaveDataClient.addCastDateRelation();
-
+			public Response importTraktCast() {
+				try{
+					Map<String, URI> castReport = SaveDataClient.saveAllTraktMovieCast();
 					Map<String, String> report = new HashMap<String, String>();
 					report.put("status", "OK");
+					report.put("cast", "" + castReport.size());
 					Gson gson = new Gson();
 					return Response.status(Status.OK).entity(gson.toJson(report)).build();
 				} catch (Exception e) {
@@ -222,18 +180,41 @@ public class AdminServlet {
 					return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
 				}
 			}
+	
+	
+			@GET
+			@Path("/tmdb")
+			@Produces(MediaType.APPLICATION_JSON)
+			public Response importTMDbCast() {
+	
+				try {
+					Map<String, String> report = new HashMap<String, String>();
+	
+					SaveDataClient.addTMDbCastData();
+					report.put("status", "OK");
+					Gson gson = new Gson();
+					return Response.status(Status.OK).entity(gson.toJson(report)).build();
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.printStackTrace();
+					return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
+				}
+	
+			}
+	
 		}
-
+	
+	
 		@GET
-		@Path("/tweets")
-		@Consumes(MediaType.APPLICATION_JSON)
+		@Path("/process")
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response importTweets() {
-			Map<String, String> report = new HashMap<String, String>();
-			report.put("status", "OK");
+		public Response processCast() {
 			try {
-				SaveDataClient.saveTweets();
-
+				SaveDataClient.addCastLinks();
+				SaveDataClient.addCastDateRelation();
+	
+				Map<String, String> report = new HashMap<String, String>();
+				report.put("status", "OK");
 				Gson gson = new Gson();
 				return Response.status(Status.OK).entity(gson.toJson(report)).build();
 			} catch (Exception e) {
@@ -241,6 +222,25 @@ public class AdminServlet {
 				e.printStackTrace();
 				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
 			}
+		}
+	}
+
+	@GET
+	@Path("/tweets")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response importTweets() {
+		Map<String, String> report = new HashMap<String, String>();
+		report.put("status", "OK");
+		try {
+			SaveDataClient.saveTweets();
+	
+			Gson gson = new Gson();
+			return Response.status(Status.OK).entity(gson.toJson(report)).build();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
 		}
 	}
 }
