@@ -22,6 +22,19 @@ var map;
 var firebase_initialized = false;
 var infowindow;
 
+var urlParam = function(name)
+{
+    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
+    if (results==null)
+	{
+       return null;
+    }
+    else
+	{
+       return results[1] || 0;
+    }
+}
+
 var fetch_movies= function()
 {
 	$.getJSON( url_all_movies)
@@ -64,7 +77,7 @@ var fetch_movies= function()
 
 var load_movie_details = function()
 {
-	var uri = $.urlParam("id");
+	var uri = urlParam("id");
 	$.getJSON( url_movie_details+uri)
 	.done(function( data ) 
 	{
@@ -150,7 +163,7 @@ var load_movie_details = function()
 		console.log(data);
 	});
 	
-	var uri = $.urlParam("id");
+	var uri = urlParam("id");
 	$.getJSON( url_movie_details+uri+"/people/main?limit=12&include_details=true")
 	.done(function( data ) 
 	{
@@ -375,7 +388,7 @@ var submit_comment = function()
 {
 	var user = $("#comment_user").val();
 	var comment = $("#comment_text").val();
-	var movie = $.urlParam("id");
+	var movie = urlParam("id");
 	
 	if(user == "" || comment == "")
 		return;
@@ -389,19 +402,6 @@ var submit_comment = function()
 
 	//$("#comment_user").val("");
 	$("#comment_text").val("");
-}
-
-$.urlParam = function(name)
-{
-    var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-    if (results==null)
-	{
-       return null;
-    }
-    else
-	{
-       return results[1] || 0;
-    }
 }
 
 var initialize_firebase = function()
