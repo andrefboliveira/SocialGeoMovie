@@ -43,7 +43,6 @@ public class SearchServlet {
 
 		String query = "MATCH (n"+ (nodeLabel != null  && !("".equals(nodeLabel)) ? ":" + WordUtils.capitalize(nodeLabel) : "") + ") WHERE n."  + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
 		query = limit > -1 ? (query + " LIMIT " + limit ): query;
-		System.out.println(query);
 		
 		List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
 		

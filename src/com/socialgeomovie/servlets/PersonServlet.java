@@ -162,7 +162,7 @@ public class PersonServlet {
 		List<Map<String, Object>> nodeList = new ArrayList<>();
 		Gson gson = new Gson();
 
-		String query = "MATCH (n) WHERE n." + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
+		String query = "MATCH (n:Person) WHERE n." + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
 		query = limit > -1 ? (query + " LIMIT " + limit ): query;
 		System.out.println(query);
 		

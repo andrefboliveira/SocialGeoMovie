@@ -24,6 +24,7 @@ import java.util.Map;
 import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.clients.OMDbClient;
 import com.socialgeomovie.clients.OpenSubsClient;
+import com.socialgeomovie.clients.SPARQLClient;
 import com.socialgeomovie.clients.SaveDataClient;
 import com.socialgeomovie.clients.TMDbClient;
 import com.socialgeomovie.clients.TraktClient;
@@ -31,6 +32,8 @@ import com.socialgeomovie.clients.OldTwitterClient;
 
 import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
+import com.socialgeomovie.pojos.sparql.BindingMovie;
+import com.socialgeomovie.pojos.sparql.DBpediaMovieResult;
 import com.socialgeomovie.pojos.tmdb.TMDbConfiguration;
 import com.socialgeomovie.pojos.tmdb.Images_Config;
 import com.socialgeomovie.pojos.tmdb.TMDbPerson;
@@ -153,7 +156,10 @@ public class ImportTest {
 //			 TMDbPerson m = tmdb.getPerson(10859);
 //			 System.out.println(m.getName());
 		
-			SaveLocationData.saveData();
+//			SaveLocationData.saveData();
+			
+//			SaveDataClient.addDBpediaCastData();
+			SaveDataClient.addDBpediaMovieData();
 			
 		}
 

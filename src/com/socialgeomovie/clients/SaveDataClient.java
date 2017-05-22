@@ -29,6 +29,9 @@ import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.Subtitle;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
+import com.socialgeomovie.pojos.sparql.BindingMovie;
+import com.socialgeomovie.pojos.sparql.DBpediaMovieResult;
+import com.socialgeomovie.pojos.sparql.DBpediaPersonResult;
 import com.socialgeomovie.pojos.tmdb.ProductionCountry;
 import com.socialgeomovie.pojos.tmdb.TMDbConfiguration;
 import com.socialgeomovie.pojos.tmdb.TMDbMovie;
@@ -616,6 +619,60 @@ public class SaveDataClient {
 
 				Neo4JClient.updateNodeProperties(nodeURI, resultMap);
 				logger.info("Added TMDb People info for: " + castProperties.get("name"));
+			}
+
+		}
+	}
+	
+	public static void addDBpediaMovieData() throws URISyntaxException, IOException {
+
+		GetNodesByLabel[] movies = Neo4JClient.getNodesByLabel("Movie");
+		
+		for (GetNodesByLabel getNodesByLabel : movies) {
+			Map<String, Object> movieProperties = getNodesByLabel.getData();
+			String title = (String) movieProperties.get("title");
+
+			if (title != null && !title.equals("")) {
+				logger.info("Search DBpedia for Movie: " + title);
+
+				DBpediaMovieResult dbpediaResult = SPARQLClient.getDBpediaMovie(title + " (film)");
+
+				Map<String, Object> resultMap = MapUtils.mergeMapCombine(movieProperties,
+						Converter.dbpediaMovie2Map(dbpediaResult));
+				
+				if (!movieProperties.equals(resultMap)) {
+					URI movieURI = new URI(getNodesByLabel.getSelf());
+
+					Neo4JClient.updateNodeProperties(movieURI, resultMap);
+					logger.info("Added DBpedia info for Movie: " + title);
+				}
+				
+			}			
+			}
+
+		}
+	
+	public static void addDBpediaCastData() throws IOException, URISyntaxException {
+		Neo4JConfig.setUniqueConstraints();
+		GetNodesByLabel[] cast = Neo4JClient.getNodesByLabel("Cast");
+		for (GetNodesByLabel getNodesByLabel : cast) {
+			Map<String, Object> castProperties = getNodesByLabel.getData();
+			String name = (String) castProperties.get("name");
+
+			if (name != null && !name.equals("")) {
+				logger.info("Search DBpedia for Movie: " + name);
+
+				DBpediaPersonResult dbpediaResult = SPARQLClient.getDBpediaPerson(name);
+
+				Map<String, Object> resultMap = MapUtils.mergeMapCombine(castProperties,
+						Converter.dbpediaPerson2Map(dbpediaResult));
+				if (!castProperties.equals(resultMap)) {
+					URI castURI = new URI(getNodesByLabel.getSelf());
+
+					Neo4JClient.updateNodeProperties(castURI, resultMap);
+					logger.info("Added DBpedia info for Cast: " + name);
+				}
+				
 			}
 
 		}

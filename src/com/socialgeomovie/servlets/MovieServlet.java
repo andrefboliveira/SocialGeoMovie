@@ -102,47 +102,6 @@ public class MovieServlet {
 	}
 
 	/**
-	 * Autocomplete
-	 * 
-	 * @param propertyName
-	 * @param propertyValue
-	 */
-	@GET
-	@Path("/search")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMoviesByProperty(@DefaultValue("-1") @QueryParam("limit") final int limit,
-			@DefaultValue("title") @QueryParam("property") final String propertyName,
-			@QueryParam("value") final String propertyValue,
-			@DefaultValue("true") @QueryParam("compact") final boolean compact_mode,
-			@DefaultValue("false") @QueryParam("include_details") final boolean details) {
-		List<Object> nodeList = new ArrayList<Object>();
-		Gson gson = new Gson();
-
-		String query = "MATCH (n) WHERE n." + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
-		query = limit > -1 ? (query + " LIMIT " + limit) : query;
-
-		List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
-		for (Datum line : results) {
-			Map<String, Object> resultMap = (Map<String, Object>) line.getRow().get(0);
-
-			Map<String, Object> nodeInfo = new HashMap<String, Object>();
-
-			if (compact_mode) {
-				nodeList.add(resultMap.get(propertyName));
-			} else {
-				if (details) {
-					nodeInfo.putAll(resultMap);
-				} else {
-					nodeInfo.put(propertyName, resultMap.get(propertyName));
-					nodeInfo.put("uri", resultMap.get("uri"));
-				}
-				nodeList.add(nodeInfo);
-			}
-		}
-		return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
-	}
-
-	/**
 	 * Get movie info by given movie name Example(deadpool):
 	 * http://localhost:8080/aw2017/rest/movie/Deadpool
 	 */
@@ -195,6 +154,47 @@ public class MovieServlet {
 
 		// return null;
 		return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
+	}
+
+	/**
+	 * Autocomplete
+	 * 
+	 * @param propertyName
+	 * @param propertyValue
+	 */
+	@GET
+	@Path("/search")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getMoviesByProperty(@DefaultValue("-1") @QueryParam("limit") final int limit,
+			@DefaultValue("title") @QueryParam("property") final String propertyName,
+			@QueryParam("value") final String propertyValue,
+			@DefaultValue("true") @QueryParam("compact") final boolean compact_mode,
+			@DefaultValue("false") @QueryParam("include_details") final boolean details) {
+		List<Object> nodeList = new ArrayList<Object>();
+		Gson gson = new Gson();
+	
+		String query = "MATCH (n:Movie) WHERE n." + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
+		query = limit > -1 ? (query + " LIMIT " + limit) : query;
+	
+		List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
+		for (Datum line : results) {
+			Map<String, Object> resultMap = (Map<String, Object>) line.getRow().get(0);
+	
+			Map<String, Object> nodeInfo = new HashMap<String, Object>();
+	
+			if (compact_mode) {
+				nodeList.add(resultMap.get(propertyName));
+			} else {
+				if (details) {
+					nodeInfo.putAll(resultMap);
+				} else {
+					nodeInfo.put(propertyName, resultMap.get(propertyName));
+					nodeInfo.put("uri", resultMap.get("uri"));
+				}
+				nodeList.add(nodeInfo);
+			}
+		}
+		return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 	}
 
 	@Path("/{movie_uri}/tweets")
