@@ -42,7 +42,7 @@ public abstract class Neo4JClient {
 		return resource;
 	}
 
-	private static void checkDatabaseIsRunning() {
+	public static void checkDatabaseIsRunning() {
 		WebResource resource = createWebResource(SERVER_ROOT_URI);
 		ClientResponse response = resource.get(ClientResponse.class);
 
@@ -812,8 +812,13 @@ public abstract class Neo4JClient {
 		return queryResult;
 	}
 
-	public static void safeDeleteNode(String nodeID) {
-		String query = "MATCH (n {uri:" + nodeID + "}) DETACH DELETE n";
+	public static void safeDeleteNode(String nodeURI) {
+		String query = "MATCH (n {uri:\"" + nodeURI + "\"}) DETACH DELETE n";
+		sendTransactionalCypherQuery(query);
+	}
+	
+	public static void safeDeleteRelation(String node1URI, String node2URI) {
+		String query = "MATCH (n {uri:\"" + node1URI + "\"}) -[r]-(m {uri:\"" + node2URI + "\"}) DETACH DELETE r";
 		sendTransactionalCypherQuery(query);
 	}
 

@@ -29,10 +29,26 @@ import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.servlets.MovieServlet.MoviePeople;
 import com.socialgeomovie.utils.exceptions.OMDbRequestException;
+import com.socialgeomovie.utils.exceptions.TMDbRequestException;
 
 @Path("/db")
 public class AdminServlet {
 	// http://localhost:8080/aw2017/rest/db
+	
+
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response checkServiceRunning() {
+		// TODO Return type
+		try{
+		Neo4JClient.checkDatabaseIsRunning();
+		return Response.status(Status.OK).entity("{\"status\":\"OK\"}").build();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
+		}
+	}
 
 	@Path("/movies")
 	public ImportMovies moviesSubResource() {
@@ -48,49 +64,66 @@ public class AdminServlet {
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response importTraktMovies(@DefaultValue("10") @QueryParam("quantity") final int quantity) {
-			Map<String, URI> moviesReport = SaveDataClient.saveAllTraktMovies(quantity);
-			Map<String, String> report = new HashMap<String, String>();
-			report.put("status", "OK");
-			report.put("movies", "" + moviesReport.size());
-			Gson gson = new Gson();
-			return Response.status(Status.OK).entity(gson.toJson(report)).build();
+			try {
+				Map<String, URI> moviesReport = SaveDataClient.saveAllTraktMovies(quantity);
+				Map<String, String> report = new HashMap<String, String>();
+				report.put("status", "OK");
+				report.put("movies", "" + moviesReport.size());
+				Gson gson = new Gson();
+				return Response.status(Status.OK).entity(gson.toJson(report)).build();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
+
+			}
+
 		}
 
 		@GET
 		@Path("/omdb")
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response importOMDbMovies() {
-			Map<String, String> report = new HashMap<String, String>();
 			try {
+				Map<String, String> report = new HashMap<String, String>();
+
 				SaveDataClient.addOMDbData();
 				report.put("status", "OK");
 				Gson gson = new Gson();
 				return Response.status(Status.OK).entity(gson.toJson(report)).build();
-			} catch (OMDbRequestException | IOException | URISyntaxException e) {
+			} catch (OMDbRequestException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				return Response.status(Status.SERVICE_UNAVAILABLE).entity("{\"status\":\"SERVICE UNAVAILABLE\"}").build();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
 			}
 
-			return null;
 		}
 
 		@GET
 		@Path("/tmdb")
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response importTMDbMovies() {
-			Map<String, String> report = new HashMap<String, String>();
-
 			try {
+				Map<String, String> report = new HashMap<String, String>();
+
 				SaveDataClient.addTMDbMovieData();
 				report.put("status", "OK");
 				Gson gson = new Gson();
 				return Response.status(Status.OK).entity(gson.toJson(report)).build();
-			} catch (NumberFormatException | UnsupportedEncodingException | URISyntaxException e) {
+			} catch (TMDbRequestException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				return Response.status(Status.SERVICE_UNAVAILABLE).entity("{\"status\":\"SERVICE UNAVAILABLE\"}").build();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
 			}
 
-			return null;
 		}
 
 		@GET
@@ -98,104 +131,116 @@ public class AdminServlet {
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response processMovies() {
 			try {
+				Map<String, String> report = new HashMap<String, String>();
 				SaveDataClient.addMovieLinks();
 				SaveDataClient.addMovieDateRelation();
-			} catch (URISyntaxException | UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			Map<String, String> report = new HashMap<String, String>();
-			report.put("status", "OK");
-			Gson gson = new Gson();
-			return Response.status(Status.OK).entity(gson.toJson(report)).build();
-		}
-	}
-
-	@Path("/people")
-	public ImportPeople peopleSubResource() {
-		return new ImportPeople();
-	}
-
-	public class ImportPeople {
-		
-		@Path("/cast")
-		public ImportCast castSubResource() {
-			return new ImportCast();
-		}
-		
-		public class ImportCast {
-			/**
-			 * Import Cast Data
-			 */
-			@GET
-			@Path("/trakt")
-			@Consumes(MediaType.APPLICATION_JSON)
-			@Produces(MediaType.APPLICATION_JSON)
-			public Response importTraktCast() {
-				Map<String, URI> castReport = SaveDataClient.saveAllTraktMovieCast();
-				Map<String, String> report = new HashMap<String, String>();
 				report.put("status", "OK");
-				report.put("cast", "" + castReport.size());
 				Gson gson = new Gson();
 				return Response.status(Status.OK).entity(gson.toJson(report)).build();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
 			}
-			
-			
-			@GET
-			@Path("/tmdb")
-			@Produces(MediaType.APPLICATION_JSON)
-			public Response importTMDbCast() {
-				Map<String, String> report = new HashMap<String, String>();
 
+		}
+
+		@Path("/people")
+		public ImportPeople peopleSubResource() {
+			return new ImportPeople();
+		}
+
+		public class ImportPeople {
+
+			@Path("/cast")
+			public ImportCast castSubResource() {
+				return new ImportCast();
+			}
+
+			public class ImportCast {
+				/**
+				 * Import Cast Data
+				 */
+				@GET
+				@Path("/trakt")
+				@Consumes(MediaType.APPLICATION_JSON)
+				@Produces(MediaType.APPLICATION_JSON)
+				public Response importTraktCast() {
+					try{
+						Map<String, URI> castReport = SaveDataClient.saveAllTraktMovieCast();
+						Map<String, String> report = new HashMap<String, String>();
+						report.put("status", "OK");
+						report.put("cast", "" + castReport.size());
+						Gson gson = new Gson();
+						return Response.status(Status.OK).entity(gson.toJson(report)).build();
+					} catch (Exception e) {
+						// TODO: handle exception
+						e.printStackTrace();
+						return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
+					}
+				}
+
+
+				@GET
+				@Path("/tmdb")
+				@Produces(MediaType.APPLICATION_JSON)
+				public Response importTMDbCast() {
+
+					try {
+						Map<String, String> report = new HashMap<String, String>();
+
+						SaveDataClient.addTMDbCastData();
+						report.put("status", "OK");
+						Gson gson = new Gson();
+						return Response.status(Status.OK).entity(gson.toJson(report)).build();
+					} catch (Exception e) {
+						// TODO: handle exception
+						e.printStackTrace();
+						return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
+					}
+
+				}
+
+			}
+
+
+			@GET
+			@Path("/process")
+			@Produces(MediaType.APPLICATION_JSON)
+			public Response processCast() {
 				try {
-					SaveDataClient.addTMDbCastData();
+					SaveDataClient.addCastLinks();
+					SaveDataClient.addCastDateRelation();
+
+					Map<String, String> report = new HashMap<String, String>();
 					report.put("status", "OK");
 					Gson gson = new Gson();
 					return Response.status(Status.OK).entity(gson.toJson(report)).build();
-				} catch (NumberFormatException | UnsupportedEncodingException | URISyntaxException e) {
-					// TODO Auto-generated catch block
+				} catch (Exception e) {
+					// TODO: handle exception
 					e.printStackTrace();
+					return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
 				}
-
-				return null;
 			}
-			
 		}
-		
 
 		@GET
-		@Path("/process")
+		@Path("/tweets")
+		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response processCast() {
-			try {
-				SaveDataClient.addCastLinks();
-				SaveDataClient.addCastDateRelation();
-			} catch (URISyntaxException | UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+		public Response importTweets() {
 			Map<String, String> report = new HashMap<String, String>();
 			report.put("status", "OK");
-			Gson gson = new Gson();
-			return Response.status(Status.OK).entity(gson.toJson(report)).build();
-		}
-	}
+			try {
+				SaveDataClient.saveTweets();
 
-	@GET
-	@Path("/tweets")
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response importTweets() 
-	{
-		Map<String, String> report = new HashMap<String, String>();
-		report.put("status", "OK");
-		try {
-			SaveDataClient.saveTweets();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+				Gson gson = new Gson();
+				return Response.status(Status.OK).entity(gson.toJson(report)).build();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
+			}
 		}
-		Gson gson = new Gson();
-		return Response.status(Status.OK).entity(gson.toJson(report)).build();
 	}
 }

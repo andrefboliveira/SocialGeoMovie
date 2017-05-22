@@ -33,6 +33,7 @@ import com.google.gson.Gson;
 import com.google.gson.internal.LinkedTreeMap;
 import com.google.gson.reflect.TypeToken;
 import com.socialgeomovie.clients.Neo4JClient;
+import com.socialgeomovie.clients.SaveDataClient;
 import com.socialgeomovie.pojos.neo4j.GetNodeByID;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
@@ -40,6 +41,7 @@ import com.socialgeomovie.pojos.neo4j.cypher.CypherResultNormal;
 import com.socialgeomovie.pojos.neo4j.cypher.Datum;
 import com.socialgeomovie.pojos.neo4j.cypher.Result;
 import com.socialgeomovie.utils.Servlet;
+import com.socialgeomovie.utils.exceptions.Neo4JRequestException;
 
 @Path("/movie")
 public class MovieServlet {
@@ -55,50 +57,51 @@ public class MovieServlet {
 	public Response getMovies(@DefaultValue("false") @QueryParam("include_details") final boolean details,
 			@DefaultValue("-1") @QueryParam("limit") final int limit,
 			@DefaultValue("1") @QueryParam("page") final int page) {
-		List<Map<String, Object>> nodeList = new ArrayList<>();
-		Gson gson = new Gson();
+		try {
+			List<Map<String, Object>> nodeList = new ArrayList<>();
+			Gson gson = new Gson();
 
-		GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabel("Movie");
-		int length = movieNodes.length;
+			GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabel("Movie");
+			int length = movieNodes.length;
 
-		int firstResult, lastResult;
-		if (limit > -1) {
-			firstResult = Integer.min(length, ((page - 1) * limit));
-			lastResult = Integer.min(length, (firstResult + limit));
-		} else {
-			firstResult = 0;
-			lastResult = length;
-		}
-
-		for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
-			GetNodesByLabel getNodesByLabel = movieNodes[nodeNumber];
-
-			Map<String, Object> nodeInfo = new HashMap<String, Object>();
-			Map<String, Object> propertiesResponse = getNodesByLabel.getData();
-
-			nodeInfo.put("uri", propertiesResponse.get("uri"));
-
-			if (details) {
-				nodeInfo.putAll(propertiesResponse);
+			int firstResult, lastResult;
+			if (limit > -1) {
+				firstResult = Integer.min(length, ((page - 1) * limit));
+				lastResult = Integer.min(length, (firstResult + limit));
 			} else {
-				nodeInfo.put("title", propertiesResponse.get("title"));
-				nodeInfo.put("poster", propertiesResponse.get("poster"));
+				firstResult = 0;
+				lastResult = length;
 			}
 
-			nodeList.add(nodeInfo);
+			for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
+				GetNodesByLabel getNodesByLabel = movieNodes[nodeNumber];
 
+				Map<String, Object> nodeInfo = new HashMap<String, Object>();
+				Map<String, Object> propertiesResponse = getNodesByLabel.getData();
+
+				nodeInfo.put("uri", propertiesResponse.get("uri"));
+
+				if (details) {
+					nodeInfo.putAll(propertiesResponse);
+				} else {
+					nodeInfo.put("title", propertiesResponse.get("title"));
+					nodeInfo.put("poster", propertiesResponse.get("poster"));
+				}
+
+				nodeList.add(nodeInfo);
+
+			}
+			return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
+		} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.NOT_FOUND).entity("{\"status\":\"NOT FOUND\"}").build();
+		}  catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}")
+					.build();
 		}
-		return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
-	}
-
-	/**
-	 * Add a movie
-	 */
-	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response createMovie(String requestJSON) {
-		return null;
 	}
 
 	/**
@@ -109,22 +112,59 @@ public class MovieServlet {
 	@Path("/{movie_uri}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMovie(@PathParam("movie_uri") String movie_uri) {
-		Gson gson = new Gson();
-
-		Map<String, Object> nodeInfo = new HashMap<String, Object>();
 
 		try {
+			Map<String, Object> nodeInfo = new HashMap<String, Object>();
+
 			GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
 
 			nodeInfo.putAll((movieNodes[0].getData()));
 
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			return Response.status(Status.OK).entity(new Gson().toJson(nodeInfo)).build();
+		} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.NOT_FOUND).entity("{\"status\":\"NOT FOUND\"}").build();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}")
+					.build();
 		}
 
-		return Response.status(Status.OK).entity(gson.toJson(nodeInfo)).build();
+	}
 
+	/**
+	 * Add a movie
+	 */
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response createMovie(String requestJSON) {
+		try {
+			Map<String, String> report = new HashMap<String, String>();
+			Gson gson = new Gson();
+			Type type = new TypeToken<Map<String, Object>>() {
+			}.getType();
+			Map<String, Object> movieProperties = gson.fromJson(requestJSON, type);
+			String movieURI = (String) movieProperties.get("uri");
+
+			Neo4JClient.createNodeWithProperties("Movie", movieProperties);
+			report.put("uri", movieURI);
+			return Response.status(Status.CREATED).entity(new Gson().toJson(report)).build();
+
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			return Response.status(Status.NOT_ACCEPTABLE).entity("{\"status\":\"NOT ACCEPTABLE\"}").build();
+		} catch (Neo4JRequestException e) {
+			e.printStackTrace();
+			return Response.status(Status.CONFLICT).entity("{\"status\":\"CONFLICT\"}").build();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}")
+					.build();
+		}
 	}
 
 	/**
@@ -135,11 +175,17 @@ public class MovieServlet {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateMovie(@PathParam("movie_uri") String movie_uri, String requestJSON) {
-		Gson gson = new Gson();
+		try {
 
-		Map<String, Object> nodeInfo = Servlet.updateResource("Movie", movie_uri, requestJSON);
+			Map<String, Object> nodeInfo = Servlet.updateResource("Movie", movie_uri, requestJSON);
 
-		return Response.status(Status.OK).entity(gson.toJson(nodeInfo)).build();
+			return Response.status(Status.OK).entity(new Gson().toJson(nodeInfo)).build();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}")
+					.build();
+		}
 	}
 
 	/**
@@ -150,10 +196,16 @@ public class MovieServlet {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response deleteMovie(@PathParam("movie_uri") String movie_uri) {
 		// TODO Return type
-		Neo4JClient.safeDeleteNode(movie_uri);
+		try {
+			Neo4JClient.safeDeleteNode(movie_uri);
 
-		// return null;
-		return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
+			return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}")
+					.build();
+		}
 	}
 
 	/**
@@ -170,83 +222,43 @@ public class MovieServlet {
 			@QueryParam("value") final String propertyValue,
 			@DefaultValue("true") @QueryParam("compact") final boolean compact_mode,
 			@DefaultValue("false") @QueryParam("include_details") final boolean details) {
-		List<Object> nodeList = new ArrayList<Object>();
-		Gson gson = new Gson();
-	
-		String query = "MATCH (n:Movie) WHERE n." + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
-		query = limit > -1 ? (query + " LIMIT " + limit) : query;
-	
-		List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
-		for (Datum line : results) {
-			Map<String, Object> resultMap = (Map<String, Object>) line.getRow().get(0);
-	
-			Map<String, Object> nodeInfo = new HashMap<String, Object>();
-	
-			if (compact_mode) {
-				nodeList.add(resultMap.get(propertyName));
-			} else {
-				if (details) {
-					nodeInfo.putAll(resultMap);
-				} else {
-					nodeInfo.put(propertyName, resultMap.get(propertyName));
-					nodeInfo.put("uri", resultMap.get("uri"));
-				}
-				nodeList.add(nodeInfo);
-			}
-		}
-		return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
-	}
-
-	@Path("/{movie_uri}/tweets")
-	public MovieTweets tweetsSubResource() {
-		return new MovieTweets();
-	}
-
-	public class MovieTweets {
-		@GET
-		@Produces(MediaType.APPLICATION_JSON)
-		public Response tweetsResource(@PathParam("movie_uri") String movie_uri,
-				@DefaultValue("-1") @QueryParam("limit") final int limit,
-				@DefaultValue("1") @QueryParam("page") final int page) {
-			List<LinkedTreeMap> tweets = new ArrayList<LinkedTreeMap>();
-			try {
-				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
-
-				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(),
-						"talks about");
-
-				int length = nodeRelationship.length;
-
-				int firstResult, lastResult;
-				if (limit > -1) {
-					firstResult = Integer.min(length, ((page - 1) * limit));
-					lastResult = Integer.min(length, (firstResult + limit));
-				} else {
-					firstResult = 0;
-					lastResult = length;
-				}
-
-				for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
-
-					GetNodeRelationship getNodeRelationship = nodeRelationship[nodeNumber];
-					Map<String, Object> nodeInfo = new HashMap<String, Object>();
-
-					String nodeID = getNodeRelationship.getStart();
-					String nodePropertiesURI = Neo4JClient.getNode(nodeID).getProperties();
-
-					LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
-							.getNodeProperties(nodePropertiesURI);
-					tweets.add(propertiesResponse);
-				}
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
+		try {
+			List<Object> nodeList = new ArrayList<Object>();
 			Gson gson = new Gson();
-			return Response.status(Status.OK).entity(gson.toJson(tweets)).build();
+	
+			String query = "MATCH (n:Movie) WHERE n." + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
+			query = limit > -1 ? (query + " LIMIT " + limit) : query;
+	
+			List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
+			for (Datum line : results) {
+				Map<String, Object> resultMap = (Map<String, Object>) line.getRow().get(0);
+	
+				Map<String, Object> nodeInfo = new HashMap<String, Object>();
+	
+				if (compact_mode) {
+					nodeList.add(resultMap.get(propertyName));
+				} else {
+					if (details) {
+						nodeInfo.putAll(resultMap);
+					} else {
+						nodeInfo.put(propertyName, resultMap.get(propertyName));
+						nodeInfo.put("uri", resultMap.get("uri"));
+					}
+					nodeList.add(nodeInfo);
+				}
+			}
+			return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
+		} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.NOT_FOUND).entity("{\"status\":\"NOT FOUND\"}").build();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}")
+					.build();
 		}
-
+	
 	}
 
 	@Path("/{movie_uri}/people")
@@ -267,10 +279,11 @@ public class MovieServlet {
 				@DefaultValue("1") @QueryParam("page") final int page,
 				@DefaultValue("false") @QueryParam("include_details") final boolean details) {
 
-			List<Map<String, Object>> nodeList = new ArrayList<>();
-			Gson gson = new Gson();
-
 			try {
+
+				List<Map<String, Object>> nodeList = new ArrayList<>();
+				Gson gson = new Gson();
+
 				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
 				GetNodeRelationship[] nodeRelationship = Neo4JClient.getNodeRelationshipsByType(movieNodes[0].getSelf(),
 						"acts in");
@@ -312,12 +325,17 @@ public class MovieServlet {
 					nodeList.add(nodeInfo);
 				}
 
-			} catch (UnsupportedEncodingException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
+			} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.NOT_FOUND).entity("{\"status\":\"NOT FOUND\"}").build();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}")
+						.build();
 			}
-
-			return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 		}
 
 		/**
@@ -328,8 +346,51 @@ public class MovieServlet {
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response addMoviePerson(@PathParam("movie_uri") String movie_uri,
-				@PathParam("person_uri") String person_uri) {
-			return null;
+				@PathParam("person_uri") String person_uri,
+				String requestJSON) {
+			
+			try {
+				Map<String, String> report = new HashMap<String, String>();
+
+				Gson gson = new Gson();
+				Type type = new TypeToken<Map<String, Object>>() {}.getType();
+				Map<String, Object> request = gson.fromJson(requestJSON, type);
+				
+				Map<String, Object> characterMap = new HashMap<String, Object>();
+				String character = (String) request.get("character");
+				characterMap.put("character", character);
+				
+				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
+				URI movieURI = new URI(movieNodes[0].getSelf());
+				
+				GetNodesByLabel[] peopleNodes = Neo4JClient.getNodesByLabelAndProperty("People", "uri", person_uri);
+				URI personURI = new URI(peopleNodes[0].getSelf());
+				
+				if (!SaveDataClient.checkRelationExists(personURI, movieURI, "acts in")) {
+					Neo4JClient.createRelationshipWithProperties(personURI, movieURI, "acts in",
+							characterMap);
+					report.put("movie", movie_uri);
+					report.put("person", person_uri);
+					report.put("character", character);
+					return Response.status(Status.CREATED).entity(gson.toJson(report)).build();
+
+				} else {
+					return Response.status(Status.CONFLICT).entity("{\"status\":\"CONFLICT\"}")
+							.build();
+				}
+				
+			} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.BAD_REQUEST).entity("{\"status\":\"BAD REQUEST\"}").build();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}")
+						.build();
+			}
+			
+			
 		}
 
 		/**
@@ -340,7 +401,16 @@ public class MovieServlet {
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response deleteMoviePerson(@PathParam("movie_uri") String movie_uri,
 				@PathParam("person_uri") String person_uri) {
-			return null;
+			try {
+				Neo4JClient.safeDeleteRelation(movie_uri, person_uri);
+
+				return Response.status(Status.NO_CONTENT).entity("{\"status\":\"NO CONTENT\"}").build();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}")
+						.build();
+			}
 		}
 
 		/**
@@ -356,31 +426,102 @@ public class MovieServlet {
 				@DefaultValue("popularity") @QueryParam("order_by") final String orderby,
 				@DefaultValue("-1") @QueryParam("limit") final int limit,
 				@DefaultValue("false") @QueryParam("include_details") final boolean details) {
-			List<Object> nodeList = new ArrayList<Object>();
-			Gson gson = new Gson();
+			try {
+				List<Object> nodeList = new ArrayList<Object>();
+				Gson gson = new Gson();
 
-			String query = "MATCH(cast:Cast) -[r:`acts in`]-> (movie:Movie {uri:\"" + movie_uri
-					+ "\"}) RETURN cast, r ORDER BY cast." + orderby + " DESC";
-			query = limit > -1 ? (query + " LIMIT " + limit) : query;
+				String query = "MATCH(cast:Cast) -[r:`acts in`]-> (movie:Movie {uri:\"" + movie_uri
+						+ "\"}) RETURN cast, r ORDER BY cast." + orderby + " DESC";
+				query = limit > -1 ? (query + " LIMIT " + limit) : query;
 
+				List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
+				for (Datum line : results) {
+					Map<String, Object> resultMap = (Map<String, Object>) line.getRow().get(0);
+					Map<String, Object> relationMap = (Map<String, Object>) line.getRow().get(1);
+					Map<String, Object> nodeInfo = new HashMap<String, Object>();
 
-			List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
-			for (Datum line : results) {
-				Map<String, Object> resultMap = (Map<String, Object>) line.getRow().get(0);
-				Map<String, Object> relationMap = (Map<String, Object>) line.getRow().get(1);
-				Map<String, Object> nodeInfo = new HashMap<String, Object>();
+					if (details) {
+						nodeInfo.putAll(resultMap);
+					} else {
+						nodeInfo.put("uri", resultMap.get("uri"));
+						nodeInfo.put("name", resultMap.get("name"));
+					}
+					nodeInfo.put("character", relationMap.get("character"));
+					nodeList.add(nodeInfo);
 
-				if (details) {
-					nodeInfo.putAll(resultMap);
-				} else {
-					nodeInfo.put("uri", resultMap.get("uri"));
-					nodeInfo.put("name", resultMap.get("name"));
 				}
-				nodeInfo.put("character", relationMap.get("character"));
-				nodeList.add(nodeInfo);
+				return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
+
+			} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.NOT_FOUND).entity("{\"status\":\"NOT FOUND\"}").build();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}")
+						.build();
+			}
+
+		}
+
+		@Path("/{movie_uri}/tweets")
+		public MovieTweets tweetsSubResource() {
+			return new MovieTweets();
+		}
+
+		public class MovieTweets {
+			@GET
+			@Produces(MediaType.APPLICATION_JSON)
+			public Response tweetsResource(@PathParam("movie_uri") String movie_uri,
+					@DefaultValue("-1") @QueryParam("limit") final int limit,
+					@DefaultValue("1") @QueryParam("page") final int page) {
+				List<LinkedTreeMap> tweets = new ArrayList<LinkedTreeMap>();
+				try {
+					GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
+
+					GetNodeRelationship[] nodeRelationship = Neo4JClient
+							.getNodeRelationshipsByType(movieNodes[0].getSelf(), "talks about");
+
+					int length = nodeRelationship.length;
+
+					int firstResult, lastResult;
+					if (limit > -1) {
+						firstResult = Integer.min(length, ((page - 1) * limit));
+						lastResult = Integer.min(length, (firstResult + limit));
+					} else {
+						firstResult = 0;
+						lastResult = length;
+					}
+
+					for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
+
+						GetNodeRelationship getNodeRelationship = nodeRelationship[nodeNumber];
+						Map<String, Object> nodeInfo = new HashMap<String, Object>();
+
+						String nodeID = getNodeRelationship.getStart();
+						String nodePropertiesURI = Neo4JClient.getNode(nodeID).getProperties();
+
+						LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
+								.getNodeProperties(nodePropertiesURI);
+						tweets.add(propertiesResponse);
+					}
+
+					Gson gson = new Gson();
+					return Response.status(Status.OK).entity(gson.toJson(tweets)).build();
+
+				} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+					// TODO: handle exception
+					e.printStackTrace();
+					return Response.status(Status.NOT_FOUND).entity("{\"status\":\"NOT FOUND\"}").build();
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.printStackTrace();
+					return Response.status(Status.INTERNAL_SERVER_ERROR)
+							.entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
+				}
 
 			}
-			return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 		}
 	}
 }

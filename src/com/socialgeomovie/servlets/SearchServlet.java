@@ -23,50 +23,56 @@ import com.socialgeomovie.pojos.neo4j.cypher.Datum;
 @Path("/search")
 public class SearchServlet {
 	// http://localhost:8080/aw2017/rest/search
-	
+
 	/**
 	 * Autocomplete
-	 * @param propertyName 
-	 * @param propertyValue 
+	 * 
+	 * @param propertyName
+	 * @param propertyValue
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getResourceByProperty(
-			@DefaultValue("") @QueryParam("type") final String nodeLabel, 
-			@QueryParam("property") final String propertyName, 
-			@QueryParam("value") final String propertyValue,
+	public Response getResourceByProperty(@DefaultValue("") @QueryParam("type") final String nodeLabel,
+			@QueryParam("property") final String propertyName, @QueryParam("value") final String propertyValue,
 			@DefaultValue("-1") @QueryParam("limit") final int limit,
 			@DefaultValue("true") @QueryParam("compact") final boolean compact_mode,
 			@DefaultValue("false") @QueryParam("include_details") final boolean details) {
-		List<Object> nodeList = new ArrayList<Object>();
-		Gson gson = new Gson();
+		try {
 
-		String query = "MATCH (n"+ (nodeLabel != null  && !("".equals(nodeLabel)) ? ":" + WordUtils.capitalize(nodeLabel) : "") + ") WHERE n."  + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
-		query = limit > -1 ? (query + " LIMIT " + limit ): query;
-		
-		List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
-		
-		
-		for (Datum line : results) {
-			Map<String, Object> resultMap = (Map<String, Object>) line.getRow().get(0);
-			
-			Map<String, Object> nodeInfo = new HashMap<String, Object>();
-			
-			if (compact_mode) {
-				nodeList.add(resultMap.get(propertyName));
-			} else {
-				if (details) {
-					nodeInfo.putAll(resultMap);
+			List<Object> nodeList = new ArrayList<Object>();
+			Gson gson = new Gson();
+
+			String query = "MATCH (n"
+					+ (nodeLabel != null && !("".equals(nodeLabel)) ? ":" + WordUtils.capitalize(nodeLabel) : "")
+					+ ") WHERE n." + propertyName + " =~ '(?i).*" + propertyValue + ".*' RETURN n";
+			query = limit > -1 ? (query + " LIMIT " + limit) : query;
+
+			List<Datum> results = Neo4JClient.sendTransactionalCypherQuery(query).getResults().get(0).getData();
+
+			for (Datum line : results) {
+				Map<String, Object> resultMap = (Map<String, Object>) line.getRow().get(0);
+
+				Map<String, Object> nodeInfo = new HashMap<String, Object>();
+
+				if (compact_mode) {
+					nodeList.add(resultMap.get(propertyName));
 				} else {
-					nodeInfo.put(propertyName, resultMap.get(propertyName));
-					nodeInfo.put("uri", resultMap.get("uri"));
+					if (details) {
+						nodeInfo.putAll(resultMap);
+					} else {
+						nodeInfo.put(propertyName, resultMap.get(propertyName));
+						nodeInfo.put("uri", resultMap.get("uri"));
+					}
+					nodeList.add(nodeInfo);
 				}
-				nodeList.add(nodeInfo);
-			}
 
-		
+			}
+			return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
 		}
-		return Response.status(Status.OK).entity(gson.toJson(nodeList)).build();
 	}
 
 }
