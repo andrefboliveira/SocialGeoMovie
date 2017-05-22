@@ -164,7 +164,7 @@ var load_movie_details = function()
 	});
 	
 	var uri = urlParam("id");
-	$.getJSON( url_movie_details+uri+"/people/main?limit=12&include_details=true")
+	$.getJSON( url_movie_details+uri+"/people/main?include_details=true")
 	.done(function( data ) 
 	{
 		var cast_div = $("#cast_list");
@@ -173,7 +173,7 @@ var load_movie_details = function()
 			var d = data[i];
 			cast_div.prepend(
 			"<a resource=\'http:\/\/dbpedia.org\/resource\/Imdb\' href='"+d.url_imdb+"' style='text-decoration: none;'>"+
-			"	<div prefix=\'dc: http:\/\/purl.org\/dc\/terms\/ og: http:\/\/ogp.me\/ns# foaf:http:\/\/xmlns.com\/foaf\/0.1\/\' typeof=\'Person\' style='padding: 2px; display: inline-block; background-color: #000; margin: 5px 0;'>"+
+			"	<div prefix=\'dc: http:\/\/purl.org\/dc\/terms\/ og: http:\/\/ogp.me\/ns# foaf:http:\/\/xmlns.com\/foaf\/0.1\/\' typeof=\'Person\' class='cast'>"+
 			"		<img property='og:image' src='"+((d.profile_image && d.profile_image.indexOf("null") < 0)?d.profile_image:'style/images/people-placeholder.png')+"' title='"+d.name+" as \'"+d.character+"\'' style='width: 70px; height: 105px'>"+
 			"	</div>"+
 			"</a>"
