@@ -2,6 +2,7 @@ package com.socialgeomovie.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -11,12 +12,13 @@ import org.apache.commons.collections.ListUtils;
 public class MapUtils {
 
 	public static Map<String, Object> mergeMapCombine(Map<String, Object> mainMap, Map<String, Object> aditionalMap){
+		Map<String, Object> resultMap = new HashMap<String, Object>(mainMap);
 		List<Object> nullList = Arrays.asList("N/A", "NA", "null", "", " ", "empty", "[]", "[ ]", "{}", "{ }", new ArrayList<>(), null);
 		aditionalMap.values().removeIf(val -> nullList.contains(val));
 		
 		for (String aditionalKey : aditionalMap.keySet()) {
-			if (mainMap.containsKey(aditionalKey)) {
-				Object mainValue = mainMap.get(aditionalKey);
+			if (resultMap.containsKey(aditionalKey)) {
+				Object mainValue = resultMap.get(aditionalKey);
 				Object otherValue = aditionalMap.get(aditionalKey);
 				if (mainValue instanceof List) {
 					List mainValueList = (List) mainValue;
@@ -24,7 +26,7 @@ public class MapUtils {
 					if (otherValue instanceof List) {
 						List otherValueList = (List) otherValue;
 						if (!mainValueList.containsAll(otherValueList)) {
-							mainMap.put(aditionalKey, new ArrayList<>(new HashSet<>(ListUtils.union(mainValueList, otherValueList))));
+							resultMap.put(aditionalKey, new ArrayList<>(new HashSet<>(ListUtils.union(mainValueList, otherValueList))));
 						}
 						
 					} else if (otherValue instanceof String || otherValue instanceof Number) {
@@ -32,7 +34,7 @@ public class MapUtils {
 							ArrayList<Object> newList = new ArrayList<Object>();
 							newList.addAll(mainValueList);
 							newList.add(otherValue);
-							mainMap.put(aditionalKey, newList);
+							resultMap.put(aditionalKey, newList);
 						}
 					}
 				} else if (mainValue instanceof String) {
@@ -43,7 +45,7 @@ public class MapUtils {
 							ArrayList<Object> newList = new ArrayList<Object>();
 							newList.add(mainValueString);
 							newList.add(otherValueString);
-							mainMap.put(aditionalKey, newList);
+							resultMap.put(aditionalKey, newList);
 						}	
 
 					 } else if (otherValue instanceof List) {
@@ -52,7 +54,7 @@ public class MapUtils {
 								ArrayList<Object> newList = new ArrayList<Object>();
 								newList.add(mainValueString);
 								newList.addAll(otherValueList);
-								mainMap.put(aditionalKey, newList);
+								resultMap.put(aditionalKey, newList);
 							}
 					 }
 			
@@ -69,7 +71,7 @@ public class MapUtils {
 							ArrayList<Object> newList = new ArrayList<Object>();
 							newList.add(mainValueNumber);
 							newList.add(otherValueDouble);
-							mainMap.put(aditionalKey, newList);
+							resultMap.put(aditionalKey, newList);
 						}	
 
 					 } else if (otherValue instanceof List) {
@@ -78,27 +80,28 @@ public class MapUtils {
 								ArrayList<Object> newList = new ArrayList<Object>();
 								newList.add(mainValueNumber);
 								newList.addAll(otherValueList);
-								mainMap.put(aditionalKey, newList);
+								resultMap.put(aditionalKey, newList);
 							}
 					 }
 			
 					
 				}
 			} else {
-				mainMap.putIfAbsent(aditionalKey, aditionalMap.get(aditionalKey));
+				resultMap.putIfAbsent(aditionalKey, aditionalMap.get(aditionalKey));
 			}
 		}
 		
-		return mainMap;
+		return resultMap;
 		
 	}
 	
 	public static Map<String, Object> mergeMapOverwrite(Map<String, Object> mainMap, Map<String, Object> aditionalMap){
 		List<Object> nullList = Arrays.asList("N/A", "NA", "null", "", " ", "empty", "[]", "[ ]", "{}", "{ }", new ArrayList<>(), null);
-		mainMap.putAll(aditionalMap);
-		mainMap.values().removeIf(val -> nullList.contains(val));
+		Map<String, Object> resultMap = new HashMap<String, Object>(mainMap);
+		resultMap.putAll(aditionalMap);
+		resultMap.values().removeIf(val -> nullList.contains(val));
 		
-		return mainMap;
+		return resultMap;
 	}
 	
 }

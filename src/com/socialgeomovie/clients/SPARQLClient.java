@@ -35,7 +35,6 @@ public static String queryDBPediaSPARQL(String query) throws IOException  {
 		query = URLEncoder.encode(query, "UTF-8");
 
 		String resultURL =  "https://dbpedia.org/sparql?default-graph-uri=" + graphURI + "&query=" + query + "&format=" + format + "&timeout=" + timeout;
-		System.out.println(resultURL);
 		
 		URL url = new URL(resultURL);
 		InputStreamReader reader = new InputStreamReader(url.openStream());
@@ -75,6 +74,7 @@ public static String queryDBPediaSPARQL(String query) throws IOException  {
 				"LIMIT 1";
 
 		String resultString = queryDBPediaSPARQL(query);
+		System.out.println(resultString);
 		return new Gson().fromJson(resultString, DBpediaMovieResult.class);
 	}
 	

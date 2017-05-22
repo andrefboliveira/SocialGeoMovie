@@ -126,6 +126,25 @@ public class AdminServlet {
 			}
 
 		}
+		
+		@GET
+		@Path("/dbpedia")
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response importDBpediaMovies() {
+			try {
+				Map<String, URI> moviesReport = SaveDataClient.addDBpediaMovieData();
+				Map<String, String> report = new HashMap<String, String>();
+				report.put("status", "OK");
+				report.put("movies_dbpedia", "" + moviesReport.size());
+				Gson gson = new Gson();
+				return Response.status(Status.OK).entity(gson.toJson(report)).build();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
+			}
+
+		}
 
 		@GET
 		@Path("/process")
@@ -199,6 +218,26 @@ public class AdminServlet {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 					return Response.status(Status.SERVICE_UNAVAILABLE).entity("{\"status\":\"SERVICE UNAVAILABLE\"}").build();
+				} catch (Exception e) {
+					// TODO: handle exception
+					e.printStackTrace();
+					return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
+				}
+	
+			}
+			
+			@GET
+			@Path("/dbpedia")
+			@Produces(MediaType.APPLICATION_JSON)
+			public Response importDBpediaCast() {
+	
+				try {
+					Map<String, URI> castReport = SaveDataClient.addDBpediaCastData();
+					Map<String, String> report = new HashMap<String, String>();
+					report.put("status", "OK");
+					report.put("cast_dbpedia", "" + castReport.size());
+					Gson gson = new Gson();
+					return Response.status(Status.OK).entity(gson.toJson(report)).build();
 				} catch (Exception e) {
 					// TODO: handle exception
 					e.printStackTrace();
