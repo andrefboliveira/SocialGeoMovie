@@ -535,12 +535,16 @@ public class SaveDataClient {
 		return subtitles;
 	}
 
-	public static void addOMDbData() throws IOException, URISyntaxException {
+	public static Map<String, URI> addOMDbData() throws IOException, URISyntaxException {
 		Neo4JConfig.setUniqueConstraints();
+		Map<String, URI> addNodesResult = new HashMap<String, URI>();
+
 		GetNodesByLabel[] movies = Neo4JClient.getNodesByLabel("Movie");
 		for (GetNodesByLabel getNodesByLabel : movies) {
 			Map<String, Object> movieProperties = getNodesByLabel.getData();
 			String id_imdb = (String) movieProperties.get("id_imdb");
+			String title = (String) movieProperties.get("title");
+
 
 			if (id_imdb != null && !id_imdb.equals("")) {
 				logger.info("Search OMDb for id: " + id_imdb);
@@ -548,23 +552,30 @@ public class SaveDataClient {
 				if (omdbProperties != null) {
 					Map<String, Object> resultMap = MapUtils.mergeMapCombine(movieProperties,
 							Converter.omdbMap(omdbProperties));
+					
+					URI nodeURI = new URI(getNodesByLabel.getSelf());
 
-					Neo4JClient.updateNodeProperties(new URI(getNodesByLabel.getSelf()), resultMap);
-					logger.info("Added OMDb info for: " + movieProperties.get("title"));
+					Neo4JClient.updateNodeProperties(nodeURI, resultMap);
+					logger.info("Added OMDb info for: " + title);
+					addNodesResult.put(id_imdb, nodeURI);
+
 				}
 
 			}
 		}
-
+		return addNodesResult;
 	}
 
-	public static void addTMDbMovieData()
+	public static Map<String, URI> addTMDbMovieData()
 			throws URISyntaxException, NumberFormatException, UnsupportedEncodingException {
 		Neo4JConfig.setUniqueConstraints();
+		Map<String, URI> addNodesResult = new HashMap<String, URI>();
+
 		GetNodesByLabel[] movies = Neo4JClient.getNodesByLabel("Movie");
 		for (GetNodesByLabel getNodesByLabel : movies) {
 			Map<String, Object> movieProperties = getNodesByLabel.getData();
 			String id_tmdb = (String) movieProperties.get("id_tmdb");
+			String title = (String) movieProperties.get("title");
 
 			if (id_tmdb != null && !id_tmdb.equals("")) {
 				logger.info("Search TMDb Movie for id: " + id_tmdb);
@@ -578,8 +589,9 @@ public class SaveDataClient {
 				URI movieURI = new URI(getNodesByLabel.getSelf());
 
 				Neo4JClient.updateNodeProperties(movieURI, resultMap);
-				logger.info("Added TMDb Movie info for: " + movieProperties.get("title"));
-				
+				logger.info("Added TMDb Movie info for: " + title);
+				addNodesResult.put(id_tmdb, movieURI);
+
 				List<ProductionCountry> countries = movie.getProductionCountries();
 				for (ProductionCountry prodCountry : countries) {
 					addLocationRelation(prodCountry,  movieURI, "created in",  (String) getNodesByLabel.getData().get("title"));
@@ -590,15 +602,20 @@ public class SaveDataClient {
 			}
 
 		}
+		return addNodesResult;
+
 	}
 
-	public static void addTMDbCastData()
+	public static Map<String, URI> addTMDbCastData()
 			throws URISyntaxException, NumberFormatException, UnsupportedEncodingException {
 		Neo4JConfig.setUniqueConstraints();
+		Map<String, URI> addNodesResult = new HashMap<String, URI>();
+
 		GetNodesByLabel[] cast = Neo4JClient.getNodesByLabel("Cast");
 		for (GetNodesByLabel getNodesByLabel : cast) {
 			Map<String, Object> castProperties = getNodesByLabel.getData();
 			String id_tmdb = (String) castProperties.get("id_tmdb");
+			String name = (String) castProperties.get("name");
 
 			if (id_tmdb != null && !id_tmdb.equals("")) {
 				logger.info("Search TMDb People for id: " + id_tmdb);
@@ -611,6 +628,7 @@ public class SaveDataClient {
 				
 				URI nodeURI = new URI(getNodesByLabel.getSelf());
 				
+				
 				Integer gender = person.getGender();
 				String label = gender == 2 ? "Actor" : (gender == 1 ? "Actress" : "");
 				if (label != null && !("".equals(label))) {
@@ -618,14 +636,20 @@ public class SaveDataClient {
 				}							
 
 				Neo4JClient.updateNodeProperties(nodeURI, resultMap);
-				logger.info("Added TMDb People info for: " + castProperties.get("name"));
+				logger.info("Added TMDb People info for: " + name);
+				addNodesResult.put(id_tmdb, nodeURI);
+
 			}
 
 		}
+		return addNodesResult;
+
 	}
 	
-	public static void addDBpediaMovieData() throws URISyntaxException, IOException {
-
+	public static Map<String, URI> addDBpediaMovieData() throws URISyntaxException, IOException {
+		Neo4JConfig.setUniqueConstraints();
+		Map<String, URI> addNodesResult = new HashMap<String, URI>();
+		
 		GetNodesByLabel[] movies = Neo4JClient.getNodesByLabel("Movie");
 		
 		for (GetNodesByLabel getNodesByLabel : movies) {
@@ -645,15 +669,19 @@ public class SaveDataClient {
 
 					Neo4JClient.updateNodeProperties(movieURI, resultMap);
 					logger.info("Added DBpedia info for Movie: " + title);
+					addNodesResult.put(title, movieURI);
 				}
 				
 			}			
-			}
-
 		}
+		return addNodesResult;
+
+	}
 	
-	public static void addDBpediaCastData() throws IOException, URISyntaxException {
+	public static Map<String, URI> addDBpediaCastData() throws IOException, URISyntaxException {
 		Neo4JConfig.setUniqueConstraints();
+		Map<String, URI> addNodesResult = new HashMap<String, URI>();
+
 		GetNodesByLabel[] cast = Neo4JClient.getNodesByLabel("Cast");
 		for (GetNodesByLabel getNodesByLabel : cast) {
 			Map<String, Object> castProperties = getNodesByLabel.getData();
@@ -671,11 +699,15 @@ public class SaveDataClient {
 
 					Neo4JClient.updateNodeProperties(castURI, resultMap);
 					logger.info("Added DBpedia info for Cast: " + name);
+					addNodesResult.put(name, castURI);
+
 				}
 				
 			}
 
 		}
+		return addNodesResult;
+
 	}
 
 }

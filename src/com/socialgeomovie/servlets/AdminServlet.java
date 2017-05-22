@@ -85,10 +85,11 @@ public class AdminServlet {
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response importOMDbMovies() {
 			try {
+				Map<String, URI> moviesReport = SaveDataClient.addOMDbData();
 				Map<String, String> report = new HashMap<String, String>();
-
-				SaveDataClient.addOMDbData();
 				report.put("status", "OK");
+				report.put("movies_omdb", "" + moviesReport.size());
+				
 				Gson gson = new Gson();
 				return Response.status(Status.OK).entity(gson.toJson(report)).build();
 			} catch (OMDbRequestException e) {
@@ -108,10 +109,10 @@ public class AdminServlet {
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response importTMDbMovies() {
 			try {
+				Map<String, URI> moviesReport =SaveDataClient.addTMDbMovieData();
 				Map<String, String> report = new HashMap<String, String>();
-
-				SaveDataClient.addTMDbMovieData();
 				report.put("status", "OK");
+				report.put("movies_tmdb", "" + moviesReport.size());
 				Gson gson = new Gson();
 				return Response.status(Status.OK).entity(gson.toJson(report)).build();
 			} catch (TMDbRequestException e) {
@@ -188,12 +189,16 @@ public class AdminServlet {
 			public Response importTMDbCast() {
 	
 				try {
+					Map<String, URI> castReport = SaveDataClient.addTMDbCastData();
 					Map<String, String> report = new HashMap<String, String>();
-	
-					SaveDataClient.addTMDbCastData();
 					report.put("status", "OK");
+					report.put("cast_tmdb", "" + castReport.size());
 					Gson gson = new Gson();
 					return Response.status(Status.OK).entity(gson.toJson(report)).build();
+				} catch (TMDbRequestException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					return Response.status(Status.SERVICE_UNAVAILABLE).entity("{\"status\":\"SERVICE UNAVAILABLE\"}").build();
 				} catch (Exception e) {
 					// TODO: handle exception
 					e.printStackTrace();
