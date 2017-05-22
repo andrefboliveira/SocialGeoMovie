@@ -19,14 +19,16 @@ import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.utils.exceptions.Neo4JRequestException;
 
 public class SaveLocationData {
-	static void saveData() throws FileNotFoundException, UnsupportedEncodingException, URISyntaxException {
+	static void saveData() throws FileNotFoundException, UnsupportedEncodingException, URISyntaxException 
+	{
 		// TODO Auto-generated method stub
 		Gson gson = new Gson();
 		FileReader json = new FileReader("Files/geo.json");
 
 		Neo4JConfig.setUniqueConstraints();
 		LocationEntity[] locationList = gson.fromJson(json, LocationEntity[].class);
-		for (LocationEntity locationEntity : locationList) {
+		for (LocationEntity locationEntity : locationList) 
+		{
 			String id_imdb = locationEntity.getImdId();
 
 			GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "id_imdb", id_imdb);
