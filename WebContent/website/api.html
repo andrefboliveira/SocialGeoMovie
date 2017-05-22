@@ -11,23 +11,23 @@
 	<script src="scripts/libs/c3.min.js" type="text/javascript"></script>
 	<script src="scripts/main.js" type="text/javascript"></script>
 </head>
-<body>
+<body prefix="dc: http://purl.org/dc/terms/ foaf:http://xmlns.com/foaf/0.1/" typeof="Person">
 	<div id="page_header">
-		<h1>Social Geo Movie</h1>
+		<h1 property="dc:title">Social Geo Movie</h1>
 		<nav>
 			<ul>
-				<li><a href="index.html"><strong>Home</strong></a></li>
-				<li><a href="geomovies.html">Geo Movies</a></li>
-				<li><a href="about.html">About Us</a></li>
-				<li><a href="api.html">API</a></li>
-				<li><a href="admin.html">Admin</a></li>
+				<li property="dc:title"><a href="index.html"><strong>Home</strong></a></li>
+				<li property="dc:title"><a href="geomovies.html">Geo Movies</a></li>
+				<li property="dc:title"><a href="about.html">About Us</a></li>
+				<li property="dc:title"><a href="api.html">API</a></li>
+				<li property="dc:title"><a href="admin.html">Admin</a></li>
 			</ul>
 		</nav>
 	</div>
-	<div id="page_content">
-		<h1><strong>SocialGeoMovie Endpoint's</strong></h1>
+	<div property="dc:description" id="page_content">
+		<h1 property="dc:title"><strong>SocialGeoMovie Endpoint's</strong></h1>
 		<!--  PEOPLE -->
-		<h2><strong>Show Person's</strong></h2>
+		<h2 property="dc:title"><strong>Show Person's</strong></h2>
 		<p>Returns json data of all Person's in database.</p>
 		<ul>
 		<li><strong>URL: http://localhost:8080/aw2017/rest/person</strong></li>
@@ -49,7 +49,7 @@
 		<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/person&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>
 
 
-		<h2><strong>Show Person by Id</strong></h2>
+		<h2 property="dc:title"><strong>Show Person by Id</strong></h2>
 		<p>Returns json data of a given Person by URI.</p>
 		<ul>
 		<li><strong>URL: http://localhost:8080/aw2017/rest/person/{person_uri}</strong></li>
@@ -70,7 +70,7 @@
 		</ul>
 		<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/person/{person_uri}&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>
 
-		<h2><strong>Delete Person by URI</strong></h2>
+		<h2 property="dc:title"><strong>Delete Person by URI</strong></h2>
 		<p>Returns json data of a given Person by URI.</p>
 		<ul>
 		<li><strong>URL: http://localhost:8080/aw2017/rest/person/delete/{person_uri}</strong></li>
@@ -92,7 +92,7 @@
 		<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/person/delete/{person_uri}&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>
 
 		<!--  MOVIES -->
-		<h2><strong>Show Movies</strong></h2>
+		<h2 property="dc:title"><strong>Show Movies</strong></h2>
 		<p>Returns json data of all Movies in database.</p>
 		<ul>
 		<li><strong>URL: http://localhost:8080/aw2017/rest/movie</strong></li>
@@ -114,7 +114,7 @@
 		<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/movie&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>
 
 
-		<h2><strong>Show Movie by URI</strong></h2>
+		<h2 property="dc:title"><strong>Show Movie by URI</strong></h2>
 		<p>Returns json data of a given Movie by URI.</p>
 		<ul>
 		<li><strong>URL: http://localhost:8080/aw2017/rest/movie/{movie_uri}</strong></li>
@@ -135,7 +135,7 @@
 		</ul>
 		<p><code>javascript     $.ajax({       url: &quot;/aw2017/rest/movie/{movie_uri}&quot;,       dataType: &quot;json&quot;,       type : &quot;GET&quot;,       success : function(r) {         console.log(r);       }     });</code></p>
 
-		<h2><strong>Delete Person by URI</strong></h2>
+		<h2 property="dc:title"><strong>Delete Person by URI</strong></h2>
 		<p>Returns json delete response data of a given Movie by URI.</p>
 		<ul>
 		<li><strong>URL: http://localhost:8080/aw2017/rest/movie/delete/{movie_uri}</strong></li>

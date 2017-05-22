@@ -30,11 +30,11 @@ var fetch_movies= function()
 		$.each( data, function( i, item ) 
 		{
 			$([
-				"<div class='movie-roll' title='"+item.title+"'>",
+				"<span prefix=\'dc: http:\/\/purl.org\/dc\/terms\/ og: http:\/\/ogp.me\/ns#\'><div property='dc:title' class='movie-roll' title='"+item.title+"'>",
 				"	<a href='movie-details.html?id="+item.uri+"'>",
-				"		<img src='"+item.poster+"'>",
+				"		<img property='og:image' src='"+item.poster+"'>",
 				"	</a>",
-				"</div>"
+				"</div></span>"
 			].join("\n")).appendTo( "#page_content" );
 		});
 	});
@@ -138,10 +138,10 @@ var load_movie_details = function()
 		{
 			var tweet = data[i];
 			tweet_container.append(
-			"<a href='"+tweet.url+"'>"+
-			"	<div class='movie-roll' style='margin: 10px 0; padding: 5px 30px;'>"+
-			"		<h4>"+tweet.user+" says:</h4>"+
-			"		<div style='margin-bottom: 10px;' >"+tweet.text+"</div>"+
+			"<a resource=\'http:\/\/dbpedia.org\/resource\/Twitter\' href='"+tweet.url+"'>"+
+			"	<div prefix=\'dc: http:\/\/purl.org\/dc\/terms\/\' class='movie-roll' style='margin: 10px 0; padding: 5px 30px;'>"+
+			"		<h4 property='dc:title'>"+tweet.user+" says:</h4>"+
+			"		<div property='dc:description' style='margin-bottom: 10px;' >"+tweet.text+"</div>"+
 			"		<div style='display:inline-block; margin-right:10px'>retweets: "+tweet.retweet_count+"</div><div style='display:inline-block;'>"+tweet.date+"</div>"+
 			"	</div>"+
 			"</a>"
@@ -159,9 +159,9 @@ var load_movie_details = function()
 		{
 			var d = data[i];
 			cast_div.prepend(
-			"<a href='"+d.url_imdb+"' style='text-decoration: none;'>"+
-			"	<div style='padding: 2px; display: inline-block; background-color: #000; margin: 5px 0;'>"+
-			"		<img src='"+((d.profile_image && d.profile_image.indexOf("null") < 0)?d.profile_image:'style/images/people-placeholder.png')+"' title='"+d.name+" as \'"+d.character+"\'' style='width: 70px; height: 105px'>"+
+			"<a resource=\'http:\/\/dbpedia.org\/resource\/Imdb\' href='"+d.url_imdb+"' style='text-decoration: none;'>"+
+			"	<div prefix=\'dc: http:\/\/purl.org\/dc\/terms\/ og: http:\/\/ogp.me\/ns# foaf:http:\/\/xmlns.com\/foaf\/0.1\/\' typeof=\'Person\' style='padding: 2px; display: inline-block; background-color: #000; margin: 5px 0;'>"+
+			"		<img property='og:image' src='"+((d.profile_image && d.profile_image.indexOf("null") < 0)?d.profile_image:'style/images/people-placeholder.png')+"' title='"+d.name+" as \'"+d.character+"\'' style='width: 70px; height: 105px'>"+
 			"	</div>"+
 			"</a>"
 			);
@@ -175,9 +175,9 @@ var load_movie_details = function()
 		var comment = snapshot.val();
 		
 		$("#comment_list").prepend(
-		"<div class='movie-roll movie-comment' style='margin: 10px 0;'>"+
-		"	<div style='margin-bottom: 10px;'>"+comment.user+" says:</div>"+
-		"	<div>"+comment.comment+"</div>"+
+		"<div prefix=\'dc: http:\/\/purl.org\/dc\/terms\/\' class='movie-roll movie-comment' style='margin: 10px 0;'>"+
+		"	<div property='dc:creator' style='margin-bottom: 10px;'>"+comment.user+" says:</div>"+
+		"	<div property='dc:description'>"+comment.comment+"</div>"+
 		"</div>"
 		);
 	});
@@ -259,7 +259,7 @@ var init_map = function()
 			
 			google.maps.event.addListener(marker, 'click', function()
 			{
-				infowindow.setContent("<b>location:</b> "+this.location_name+"<br><b>Movie:</b> "+this.movie)
+				infowindow.setContent("<span prefix=\'dc: http:\/\/purl.org\/dc\/terms\/ vc: http:\/\/www.w3.org\/2006\/vcard\/ns#\' typeof=\'vcard:VCard\'><b property='vc:location'>location:</b></span> "+this.location_name+"<br><b property='dc:title'>Movie:</b> "+this.movie)
 				infowindow.open(map, this);
 			});
 

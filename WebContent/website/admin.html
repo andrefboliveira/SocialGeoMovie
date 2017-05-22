@@ -11,25 +11,25 @@
 	<script src="scripts/libs/c3.min.js" type="text/javascript"></script>
 	<script src="scripts/main.js" type="text/javascript"></script>
 </head>
-<body>
+<body prefix="dc: http://purl.org/dc/terms/">
 	<div id="page_header">
-		<h1>Social Geo Movie</h1>
+		<h1 property="dc:title">Social Geo Movie</h1>
 		<nav>
 			<ul>
-				<li><a href="index.html"><strong>Home</strong></a></li>
-				<li><a href="geomovies.html">Geo Movies</a></li>
-				<li><a href="about.html">About Us</a></li>
-				<li><a href="api.html">API</a></li>
-				<li><a href="admin.html">Admin</a></li>
+				<li property="dc:title"><a href="index.html"><strong>Home</strong></a></li>
+				<li property="dc:title"><a href="geomovies.html">Geo Movies</a></li>
+				<li property="dc:title"><a href="about.html">About Us</a></li>
+				<li property="dc:title"><a href="api.html">API</a></li>
+				<li property="dc:title"><a href="admin.html">Admin</a></li>
 			</ul>
 		</nav>
 	</div>
 	<div id="page_content">
-		<div><h2>Import process</h2></div>
+		<div><h2 property="dc:title">Import process</h2></div>
 		<div id="movie_import_content">
-			<h4>Movies:</h4>
-			<input id="opt_trakt" type="checkbox" name="opt_trakt" value="trakt" checked disabled>Trakt<br>
-			<input id="opt_omdb" type="checkbox" name="opt_omdb" value="omdb">OMDB<br><br>
+			<h4 property="dc:title">Movies:</h4>
+			<input property="dc:description" id="opt_trakt" type="checkbox" name="opt_trakt" value="trakt" checked disabled>Trakt<br>
+			<input property="dc:description" id="opt_omdb" type="checkbox" name="opt_omdb" value="omdb">OMDB<br><br>
 			<input id="movie_import_start" type="button" value="Import Movies" class="button" onclick="admin_import.movies();" />
 		</div>
 		<div id="cast_import_content" style="margin-top:20px">
