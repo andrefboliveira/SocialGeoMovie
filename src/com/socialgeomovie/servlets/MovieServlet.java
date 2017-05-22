@@ -464,64 +464,64 @@ public class MovieServlet {
 			}
 
 		}
+	}
 
-		@Path("/{movie_uri}/tweets")
-		public MovieTweets tweetsSubResource() {
-			return new MovieTweets();
-		}
+	@Path("/{movie_uri}/tweets")
+	public MovieTweets tweetsSubResource() {
+		return new MovieTweets();
+	}
 
-		public class MovieTweets {
-			@GET
-			@Produces(MediaType.APPLICATION_JSON)
-			public Response tweetsResource(@PathParam("movie_uri") String movie_uri,
-					@DefaultValue("-1") @QueryParam("limit") final int limit,
-					@DefaultValue("1") @QueryParam("page") final int page) {
-				List<LinkedTreeMap> tweets = new ArrayList<LinkedTreeMap>();
-				try {
-					GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
-
-					GetNodeRelationship[] nodeRelationship = Neo4JClient
-							.getNodeRelationshipsByType(movieNodes[0].getSelf(), "talks about");
-
-					int length = nodeRelationship.length;
-
-					int firstResult, lastResult;
-					if (limit > -1) {
-						firstResult = Integer.min(length, ((page - 1) * limit));
-						lastResult = Integer.min(length, (firstResult + limit));
-					} else {
-						firstResult = 0;
-						lastResult = length;
-					}
-
-					for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
-
-						GetNodeRelationship getNodeRelationship = nodeRelationship[nodeNumber];
-						Map<String, Object> nodeInfo = new HashMap<String, Object>();
-
-						String nodeID = getNodeRelationship.getStart();
-						String nodePropertiesURI = Neo4JClient.getNode(nodeID).getProperties();
-
-						LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
-								.getNodeProperties(nodePropertiesURI);
-						tweets.add(propertiesResponse);
-					}
-
-					Gson gson = new Gson();
-					return Response.status(Status.OK).entity(gson.toJson(tweets)).build();
-
-				} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
-					// TODO: handle exception
-					e.printStackTrace();
-					return Response.status(Status.NOT_FOUND).entity("{\"status\":\"NOT FOUND\"}").build();
-				} catch (Exception e) {
-					// TODO: handle exception
-					e.printStackTrace();
-					return Response.status(Status.INTERNAL_SERVER_ERROR)
-							.entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
+	public class MovieTweets {
+		@GET
+		@Produces(MediaType.APPLICATION_JSON)
+		public Response tweetsResource(@PathParam("movie_uri") String movie_uri,
+				@DefaultValue("-1") @QueryParam("limit") final int limit,
+				@DefaultValue("1") @QueryParam("page") final int page) {
+			List<LinkedTreeMap> tweets = new ArrayList<LinkedTreeMap>();
+			try {
+				GetNodesByLabel[] movieNodes = Neo4JClient.getNodesByLabelAndProperty("Movie", "uri", movie_uri);
+	
+				GetNodeRelationship[] nodeRelationship = Neo4JClient
+						.getNodeRelationshipsByType(movieNodes[0].getSelf(), "talks about");
+	
+				int length = nodeRelationship.length;
+	
+				int firstResult, lastResult;
+				if (limit > -1) {
+					firstResult = Integer.min(length, ((page - 1) * limit));
+					lastResult = Integer.min(length, (firstResult + limit));
+				} else {
+					firstResult = 0;
+					lastResult = length;
 				}
-
+	
+				for (int nodeNumber = firstResult; nodeNumber < lastResult; nodeNumber++) {
+	
+					GetNodeRelationship getNodeRelationship = nodeRelationship[nodeNumber];
+					Map<String, Object> nodeInfo = new HashMap<String, Object>();
+	
+					String nodeID = getNodeRelationship.getStart();
+					String nodePropertiesURI = Neo4JClient.getNode(nodeID).getProperties();
+	
+					LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
+							.getNodeProperties(nodePropertiesURI);
+					tweets.add(propertiesResponse);
+				}
+	
+				Gson gson = new Gson();
+				return Response.status(Status.OK).entity(gson.toJson(tweets)).build();
+	
+			} catch (NullPointerException | ArrayIndexOutOfBoundsException e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.NOT_FOUND).entity("{\"status\":\"NOT FOUND\"}").build();
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				return Response.status(Status.INTERNAL_SERVER_ERROR)
+						.entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
 			}
+	
 		}
 	}
 }

@@ -117,7 +117,7 @@ public class Converter {
 		omdbData.put("runtime", runtimeString.split(" ")[0]);
 
 		String genresString = (String) omdbResponse.get("Genre");
-		omdbData.put("genres", genresString.split(", "));
+//		omdbData.put("genres", genresString.split(", "));
 
 		// omdbData.put("overview", omdbResponse.get("Plot"));
 		omdbData.put("homepage", omdbResponse.get("Website"));
@@ -188,7 +188,7 @@ public class Converter {
 			genreList.add(genre.getName());
 		}
 
-		tmdbMovieData.put("genres", genreList);
+//		tmdbMovieData.put("genres", genreList);
 
 		tmdbMovieData.put("title", movie.getTitle());
 		tmdbMovieData.put("popularity", movie.getPopularity());

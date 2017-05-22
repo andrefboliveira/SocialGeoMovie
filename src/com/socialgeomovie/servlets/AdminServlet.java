@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import com.google.gson.Gson;
+import com.socialgeomovie.SaveLocationData;
 import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.clients.NewTwitterClient;
 import com.socialgeomovie.clients.SaveDataClient;
@@ -274,10 +275,30 @@ public class AdminServlet {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response importTweets() {
+	
+		try {
+			SaveDataClient.saveTweets();
+			
+			Map<String, String> report = new HashMap<String, String>();
+			report.put("status", "OK");
+			Gson gson = new Gson();
+			return Response.status(Status.OK).entity(gson.toJson(report)).build();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("{\"status\":\"INTERNAL SERVER ERROR\"}").build();
+		}
+	}
+	
+	@GET
+	@Path("/natural_language")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response importNaturalLanguageResults() {
 		Map<String, String> report = new HashMap<String, String>();
 		report.put("status", "OK");
 		try {
-			SaveDataClient.saveTweets();
+			SaveLocationData.saveData();
 	
 			Gson gson = new Gson();
 			return Response.status(Status.OK).entity(gson.toJson(report)).build();
