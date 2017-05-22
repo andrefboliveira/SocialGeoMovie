@@ -172,7 +172,7 @@ var load_movie_details = function()
 		{
 			var d = data[i];
 			cast_div.prepend(
-			"<a resource=\'http:\/\/dbpedia.org\/resource\/Imdb\' href='"+d.url_imdb+"' style='text-decoration: none;'>"+
+			"<a resource=\'http:\/\/dbpedia.org\/resource\/Imdb\' href='"+d.url_trakt+"' style='text-decoration: none;'>"+
 			"	<div prefix=\'dc: http:\/\/purl.org\/dc\/terms\/ og: http:\/\/ogp.me\/ns# foaf:http:\/\/xmlns.com\/foaf\/0.1\/\' typeof=\'Person\' class='cast'>"+
 			"		<img property='og:image' src='"+((d.profile_image && d.profile_image.indexOf("null") < 0)?d.profile_image:'style/images/people-placeholder.png')+"' title='"+d.name+" as \'"+d.character+"\'' style='width: 70px; height: 105px'>"+
 			"	</div>"+
@@ -335,6 +335,15 @@ var admin_import =
 		
 		if(trakt == true)
 		{
+			/*$("#movie_import_start").toggleClass("loading_button");
+			$.when($.get(url_admin_movie_trakt))
+			.then($.get(url_admin_movie_omdb))
+			.then($.get(url_admin_movie_tmdb))
+			.then($.get(url_admin_movie_process))
+			.then($("#movie_import_start").toggleClass("loading_button"));
+			*/
+			
+			
 			$("#movie_import_start").toggleClass("loading_button");
 			$.get(url_admin_movie_trakt, function(data, status)
 			{
@@ -343,18 +352,23 @@ var admin_import =
 				{
 					$.get(url_admin_movie_omdb, function(data, status)
 					{
-						
-						$.get(url_admin_movie_process, function(data, status)
+						$.get(url_admin_movie_tmdb, function(data, status)
 						{
-							$("#movie_import_start").toggleClass("loading_button");
+							$.get(url_admin_movie_process, function(data, status)
+							{
+								$("#movie_import_start").toggleClass("loading_button");
+							});
 						});
 					});
 				}
 				else
 				{
-					$.get(url_admin_movie_process, function(data, status)
+					$.get(url_admin_movie_tmdb, function(data, status)
 					{
-						$("#movie_import_start").toggleClass("loading_button");
+						$.get(url_admin_movie_process, function(data, status)
+						{
+							$("#movie_import_start").toggleClass("loading_button");
+						});
 					});
 				}	
 			})
