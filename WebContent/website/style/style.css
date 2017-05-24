@@ -1,51 +1,48 @@
-html
-{
+html {
 	height: 100%
 }
 
-body
-{
+body {
 	background: #222;
 	font-size: 14px;
-    line-height: 1em;
-    color: #858585;
+	line-height: 1em;
+	color: #858585;
 	min-height: 100%;
 	font-family: Exo;
 	/*padding: 0 10;*/
-    padding-top: 50px;
+	padding-top: 50px;
 	margin: 0;
 }
 
-#page_header, #page_content
-{
+#page_header, #page_content {
 	width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 .navbar {
-    margin-bottom: 0;
-    background-color: #f4511e;
-    z-index: 9999;
-    border: 0;
-    font-size: 12px !important;
-    line-height: 1.42857143 !important;
-    letter-spacing: 4px;
-    border-radius: 0;
+	margin-bottom: 0;
+	background-color: #f4511e;
+	z-index: 9999;
+	border: 0;
+	font-size: 12px !important;
+	line-height: 1.42857143 !important;
+	letter-spacing: 4px;
+	border-radius: 0;
 }
 
 .navbar li a, .navbar .navbar-brand {
-    color: #fff !important;
+	color: #fff !important;
 }
 
 .navbar-nav li a:hover, .navbar-nav li.active a {
-    color: #f4511e !important;
-    background-color: #fff !important;
+	color: #f4511e !important;
+	background-color: #fff !important;
 }
 
 .navbar-default .navbar-toggle {
-    border-color: transparent;
-    color: #fff !important;
+	border-color: transparent;
+	color: #fff !important;
 }
 
 /*
@@ -80,139 +77,136 @@ nav li a
     border-radius: 5px 5px 0 0;
     line-height: 3;
 }*/
-
-.movie-roll
-{
+.movie-roll {
 	padding: 3px 20px;
 	display: inline-block;
-	background: url(images/border-right.gif) 100% 0px repeat-y, url(images/border-left.gif) 0px 0px repeat-y, #000;
-    background-size: 15px 15px;
+	background: url(images/border-right.gif) 100% 0px repeat-y,
+		url(images/border-left.gif) 0px 0px repeat-y, #000;
+	background-size: 15px 15px;
 	margin: 17px;
 }
 
-.movie-roll img
-{
+.movie-roll img {
 	width: 175px;
 	height: 267px;
 }
 
-#map_container
-{
+#map_container {
 	width: 960px;
 	height: 600px;
 	margin: 0
 }
 
-
-#map
-{
+#map {
 	width: 100%;
 	height: 100%;
 }
 
-
-.detail-left
-{
+.detail-left {
 	width: 60%;
 	text-align: justify;
 	float: left;
 }
 
-.detail-left .label, .detail-left .value
-{
+.detail-left .label, .detail-left .value {
 	display: inline-block;
 }
 
-.detail-right
-{
+.detail-right {
 	width: 35%;
-    text-align: justify;
-    min-height: 200px;
-    float: right;
-	//height: calc(100% - 110px);
+	text-align: justify;
+	min-height: 200px;
+	float: right; //
+	height: calc(100% - 110px);
 	overflow: hidden;
-}	
-
-.detail-right #cast_list
-{
-	height: 350px;
-    overflow-y: auto;
 }
 
-.detail-right #cast_list .cast
-{
-	padding: 2px; 
-	display: inline-block; 
+.detail-right #cast_list {
+	height: 350px;
+	overflow-y: auto;
+}
+
+.detail-right #cast_list .cast {
+	padding: 2px;
+	display: inline-block;
 	margin: 5px;
 	text-align: center;
 	width: 70px;
 }
 
-.detail-right #tweet_list
-{
+.detail-right #tweet_list {
 	height: 700px;
-    overflow-y: auto;
+	overflow-y: auto;
 	cursor: pointer;
-	
 }
 
-.detail-right #tweet_list h4
-{
+.detail-right #tweet_list h4 {
 	margin: 10px 0 15px;
-    text-decoration: underline;
+	text-decoration: underline;
 }
-	
-.detail-right #tweet_list .movie-roll
-{
+
+.detail-right #tweet_list .movie-roll {
 	margin: 10px 0;
-    padding: 5px 30px;
-    color: #858585 !important;
-    font-size: 13px;
+	padding: 5px 30px;
+	color: #858585 !important;
+	font-size: 13px;
 	width: 100%;
 }
-	
-#certification
-{
-	display: inline-block;
-    border: 2px solid;
-    padding: 3px;
-    border-radius: 4px;
-}	
 
-.c3-chart-arcs-title
-{
+#certification {
+	display: inline-block;
+	border: 2px solid;
+	padding: 3px;
+	border-radius: 4px;
+}
+
+.c3-chart-arcs-title {
 	fill: #858585;
 	font-size: 16px !important
 }
-	
-.detail-links
-{
+
+.detail-links {
 	margin-right: 20px;
 	text-decoration: none;
 	color: #858585;
 }
-	
-.button
-{
+
+.button {
 	padding: 10px 40px;
-    cursor: pointer;
-    border: none;
+	cursor: pointer;
+	border: none;
 }
 
-.loading_button
-{
+.loading_button {
 	background-image: url(images/loading-dark.gif);
-    background-repeat: no-repeat;
-    background-size: 20px;
-    background-position: 95% 50%;
+	background-repeat: no-repeat;
+	background-size: 20px;
+	background-position: 95% 50%;
 }
 
-#comments p
-{
+#comments p {
 	display: inline-block
 }
 
-.movie-comment
-{
+.movie-comment {
 	display: block !important;
+}
+
+#search_content {
+	display: block;
+	text-align: center;
+	margin-top: 15px;
+	margin-bottom: 5px;
+	margin-left: 5%;
+	margin-right: 5%;
+}
+
+#searchbox {
+	width: 150px;
+	-webkit-transition: width 0.4s ease-in-out;
+	transition: width 0.4s ease-in-out;
+}
+
+#searchbox:focus {
+	width: 100%;
 }

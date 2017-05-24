@@ -166,8 +166,16 @@ public class Converter {
 				poster.add(baseURL + size + posterPath);
 			}
 		}
-		tmdbMovieData.put("poster", baseURL + posterSize.get(3) + posterPath);
 		tmdbMovieData.put("poster_tmdb", poster);
+		
+		String poster_image = poster.get(3);
+		if (poster_image != null && !("".equals(poster_image))) {
+			tmdbMovieData.put("poster", poster_image);
+
+		} else {
+			tmdbMovieData.put("poster", baseURL + "original" + posterPath);
+		}
+
 
 		String backdropPath = movie.getBackdropPath();
 		List<String> backdropSize = config.getImages().getBackdropSizes();
@@ -257,8 +265,16 @@ public class Converter {
 			}
 		}
 
-		tmdbPersonData.put("profile_image", baseURL + imageSize.get(1) + profilePath);
 		tmdbPersonData.put("profile_image_tmdb", profileImage);
+		
+		String profile_image = profileImage.get(1);
+		if (profile_image != null && !("".equals(profile_image))) {
+			tmdbPersonData.put("profile_image", profile_image);
+		} else {
+			tmdbPersonData.put("profile_image",  baseURL + "original" + profilePath);
+		}
+
+
 
 		return tmdbPersonData;
 

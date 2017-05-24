@@ -35,8 +35,57 @@ var urlParam = function(name)
     }
 }
 
-var fetch_movies= function()
-{
+var searchMovies = function(str) {
+	var url_movie_search = url_base+"/movie/search/?compact=false&include_poster=true&value=";
+
+	if (str.length == 0) {
+    	$("#movie_list").empty();
+		fetch_movies();
+        return;
+    } else {
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+            	var result = JSON.parse(this.responseText);
+            	$("#movie_list").empty();
+            	$.each( result, function( i, item ) 
+            			{
+            				$([
+            					"<span prefix=\'dc: http:\/\/purl.org\/dc\/terms\/ og: http:\/\/ogp.me\/ns#\'><div property='dc:title' class='movie-roll' title='"+item.title+"'>",
+            					"	<a href='movie-details.html?id="+item.uri+"'>",
+            					"		<img property='og:image' src='"+item.poster+"'>",
+            					"	</a>",
+            					"</div></span>"
+            				].join("\n")).appendTo( "#movie_list" );
+            			});
+            }
+        };
+        xmlhttp.open("GET", url_movie_search + str, true);
+        xmlhttp.send();
+    }
+}
+
+var add_search = function(){
+	
+	$("<div id=\"search_content\">	<form><input type=\"text\" name=\"search\" placeholder=\"Search movie by title...\" id=\"searchbox\" onkeyup=\"searchMovies(this.value)\"></form></div>")
+	.prependTo( "#page_content" );
+	
+	/*
+	 $("#searchbox").autocomplete({
+		 	serviceUrl: url_movie_search,
+		    onSelect: function (suggestion) {
+		        alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
+		    }
+	 });
+	 */
+	
+	$("<div id=\"movie_list\"</div>")
+	.appendTo( "#page_content" );
+	
+}
+
+var fetch_movies = function()
+{	
 	$.getJSON( url_all_movies)
 	.done(function( data ) 
 	{
@@ -48,7 +97,7 @@ var fetch_movies= function()
 				"		<img property='og:image' src='"+item.poster+"'>",
 				"	</a>",
 				"</div></span>"
-			].join("\n")).appendTo( "#page_content" );
+			].join("\n")).appendTo( "#movie_list" );
 		});
 	});
 

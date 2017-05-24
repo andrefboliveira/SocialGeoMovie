@@ -25,6 +25,7 @@ import com.socialgeomovie.SaveLocationData;
 import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.clients.NewTwitterClient;
 import com.socialgeomovie.clients.SaveDataClient;
+import com.socialgeomovie.config.Neo4JConfig;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.servlets.MovieServlet.MoviePeople;
@@ -63,7 +64,7 @@ public class AdminServlet {
 		@Path("/trakt")
 		@Consumes(MediaType.APPLICATION_JSON)
 		@Produces(MediaType.APPLICATION_JSON)
-		public Response importTraktMovies(@DefaultValue("10") @QueryParam("quantity") final int quantity) {
+		public Response importTraktMovies(@DefaultValue("20") @QueryParam("quantity") final int quantity) {
 			try {
 				Map<String, URI> moviesReport = SaveDataClient.saveAllTraktMovies(quantity);
 				Map<String, String> report = new HashMap<String, String>();
@@ -154,6 +155,7 @@ public class AdminServlet {
 				Map<String, String> report = new HashMap<String, String>();
 				SaveDataClient.addMovieLinks();
 				SaveDataClient.addMovieDateRelation();
+				Neo4JConfig.cleanDB();
 				report.put("status", "OK");
 				Gson gson = new Gson();
 				return Response.status(Status.OK).entity(gson.toJson(report)).build();
@@ -256,6 +258,8 @@ public class AdminServlet {
 			try {
 				SaveDataClient.addCastLinks();
 				SaveDataClient.addCastDateRelation();
+				Neo4JConfig.cleanDB();
+
 	
 				Map<String, String> report = new HashMap<String, String>();
 				report.put("status", "OK");
