@@ -49,9 +49,11 @@ public class PersonServlet {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPeople(@DefaultValue("false") @QueryParam("include_details") final boolean details,
+	public Response getPeople(
 			@DefaultValue("-1") @QueryParam("limit") final int limit,
-			@DefaultValue("1") @QueryParam("page") final int page) {
+			@DefaultValue("1") @QueryParam("page") final int page,
+			@DefaultValue("false") @QueryParam("include_profile_image") final boolean profile_image,
+			@DefaultValue("false") @QueryParam("include_details") final boolean details) {
 
 		try {
 			List<Map<String, Object>> nodeList = new ArrayList<>();
@@ -76,12 +78,16 @@ public class PersonServlet {
 
 				Map<String, Object> propertiesResponse = getNodesByLabel.getData();
 
-				nodeInfo.put("uri", propertiesResponse.get("uri"));
 
 				if (details) {
 					nodeInfo.putAll(propertiesResponse);
 				} else {
+					nodeInfo.put("uri", propertiesResponse.get("uri"));
 					nodeInfo.put("name", propertiesResponse.get("name"));
+					
+					if (profile_image) {
+						nodeInfo.put("profile_image", propertiesResponse.get("profile_image"));
+					}
 				}
 
 				nodeList.add(nodeInfo);
@@ -221,9 +227,10 @@ public class PersonServlet {
 	@GET
 	@Path("/search")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getPeopleByProperty(@DefaultValue("-1") @QueryParam("limit") final int limit,
+	public Response searchPeopleByProperty(@DefaultValue("-1") @QueryParam("limit") final int limit,
 			@DefaultValue("name") @QueryParam("property") final String propertyName,
 			@QueryParam("value") final String propertyValue,
+			@DefaultValue("false") @QueryParam("include_profile_image") final boolean profile_image,
 			@DefaultValue("false") @QueryParam("include_details") final boolean details) {
 		try {
 
@@ -244,8 +251,12 @@ public class PersonServlet {
 				if (details) {
 					nodeInfo.putAll(resultMap);
 				} else {
-					nodeInfo.put("name", resultMap.get("name"));
 					nodeInfo.put("uri", resultMap.get("uri"));
+					nodeInfo.put("name", resultMap.get("name"));
+					
+					if (profile_image) {
+						nodeInfo.put("profile_image", resultMap.get("profile_image"));
+					}
 
 				}
 
@@ -279,9 +290,10 @@ public class PersonServlet {
 		@GET
 		@Produces(MediaType.APPLICATION_JSON)
 		public Response getMoviePeople(@PathParam("person_uri") String person_uri,
-				@DefaultValue("false") @QueryParam("include_details") final boolean details,
 				@DefaultValue("-1") @QueryParam("limit") final int limit,
-				@DefaultValue("1") @QueryParam("page") final int page) {
+				@DefaultValue("1") @QueryParam("page") final int page,
+				@DefaultValue("false") @QueryParam("include_poster") final boolean poster,
+				@DefaultValue("false") @QueryParam("include_details") final boolean details) {
 			try {
 
 				List<Map<String, Object>> nodeList = new ArrayList<>();
@@ -313,14 +325,19 @@ public class PersonServlet {
 
 					LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
 							.getNodeProperties(nodePropertiesURI);
-
+					
 					String uri = (String) propertiesResponse.get("uri");
 					nodeInfo.put("uri", uri);
-
+					
 					if (details) {
 						nodeInfo.putAll(propertiesResponse);
 					} else {
+						
 						nodeInfo.put("title", propertiesResponse.get("title"));
+						if (poster) {
+							nodeInfo.put("poster", propertiesResponse.get("poster"));
+						}
+
 					}
 
 					nodeInfo.put("character", getNodeRelationship.getData().get("character"));

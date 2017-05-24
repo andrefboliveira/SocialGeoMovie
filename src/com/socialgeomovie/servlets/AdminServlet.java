@@ -25,7 +25,6 @@ import com.socialgeomovie.SaveLocationData;
 import com.socialgeomovie.clients.Neo4JClient;
 import com.socialgeomovie.clients.NewTwitterClient;
 import com.socialgeomovie.clients.SaveDataClient;
-import com.socialgeomovie.clients.OldTwitterClient;
 import com.socialgeomovie.pojos.neo4j.GetNodeRelationship;
 import com.socialgeomovie.pojos.neo4j.GetNodesByLabel;
 import com.socialgeomovie.servlets.MovieServlet.MoviePeople;

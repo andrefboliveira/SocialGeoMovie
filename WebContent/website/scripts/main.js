@@ -1,5 +1,5 @@
 var url_base = "http://localhost:8080/aw2017/rest";
-var url_all_movies = 	url_base+"/movie";
+var url_all_movies = 	url_base+"/movie?include_poster=true";
 var url_movie_details = url_base+"/movie/";
 var url_geo_movie = 	"http://localhost:8080/aw2017/website/geo.json";
 var url_movie_tweets = url_base+"/movie/[ID]/tweets";
@@ -164,7 +164,7 @@ var load_movie_details = function()
 	});
 	
 	var uri = urlParam("id");
-	$.getJSON( url_movie_details+uri+"/people/main?include_details=true")
+	$.getJSON( url_movie_details+uri+"/person/main?include_profile_image=true")
 	.done(function( data ) 
 	{
 		var cast_div = $("#cast_list");

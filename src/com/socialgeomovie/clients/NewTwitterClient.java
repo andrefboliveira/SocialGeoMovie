@@ -52,7 +52,7 @@ public class NewTwitterClient
 				tweet.put("retweet_count", status.getRetweetCount());
 				tweet.put("url", "https://twitter.com/"+tweet.get("user")+"/status/"+status.getId());
 				tweets.add(tweet);
-		        System.out.println("@" + status.getUser().getScreenName() + " : " + status.getText() + " : " + status.getCreatedAt());
+//		        System.out.println("@" + status.getUser().getScreenName() + " : " + status.getText() + " : " + status.getCreatedAt());
 		    }
 		} 
 		catch (TwitterException e)

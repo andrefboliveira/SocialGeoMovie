@@ -54,9 +54,11 @@ public class MovieServlet {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMovies(@DefaultValue("false") @QueryParam("include_details") final boolean details,
+	public Response getMovies(
 			@DefaultValue("-1") @QueryParam("limit") final int limit,
-			@DefaultValue("1") @QueryParam("page") final int page) {
+			@DefaultValue("1") @QueryParam("page") final int page,
+			@DefaultValue("false") @QueryParam("include_poster") final boolean poster,
+			@DefaultValue("false") @QueryParam("include_details") final boolean details) {
 		try {
 			List<Map<String, Object>> nodeList = new ArrayList<>();
 			Gson gson = new Gson();
@@ -79,13 +81,15 @@ public class MovieServlet {
 				Map<String, Object> nodeInfo = new HashMap<String, Object>();
 				Map<String, Object> propertiesResponse = getNodesByLabel.getData();
 
-				nodeInfo.put("uri", propertiesResponse.get("uri"));
 
 				if (details) {
 					nodeInfo.putAll(propertiesResponse);
 				} else {
+					nodeInfo.put("uri", propertiesResponse.get("uri"));
 					nodeInfo.put("title", propertiesResponse.get("title"));
-					nodeInfo.put("poster", propertiesResponse.get("poster"));
+					if (poster) {
+						nodeInfo.put("poster", propertiesResponse.get("poster"));
+					}
 				}
 
 				nodeList.add(nodeInfo);
@@ -217,10 +221,11 @@ public class MovieServlet {
 	@GET
 	@Path("/search")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getMoviesByProperty(@DefaultValue("-1") @QueryParam("limit") final int limit,
+	public Response searchMoviesByProperty(@DefaultValue("-1") @QueryParam("limit") final int limit,
 			@DefaultValue("title") @QueryParam("property") final String propertyName,
 			@QueryParam("value") final String propertyValue,
 			@DefaultValue("true") @QueryParam("compact") final boolean compact_mode,
+			@DefaultValue("false") @QueryParam("include_poster") final boolean poster,
 			@DefaultValue("false") @QueryParam("include_details") final boolean details) {
 		try {
 			List<Object> nodeList = new ArrayList<Object>();
@@ -238,12 +243,18 @@ public class MovieServlet {
 				if (compact_mode) {
 					nodeList.add(resultMap.get(propertyName));
 				} else {
+					
 					if (details) {
 						nodeInfo.putAll(resultMap);
 					} else {
-						nodeInfo.put(propertyName, resultMap.get(propertyName));
 						nodeInfo.put("uri", resultMap.get("uri"));
+						nodeInfo.put(propertyName, resultMap.get(propertyName));
+						
+						if (poster) {
+							nodeInfo.put("poster", resultMap.get("poster"));
+						}
 					}
+					
 					nodeList.add(nodeInfo);
 				}
 			}
@@ -261,7 +272,7 @@ public class MovieServlet {
 	
 	}
 
-	@Path("/{movie_uri}/people")
+	@Path("/{movie_uri}/person")
 	public MoviePeople peopleSubResource() {
 		return new MoviePeople();
 	}
@@ -277,6 +288,7 @@ public class MovieServlet {
 		public Response getMoviePeople(@PathParam("movie_uri") String movie_uri,
 				@DefaultValue("-1") @QueryParam("limit") final int limit,
 				@DefaultValue("1") @QueryParam("page") final int page,
+				@DefaultValue("false") @QueryParam("include_profile_image") final boolean profile_image,
 				@DefaultValue("false") @QueryParam("include_details") final boolean details) {
 
 			try {
@@ -309,15 +321,20 @@ public class MovieServlet {
 
 					LinkedTreeMap<String, Object> propertiesResponse = (LinkedTreeMap<String, Object>) Neo4JClient
 							.getNodeProperties(nodePropertiesURI);
-
+					
 					String uri = (String) propertiesResponse.get("uri");
 					nodeInfo.put("uri", uri);
+					
 
 					if (details) {
 						nodeInfo.putAll(propertiesResponse);
 					} else {
+						
 						nodeInfo.put("name", propertiesResponse.get("name"));
-
+						
+						if (profile_image) {
+							nodeInfo.put("profile_image", propertiesResponse.get("profile_image"));
+						}
 					}
 
 					nodeInfo.put("character", getNodeRelationship.getData().get("character"));
@@ -425,6 +442,7 @@ public class MovieServlet {
 		public Response getMainMoviePeople(@PathParam("movie_uri") String movie_uri,
 				@DefaultValue("popularity") @QueryParam("order_by") final String orderby,
 				@DefaultValue("-1") @QueryParam("limit") final int limit,
+				@DefaultValue("false") @QueryParam("include_profile_image") final boolean profile_image,
 				@DefaultValue("false") @QueryParam("include_details") final boolean details) {
 			try {
 				List<Object> nodeList = new ArrayList<Object>();
@@ -445,6 +463,9 @@ public class MovieServlet {
 					} else {
 						nodeInfo.put("uri", resultMap.get("uri"));
 						nodeInfo.put("name", resultMap.get("name"));
+						if (profile_image) {
+							nodeInfo.put("profile_image", resultMap.get("profile_image"));
+						}
 					}
 					nodeInfo.put("character", relationMap.get("character"));
 					nodeList.add(nodeInfo);
