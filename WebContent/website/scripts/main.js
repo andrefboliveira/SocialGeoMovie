@@ -8,6 +8,7 @@ var url_movie_tweets = url_base+"/movie/[ID]/tweets";
 var url_admin_movie_trakt = url_base+"/db/movies/trakt";
 var url_admin_movie_omdb = url_base+"/db/movies/omdb";
 var url_admin_movie_tmdb = url_base+"/db/movies/tmdb";
+var url_admin_movie_dbpedia = url_base+"/db/movies/dbpedia";
 var url_admin_movie_process = url_base+"/db/movies/process";
 var url_admin_cast_trakt = url_base+"/db/people/cast/trakt";
 var url_admin_cast_tmdb = url_base+"/db/people/cast/tmdb";
@@ -143,6 +144,7 @@ var load_movie_details = function()
 		$("#trakt").attr('href', data.url_trakt);
 		$("#imdb").attr('href', data.url_imdb);
 		$("#tmdb").attr('href', data.url_tmdb);
+		$("#wiki").attr('href', data.url_wikipedia);
 		
 		var chart = c3.generate(
 		{
@@ -223,7 +225,7 @@ var load_movie_details = function()
 			cast_div.prepend(
 			"<a resource=\'http:\/\/dbpedia.org\/resource\/Imdb\' href='"+d.url_trakt+"' style='text-decoration: none;'>"+
 			"	<div prefix=\'dc: http:\/\/purl.org\/dc\/terms\/ og: http:\/\/ogp.me\/ns# foaf:http:\/\/xmlns.com\/foaf\/0.1\/\' typeof=\'Person\' class='cast'>"+
-			"		<img property='og:image' src='"+((d.profile_image && d.profile_image.indexOf("null") < 0)?d.profile_image:'style/images/people-placeholder.png')+"' title='"+d.name+" as \'"+d.character+"\'' style='width: 70px; height: 105px'>"+
+			"		<img property='og:image' src='"+((d.profile_image && d.profile_image.indexOf("null") < 0)?d.profile_image:'style/images/people-placeholder.png')+"' title='"+d.name+" as "+d.character+"' style='width: 70px; height: 105px'>"+
 			"	</div>"+
 			"</a>"
 			);
@@ -403,9 +405,12 @@ var admin_import =
 					{
 						$.get(url_admin_movie_tmdb, function(data, status)
 						{
-							$.get(url_admin_movie_process, function(data, status)
+							$.get(url_admin_movie_dbpedia, function(data, status)
 							{
-								$("#movie_import_start").toggleClass("loading_button");
+								$.get(url_admin_movie_process, function(data, status)
+								{
+									$("#movie_import_start").toggleClass("loading_button");
+								});
 							});
 						});
 					});
@@ -414,9 +419,12 @@ var admin_import =
 				{
 					$.get(url_admin_movie_tmdb, function(data, status)
 					{
-						$.get(url_admin_movie_process, function(data, status)
+						$.get(url_admin_movie_dbpedia, function(data, status)
 						{
-							$("#movie_import_start").toggleClass("loading_button");
+							$.get(url_admin_movie_process, function(data, status)
+							{
+								$("#movie_import_start").toggleClass("loading_button");
+							});
 						});
 					});
 				}	
