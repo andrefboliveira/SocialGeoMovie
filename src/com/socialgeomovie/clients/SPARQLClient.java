@@ -41,9 +41,10 @@ public static String queryDBPediaSPARQL(String query) throws IOException  {
 		return IOUtils.toString(reader);
 	}
 	
-	public static DBpediaMovieResult getDBpediaMovie(String movieName) throws IOException, URISyntaxException {
-		
-		String uriName = movieName.replaceAll(" ", "_");
+	public static DBpediaMovieResult getDBpediaMovie(String movieName, Integer movieYear) throws IOException, URISyntaxException {
+		String movieLabel = movieName + " (film)";
+		String movieYearLabel = movieName + " (" + String.valueOf(movieYear) + " film)";
+
 	
 		String query = "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>                                 " +
 				"PREFIX foaf: <http://xmlns.com/foaf/0.1/>                                                        " +
@@ -51,17 +52,29 @@ public static String queryDBPediaSPARQL(String query) throws IOException  {
 				"                                                                                                 " +
 				"SELECT DISTINCT ?movieResource ?wikipediaPage ?directorName WHERE {                              " +
 				"  {                                                                                              " +
-				"    ?movieResource rdfs:label \"" + movieName + "\"@en.                                              " +
+				"    ?movieResource rdfs:label \"" + movieLabel + "\"@en.                                              " +
 				"                                                                                                 " +
 				"  }                                                                                              " +
 				"  UNION                                                                                          " +
 				"  {                                                                                              " +
-				"    ?altName rdfs:label \"" + movieName + "\"@en ;                                                   " +
+				"    ?movieResource rdfs:label \"" + movieYearLabel + "\"@en.                                              " +
+				"  }                                                                                              " +
+				"  UNION                                                                                          " +
+				"  {                                                                                              " +
+				"    ?altName rdfs:label \"" + movieLabel + "\"@en ;                                                   " +
 				"             dbo:wikiPageRedirects ?movieResource .                                              " +
 				"  }                                                                                              " +
 				"  UNION                                                                                          " +
 				"  {                                                                                              " +
-				" <http://dbpedia.org/resource/" + uriName + ">	dbo:wikiPageRedirects	?movieResource .  " +
+				" <http://dbpedia.org/resource/" + movieName.replaceAll(" ", "_") + ">	dbo:wikiPageRedirects	?movieResource .  " +
+				"  }                                                                                              " +
+				"  UNION                                                                                          " +
+				"  {                                                                                              " +
+				" <http://dbpedia.org/resource/" + movieLabel.replaceAll(" ", "_") + ">	dbo:wikiPageRedirects	?movieResource .  " +
+				"  }                                                                                              " +
+				"  UNION                                                                                          " +
+				"  {                                                                                              " +
+				" <http://dbpedia.org/resource/" + movieYearLabel.replaceAll(" ", "_") + ">	dbo:wikiPageRedirects	?movieResource .  " +
 				"  }                                                                                              " +
 				"	?movieResource a dbo:Film;                                                                    " +
 				"		foaf:isPrimaryTopicOf ?wikipediaPage.                                                     " +
@@ -74,7 +87,6 @@ public static String queryDBPediaSPARQL(String query) throws IOException  {
 				"LIMIT 1";
 
 		String resultString = queryDBPediaSPARQL(query);
-		System.out.println(resultString);
 		return new Gson().fromJson(resultString, DBpediaMovieResult.class);
 	}
 	

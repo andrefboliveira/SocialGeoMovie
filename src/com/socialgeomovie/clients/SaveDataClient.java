@@ -618,8 +618,7 @@ public class SaveDataClient {
 		GetNodesByLabel[] cast = Neo4JClient.getNodesByLabel("Cast");
 		for (GetNodesByLabel getNodesByLabel : cast)
 		{
-			try
-			{
+			
 				Map<String, Object> castProperties = getNodesByLabel.getData();
 				String id_tmdb = (String) castProperties.get("id_tmdb");
 				String name = (String) castProperties.get("name");
@@ -647,8 +646,7 @@ public class SaveDataClient {
 					addNodesResult.put(id_tmdb, nodeURI);
 	
 				}
-			}
-			catch(Exception e) {}
+			
 		}
 		return addNodesResult;
 
@@ -663,11 +661,14 @@ public class SaveDataClient {
 		for (GetNodesByLabel getNodesByLabel : movies) {
 			Map<String, Object> movieProperties = getNodesByLabel.getData();
 			String title = (String) movieProperties.get("title");
+			Double yearDouble = (Double) movieProperties.get("year");
+			Integer year = yearDouble.intValue();
+
 
 			if (title != null && !title.equals("")) {
 				logger.info("Search DBpedia for Movie: " + title);
 
-				DBpediaMovieResult dbpediaResult = SPARQLClient.getDBpediaMovie(title + " (film)");
+				DBpediaMovieResult dbpediaResult = SPARQLClient.getDBpediaMovie(title, year);
 
 				Map<String, Object> resultMap = MapUtils.mergeMapCombine(movieProperties,
 						Converter.dbpediaMovie2Map(dbpediaResult));

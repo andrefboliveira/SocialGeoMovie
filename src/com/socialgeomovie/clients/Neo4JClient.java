@@ -199,8 +199,29 @@ public abstract class Neo4JClient {
 
 		return createSimpleNodeWithProperties(properties);
 	}
+	
+	private static List<String> getNodeLabels(URI nodeUri) {
+		final String nodeLabelsUri = nodeUri.toString() + "/labels";
+		// http://localhost:7474/db/data/node/{nodeID}/labels
 
-	public static ArrayList<String> getAllLabels(String ID) {
+		WebResource resource = createWebResource(nodeLabelsUri);
+
+		ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+
+		if (response.getStatus() != ClientResponse.Status.OK.getStatusCode()) {
+			throw new Neo4JRequestException("Failed! " + response.toString());
+		}
+		
+		String output = response.getEntity(String.class);
+		ArrayList<String> labels = gson.fromJson(output, ArrayList.class);
+		
+		response.close();
+
+		return labels;
+	}
+
+	public static List<String> getAllLabels(String ID) {
 		final String labelsUri = SERVER_ROOT_URI + "labels/";
 
 		WebResource resource = createWebResource(labelsUri);
