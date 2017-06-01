@@ -618,7 +618,7 @@ public class SaveDataClient {
 		GetNodesByLabel[] cast = Neo4JClient.getNodesByLabel("Cast");
 		for (GetNodesByLabel getNodesByLabel : cast)
 		{
-			
+			try{
 				Map<String, Object> castProperties = getNodesByLabel.getData();
 				String id_tmdb = (String) castProperties.get("id_tmdb");
 				String name = (String) castProperties.get("name");
@@ -645,6 +645,9 @@ public class SaveDataClient {
 					logger.info("Added TMDb People info for: " + name);
 					addNodesResult.put(id_tmdb, nodeURI);
 	
+				}
+			} catch (Exception e) {
+					// TODO: handle exception
 				}
 			
 		}
