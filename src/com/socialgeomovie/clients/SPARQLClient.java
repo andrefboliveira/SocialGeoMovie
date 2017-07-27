@@ -85,7 +85,7 @@ public static String queryDBPediaSPARQL(String query) throws IOException  {
 				"		                                                                                          " +
 				"}                                                                                                " +
 				"LIMIT 1";
-
+		System.out.println(query);
 		String resultString = queryDBPediaSPARQL(query);
 		return new Gson().fromJson(resultString, DBpediaMovieResult.class);
 	}
@@ -122,6 +122,8 @@ public static DBpediaPersonResult getDBpediaPerson(String personName) throws IOE
 		"  }                                                                                         " +
 		" }                                                                                          " +
 		"LIMIT 1";
+		
+		System.out.println(query);
 
 		String resultString = queryDBPediaSPARQL(query);
 		return new Gson().fromJson(resultString, DBpediaPersonResult.class);
