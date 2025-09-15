@@ -1,6 +1,6 @@
 # SocialGeoMovie
 
-Group project for the course "Aplicações na Web" / Web Applications for the school year 2016/2017 of the Master's degree in Informatics (Mestrado em Informática) at FCUL/ULisboa
+Group project titled "SocialGeoMovie" for the course "Aplicações na Web" (Web Applications) for the school year 2016/2017 of the Master's degree in Informatics (Mestrado em Informática) at FCUL/ULisboa
 
 ## Project Stack
 Web services (REST), Java, HTML, CSS, JavaScript, d3.js, Neo4J, SPARQL, RDFα
