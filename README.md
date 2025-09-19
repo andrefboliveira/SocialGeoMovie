@@ -24,17 +24,25 @@ The goal of the project was the consumption and implementation of (REST) web ser
 
 For more information, please check the [attached reports](Reports)
 
+## Code structure
+The general organization of the code is as follows:
+- backend code is stored at [/src/com/socialgeomovie](/src/com/socialgeomovie)
+- frontend code is stored at [WebContent](/WebContent) with the main page available at [WebContent/website](/WebContent/website)
+- the clients that interact with the data sources and the Neo4J DB are stored at [clients](/src/com/socialgeomovie/clients)
+- the REST services that expose the data to the frontend are stored at [servlets](/src/com/socialgeomovie/servlets)
+
+
 ## Contributors
 - Alexander José Pereira Fernandes
 - André Filipe Bernardes Oliveira
 - Ricardo Ferreira Vallejo
 - Tânia Sofia Guerreiro Maldonado
 
-My personal contributions (André) to the group project were mainly related with back-end:
-- retrieval of the data from the sources
+My personal contributions (André) to the group project were mainly related with back-end including :
+- retrieval of the data from the movide data sources: from OMDB and TMDB via APIs and from DBpedia via SPARQL endpoint 
 - processing of the received data
-- storage in the NoSQL graph database
-- publishing of web services to expose the data to the front end
+- storing and retriving data from the NoSQL graph database
+- publishing of web services to expose the data from the backend to the front end
 
 ## Note
 This is a mirror of the SVN repository (RiouxSVN) used for the development of this application.
